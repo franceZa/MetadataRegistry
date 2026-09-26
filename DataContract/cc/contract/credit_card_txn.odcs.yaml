@@ -27,7 +27,7 @@ servers:
     environment: dev
     type: custom
     format: csv
-    location: "/Volumes/dev_catalog/landing_cc/files/credit_card_txn/"
+    location: "/Volumes/{catalog}/landing_{source}/files/credit_card_txn/"
 
 slaProperties:
   - property: frequency
@@ -80,6 +80,7 @@ schema:
         physicalType: string
         required: true
         classification: sensitive
+        tags: ["dq:fk"]
         description: "REALITY: one row per file uses a PAN that appears in no
           credit_card file (prawden 8). Also: every txn on
           business_date=2026-09-10 references cards whose master
@@ -115,14 +116,12 @@ schema:
         physicalType: string
         required: true
         classification: none
+        tags: ["dq:valid_values"]
         description: "ISO currency code for transaction amount."
-        quality:
-          - type: library
-            rule: validValues
-            validValues: [THB]
         customProperties:
           - { property: pii, value: false }
           - { property: pci, value: false }
+          - { property: valid_values, value: ["THB"] }
 
       - name: merchant_name
         logicalType: string
@@ -149,14 +148,12 @@ schema:
         physicalType: string
         required: true
         classification: none
+        tags: ["dq:valid_values"]
         description: "Transaction processing result status."
-        quality:
-          - type: library
-            rule: validValues
-            validValues: [APPROVED, DECLINED, REVERSED]
         customProperties:
           - { property: pii, value: false }
           - { property: pci, value: false }
+          - { property: valid_values, value: ["APPROVED", "DECLINED", "REVERSED"] }
 
       - name: business_date
         logicalType: date

@@ -1,0 +1,62 @@
+name: Security (bandit + gitleaks)
+
+# Runs on every push (any branch) and on every PR to master.
+# Either job failing blocks the check; mark both as required checks in
+# branch protection for master to make the block enforceable.
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  bandit:
+    name: Bandit SAST (fail on Medium/High)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      # Bandit severities are LOW / MEDIUM / HIGH (there is no "critical").
+      # --severity-level medium reports only MEDIUM and HIGH, and bandit
+      # exits 1 when it reports anything -> MEDIUM/HIGH fail the job,
+      # LOW findings (e.g. assert in tests) do not.
+      - name: Run bandit
+        run: >
+          uvx --from bandit==1.9.4 bandit
+          -r src tests
+          --severity-level medium
+          --confidence-level low
+          --format txt
+
+  gitleaks:
+    name: Gitleaks secret scan (fail on any finding)
+    runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks (checksum-pinned)
+        run: |
+          curl -sSfL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          ./gitleaks version
+
+      # Scans every commit reachable in the checkout, not only the working
+      # tree, so a secret added and later deleted is still caught.
+      # Exit code 1 on any finding fails the job. --redact keeps the secret
+      # value out of the public log.
+      - name: Scan git history
+        run: ./gitleaks git . --redact --verbose --exit-code 1

@@ -6,3 +6,11 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+qa/
+docs/
+DocsForAgent/
+tickets/
+agent_output/
+handoffs/
+logs/
+.gitleaks-report.json

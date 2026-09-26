@@ -1,0 +1,31 @@
+[
+  {
+    "id": "PL_ALLOWED_KEYS",
+    "description": "Pipeline only allows known keys (FR-B.3)",
+    "scope": "file",
+    "field": "",
+    "operator": "allowed_keys",
+    "value": [
+      "dq_version",
+      "contract_ref",
+      "framework",
+      "columns",
+      "rules",
+      "derived",
+      "business_rules",
+      "actions",
+      "dedup",
+      "load",
+      "retention",
+      "normalise",
+      "tokenise",
+      "quarantine",
+      "dq_policy",
+      "ops",
+      "extensions"
+    ],
+    "message": "Pipeline มี key ที่ไม่อนุญาต (unknown key)",
+    "fix": "ตรวจสอบการสะกดชื่อ key ในไฟล์ pipeline หรือย้ายไปใส่ใน extensions",
+    "severity": "error"
+  }
+]

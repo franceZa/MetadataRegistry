@@ -3,12 +3,12 @@
 # =============================================================================
 # วิธีใช้:
 #   1. copy ไฟล์นี้ไปที่ DataContract/<source>/contract/<dataset>.odcs.yaml
-#   2. copy ไฟล์ dq คู่กันไปที่ DataContract/<source>/dq/<dataset>.dq.yaml
+#   2. copy ไฟล์ pipeline คู่กันไปที่ DataContract/<source>/pipeline/<dataset>.pipeline.yaml
 #   3. แก้ค่าทุกตัวที่ขึ้นต้นด้วย my_ / example
 #   4. รัน:  uv run mdf validate
 #
 # ไฟล์นี้เก็บเฉพาะ "สิ่งที่ต้นทางรับปาก" (schema, ประเภทข้อมูล PDPA/PCI, SLA, ที่วางไฟล์)
-# ห้ามใส่: derived column, dedup, business rule, retention -> ไปใส่ในไฟล์ dq
+# ห้ามใส่: derived column, dedup, business rule, retention -> ไปใส่ในไฟล์ pipeline
 # กฎทั้งหมดที่ใช้ตรวจอยู่ที่ metadata/_rules/rules.yaml
 # =============================================================================
 
@@ -34,7 +34,7 @@ servers:
     environment: dev
     type: custom
     format: csv # csv | json | jsonl | parquet
-    location: "/Volumes/dev_catalog/landing_my_source/files/my_dataset/"
+    location: "/Volumes/{catalog}/landing_{source}/files/my_dataset/"
 
 slaProperties:
   - property: frequency
@@ -88,6 +88,7 @@ schema:
         classification: sensitive
         logicalTypeOptions:
           pattern: "^[0-9]{13}$" # regex ที่ต้นทางรับปาก
+        tags: ["dq:pattern"]
         description: "เลขประจำตัวประชาชน 13 หลัก ถูกแปลงเป็น token ตอนเขียน silver"
         customProperties:
           - { property: pii, value: true }
@@ -108,14 +109,12 @@ schema:
         physicalType: string
         required: true
         classification: none
+        tags: ["dq:valid_values"]
         description: "สถานะของรายการ (ตัวอย่าง allowed values)"
-        quality:
-          - type: library
-            rule: validValues
-            validValues: [ACTIVE, CLOSED]
         customProperties:
           - { property: pii, value: false }
           - { property: pci, value: false }
+          - { property: valid_values, value: ["ACTIVE", "CLOSED"] }
 
       - name: business_date
         logicalType: date

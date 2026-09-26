@@ -1,0 +1,10 @@
+env: dev
+catalog: dev_catalog
+landing_volume_prefix: "/Volumes/{catalog}/landing_{source}/"
+secret_scope: "mdf-dev"
+dummy: false
+workspace_host: "https://adb-dev.azuredatabricks.net"
+timezone: "Asia/Bangkok"
+default_catalog: false
+cluster_policy: null
+schedules: {}
