@@ -1,9 +1,7 @@
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
-
-import yaml
+from typing import Any
 
 from mdf.loading import discover_datasets, load_yaml, load_yaml_file
 
@@ -11,15 +9,17 @@ from mdf.loading import discover_datasets, load_yaml, load_yaml_file
 @dataclass
 class ChangeRecord:
     kind: str  # "breaking" | "non_breaking" | "info"
-    category: str  # e.g. "column_removed", "column_type_changed", "required_changed", "library_rule_changed", "library_rule_disabled"
+    # e.g. "column_removed", "column_type_changed", "required_changed",
+    # "library_rule_changed", "library_rule_disabled"
+    category: str
     dataset: str
     detail: str
-    fix: Optional[str] = None
+    fix: str | None = None
 
 
 @dataclass
 class DiffResult:
-    changes: List[ChangeRecord] = field(default_factory=list)
+    changes: list[ChangeRecord] = field(default_factory=list)
 
     @property
     def has_breaking(self) -> bool:
@@ -44,7 +44,7 @@ class DiffResult:
         return "\n".join(lines)
 
 
-def _git_show_file(rev: str, path: str) -> Optional[str]:
+def _git_show_file(rev: str, path: str) -> str | None:
     """Read a file's content at a git revision. Returns None if not present."""
     try:
         result = subprocess.run(
@@ -61,11 +61,12 @@ def _git_show_file(rev: str, path: str) -> Optional[str]:
         return None
 
 
-def load_baseline_contracts(rev: str, base_dir: Path | str = "DataContract") -> Dict[str, Dict[str, Any]]:
+def load_baseline_contracts(
+    rev: str, base_dir: Path | str = "DataContract"
+) -> dict[str, dict[str, Any]]:
     """Load all contract YAMLs from a git revision, keyed by contract id."""
-    base = str(base_dir).replace("\\", "/")
     # Discover dataset list from current workspace layout (filenames are stable across revs here)
-    baseline: Dict[str, Dict[str, Any]] = {}
+    baseline: dict[str, dict[str, Any]] = {}
     datasets = discover_datasets(base_dir)
     for ds in datasets:
         rel = str(ds.contract_path).replace("\\", "/")
@@ -78,7 +79,9 @@ def load_baseline_contracts(rev: str, base_dir: Path | str = "DataContract") -> 
     return baseline
 
 
-def load_baseline_library(rev: str, library_path: str = "config/dq_library.yaml") -> Optional[Dict[str, Any]]:
+def load_baseline_library(
+    rev: str, library_path: str = "config/dq_library.yaml"
+) -> dict[str, Any] | None:
     """Load DQ library from a git revision."""
     content = _git_show_file(rev, library_path)
     if content is None:
@@ -86,8 +89,8 @@ def load_baseline_library(rev: str, library_path: str = "config/dq_library.yaml"
     return load_yaml(content, filepath=f"{rev}:{library_path}")
 
 
-def _contract_columns(contract: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    cols: Dict[str, Dict[str, Any]] = {}
+def _contract_columns(contract: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    cols: dict[str, dict[str, Any]] = {}
     for s in contract.get("schema", []) or []:
         if isinstance(s, dict):
             for p in s.get("properties", []) or []:
@@ -104,9 +107,9 @@ def _major_version(version: str) -> int:
 
 
 def diff_contracts(
-    current: Dict[str, Dict[str, Any]],
-    baseline: Dict[str, Dict[str, Any]],
-) -> List[ChangeRecord]:
+    current: dict[str, dict[str, Any]],
+    baseline: dict[str, dict[str, Any]],
+) -> list[ChangeRecord]:
     """
     Compare current contracts against baseline, detecting breaking changes per AC-13:
     - Column removed without major version bump -> breaking
@@ -114,7 +117,7 @@ def diff_contracts(
     - required true->false without major bump -> breaking (semantic)
     - With major bump: reported as info/impact but not breaking
     """
-    changes: List[ChangeRecord] = []
+    changes: list[ChangeRecord] = []
 
     for cid, cur in current.items():
         base = baseline.get(cid)
@@ -124,12 +127,14 @@ def diff_contracts(
                     kind="info",
                     category="new_dataset",
                     dataset=cid,
-                    detail=f"Dataset ใหม่ (ไม่มีใน baseline)",
+                    detail="Dataset ใหม่ (ไม่มีใน baseline)",
                 )
             )
             continue
 
-        major_bumped = _major_version(cur.get("version", "0")) > _major_version(base.get("version", "0"))
+        major_bumped = _major_version(cur.get("version", "0")) > _major_version(
+            base.get("version", "0")
+        )
 
         cur_cols = _contract_columns(cur)
         base_cols = _contract_columns(base)
@@ -142,7 +147,8 @@ def diff_contracts(
                         kind="info",
                         category="column_removed_bumped",
                         dataset=cid,
-                        detail=f"ลบคอลัมน์ '{col_name}' (major version bumped แล้ว — รายงาน impact อย่างเดียว)",
+                        detail=f"ลบคอลัมน์ '{col_name}' (major version bumped แล้ว — รายงาน impact "
+                        "อย่างเดียว)",
                         fix="ตรวจสอบ downstream consumers ของคอลัมน์นี้",
                     )
                 )
@@ -152,8 +158,10 @@ def diff_contracts(
                         kind="breaking",
                         category="column_removed",
                         dataset=cid,
-                        detail=f"ลบคอลัมน์ '{col_name}' โดยไม่ bump major version (base v{base.get('version')} → cur v{cur.get('version')})",
-                        fix=f"กู้คืนคอลัมน์ หรือ bump major version (เช่น {int(str(base.get('version','1.0.0')).split('.')[0]) + 1}.0.0)",
+                        detail=f"ลบคอลัมน์ '{col_name}' โดยไม่ bump major version (base "
+                        f"v{base.get('version')} → cur v{cur.get('version')})",
+                        fix="กู้คืนคอลัมน์ หรือ bump major version (เช่น "
+                        f"{int(str(base.get('version', '1.0.0')).split('.')[0]) + 1}.0.0)",
                     )
                 )
 
@@ -172,7 +180,8 @@ def diff_contracts(
                     )
                 )
 
-            # required true -> false is a relaxation; false -> true is stricter (breaking for producers)
+            # required true -> false is a relaxation;
+            # false -> true is stricter (breaking for producers)
             cur_req = cur_cols[col_name].get("required")
             base_req = base_cols[col_name].get("required")
             if base_req and not cur_req:
@@ -190,7 +199,8 @@ def diff_contracts(
                         kind="breaking" if not major_bumped else "info",
                         category="required_strictened",
                         dataset=cid,
-                        detail=f"คอลัมน์ '{col_name}' เปลี่ยน required: false → true (เข้มงวดขึ้น — source ต้องส่งค่าเสมอ)",
+                        detail=f"คอลัมน์ '{col_name}' เปลี่ยน required: false → true (เข้มงวดขึ้น — "
+                        "source ต้องส่งค่าเสมอ)",
                     )
                 )
 
@@ -209,13 +219,13 @@ def diff_contracts(
 
 
 def diff_library(
-    current_lib: Dict[str, Any],
-    baseline_lib: Optional[Dict[str, Any]],
-) -> List[ChangeRecord]:
+    current_lib: dict[str, Any],
+    baseline_lib: dict[str, Any] | None,
+) -> list[ChangeRecord]:
     """
     Compare DQ library versions (DQ-6, FR-C.7): rule changes and disabled rules are reported.
     """
-    changes: List[ChangeRecord] = []
+    changes: list[ChangeRecord] = []
     if baseline_lib is None:
         return changes
 
@@ -262,12 +272,12 @@ def diff_library(
 def blast_radius(
     rule_name: str,
     base_dir: Path | str = "DataContract",
-) -> List[Dict[str, str]]:
+) -> list[dict[str, str]]:
     """
     Compute blast radius of a DQ library rule: every dataset/column using it
     via dq: tags (AC-24, DQ-6).
     """
-    affected: List[Dict[str, str]] = []
+    affected: list[dict[str, str]] = []
     for ds in discover_datasets(base_dir):
         contract = load_yaml_file(ds.contract_path)
         for s in contract.get("schema", []) or []:
@@ -293,7 +303,7 @@ def run_diff(rev: str, base_dir: Path | str = "DataContract") -> DiffResult:
     Run a full diff of the current workspace against a git baseline revision.
     Returns a DiffResult; has_breaking is True when AC-13-breaking changes exist.
     """
-    current_contracts: Dict[str, Dict[str, Any]] = {}
+    current_contracts: dict[str, dict[str, Any]] = {}
     for ds in discover_datasets(base_dir):
         data = load_yaml_file(ds.contract_path)
         if isinstance(data, dict) and "id" in data:

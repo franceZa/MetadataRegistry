@@ -1,5 +1,7 @@
 import json
+
 import pytest
+
 from mdf.rules import (
     Rule,
     RuleConfigError,
@@ -8,6 +10,7 @@ from mdf.rules import (
     load_rules_json,
     validate_rule_definition,
 )
+
 
 def test_validate_rule_definition_valid():
     rule_dict = {
@@ -25,6 +28,7 @@ def test_validate_rule_definition_valid():
     assert rule.operator == "required"
     assert "R001" in seen
 
+
 def test_validate_rule_definition_duplicate_id():
     rule_dict = {
         "id": "R001",
@@ -39,6 +43,7 @@ def test_validate_rule_definition_duplicate_id():
         validate_rule_definition(rule_dict, seen)
     assert "Duplicate rule id 'R001'" in str(exc_info.value)
 
+
 def test_validate_rule_definition_missing_desc():
     rule_dict = {
         "id": "R002",
@@ -52,6 +57,7 @@ def test_validate_rule_definition_missing_desc():
         validate_rule_definition(rule_dict, set())
     assert "description" in str(exc_info.value)
 
+
 def test_validate_rule_definition_unknown_operator():
     rule_dict = {
         "id": "R003",
@@ -64,6 +70,7 @@ def test_validate_rule_definition_unknown_operator():
     with pytest.raises(RuleConfigError) as exc_info:
         validate_rule_definition(rule_dict, set())
     assert "Unknown operator" in str(exc_info.value)
+
 
 def test_load_rules_json(tmp_path):
     rules_file = tmp_path / "test.rules.json"
@@ -81,6 +88,7 @@ def test_load_rules_json(tmp_path):
     loaded = load_rules_json(rules_file)
     assert len(loaded) == 1
     assert loaded[0].id == "T01"
+
 
 def test_evaluate_operators():
     # required
@@ -107,6 +115,7 @@ def test_evaluate_operators():
     assert evaluate_operator("allowed_keys", data, ["name"]) is True
     data_bad = {"name": "test", "unknown": 456}
     assert evaluate_operator("allowed_keys", data_bad, ["name"]) is False
+
 
 def test_evaluate_rules_property_scope():
     rules = [

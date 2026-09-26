@@ -1,6 +1,7 @@
 import json
+
 import pytest
-from pathlib import Path
+
 from mdf.package import (
     ReleaseGateError,
     TamperError,
@@ -39,6 +40,7 @@ def test_verify_intact_package_passes(built_package):
 def test_verify_detects_one_byte_tampering(built_package, tmp_path):
     """AC-15/AC-16: flipping 1 byte in a packaged file is detected (TAMPERED)."""
     import shutil
+
     tampered_dir = tmp_path / "tampered_pkg"
     shutil.copytree(built_package, tampered_dir)
 
@@ -59,6 +61,7 @@ def test_verify_detects_one_byte_tampering(built_package, tmp_path):
 def test_verify_detects_missing_file(built_package, tmp_path):
     """A file removed from the package is detected."""
     import shutil
+
     broken_dir = tmp_path / "missing_pkg"
     shutil.copytree(built_package, broken_dir)
     (broken_dir / "bronze.cc.customer.resolved.json").unlink()
@@ -71,6 +74,7 @@ def test_verify_detects_missing_file(built_package, tmp_path):
 def test_verify_detects_extra_file(built_package, tmp_path):
     """An unlisted extra file is detected."""
     import shutil
+
     extra_dir = tmp_path / "extra_pkg"
     shutil.copytree(built_package, extra_dir)
     (extra_dir / "sneaky_file.json").write_text("{}", encoding="utf-8")
@@ -99,10 +103,14 @@ def test_release_gate_placeholder_secret_scope(tmp_path):
     cfg = tmp_path / "config"
     (cfg / "env").mkdir(parents=True)
     (cfg / "env" / "todoscope.yaml").write_text(
-        "env: todoscope" + chr(10)
-        + "catalog: c" + chr(10)
-        + "dummy: false" + chr(10)
-        + 'secret_scope: "<TODO:set-me>"' + chr(10),
+        "env: todoscope"
+        + chr(10)
+        + "catalog: c"
+        + chr(10)
+        + "dummy: false"
+        + chr(10)
+        + 'secret_scope: "<TODO:set-me>"'
+        + chr(10),
         encoding="utf-8",
     )
     with pytest.raises(ReleaseGateError) as exc_info:

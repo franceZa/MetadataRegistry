@@ -3,6 +3,7 @@
 Runs the actual CLI entrypoint through the complete workflow:
 validate -> compile -> diff -> package -> verify-package -> trace
 """
+
 import json
 import time
 from pathlib import Path

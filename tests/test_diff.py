@@ -1,7 +1,4 @@
-import pytest
-from pathlib import Path
 from mdf.diff import (
-    DiffResult,
     blast_radius,
     diff_contracts,
     diff_library,
@@ -70,7 +67,9 @@ def test_dataset_removed_is_breaking():
 
 def test_no_changes_no_diff():
     baseline = {"cc.credit_card_txn": _mk_contract("cc.credit_card_txn", "1.0.0", BASE_TXN_COLS)}
-    current = {"cc.credit_card_txn": _mk_contract("cc.credit_card_txn", "1.0.0", dict(BASE_TXN_COLS))}
+    current = {
+        "cc.credit_card_txn": _mk_contract("cc.credit_card_txn", "1.0.0", dict(BASE_TXN_COLS))
+    }
     changes = diff_contracts(current, baseline)
     assert changes == []
 

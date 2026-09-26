@@ -1,10 +1,11 @@
 import pytest
+
 from mdf.dq import (
     DQLibrary,
     DQValidationError,
     resolve_column_dq_rules,
 )
-from mdf.rules import RuleConfigError
+
 
 def test_load_official_dq_library():
     lib = DQLibrary.load("config/dq_library.yaml")
@@ -15,6 +16,7 @@ def test_load_official_dq_library():
     assert "fk" in lib.rules
     assert lib.rules["not_null"].kind == "sql"
     assert lib.rules["luhn"].kind == "function"
+
 
 def test_resolve_auto_and_tags():
     lib = DQLibrary.load("config/dq_library.yaml")
@@ -34,6 +36,7 @@ def test_resolve_auto_and_tags():
     assert "card_pan IS NULL OR card_pan RLIKE ^[0-9]{15,16}$" in pattern_rule.sql
     assert pattern_rule.action == "reject"
 
+
 def test_action_override_from_pipeline():
     lib = DQLibrary.load("config/dq_library.yaml")
     col_def = {
@@ -47,6 +50,7 @@ def test_action_override_from_pipeline():
     pattern_rule = next(r for r in rules if r.rule_name == "pattern")
     assert pattern_rule.action == "flag"
 
+
 def test_error_unknown_tag():
     lib = DQLibrary.load("config/dq_library.yaml")
     col_def = {
@@ -56,6 +60,7 @@ def test_error_unknown_tag():
     with pytest.raises(DQValidationError) as exc:
         resolve_column_dq_rules(col_def, lib)
     assert exc.value.code == "UNKNOWN_TAG"
+
 
 def test_error_tag_without_param():
     lib = DQLibrary.load("config/dq_library.yaml")
@@ -68,6 +73,7 @@ def test_error_tag_without_param():
         resolve_column_dq_rules(col_def, lib)
     assert exc.value.code == "TAG_WITHOUT_PARAM"
 
+
 def test_error_param_without_tag():
     lib = DQLibrary.load("config/dq_library.yaml")
     col_def = {
@@ -78,6 +84,7 @@ def test_error_param_without_tag():
     with pytest.raises(DQValidationError) as exc:
         resolve_column_dq_rules(col_def, lib)
     assert exc.value.code == "PARAM_WITHOUT_TAG"
+
 
 def test_error_use_tag_when_quality_present():
     lib = DQLibrary.load("config/dq_library.yaml")

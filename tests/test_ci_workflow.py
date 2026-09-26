@@ -1,8 +1,9 @@
 import os
 import subprocess
+from pathlib import Path
+
 import pytest
 import yaml
-from pathlib import Path
 
 CI_YML = Path(".github/workflows/ci.yml")
 
@@ -12,6 +13,7 @@ def _load_ci():
 
 
 # ---------- AC-19: Static safety checks ----------
+
 
 def test_ac19_trigger_targets_master():
     ci = _load_ci()
@@ -62,6 +64,7 @@ def test_ac19_ci_steps_complete_fr_h1():
 
 
 # ---------- AC-34: Run the same steps locally ----------
+
 
 def _run(args, env=None):
     # args is a list and shell is not used: no shell injection (bandit B602)

@@ -1,18 +1,16 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-from mdf.loading import discover_datasets
+from typing import Any
 
 
 @dataclass
 class OrphanReport:
-    orphan_contracts: List[str]
-    orphan_pipelines: List[str]
+    orphan_contracts: list[str]
+    orphan_pipelines: list[str]
 
 
-def load_dataset(env: str, source: str, dataset: str, layer: str) -> Dict[str, Any]:
+def load_dataset(env: str, source: str, dataset: str, layer: str) -> dict[str, Any]:
     """
     Load a resolved dataset config from build/<env>/resolved/ (getter per FR-G).
     Raises FileNotFoundError if not compiled yet.
@@ -26,7 +24,7 @@ def load_dataset(env: str, source: str, dataset: str, layer: str) -> Dict[str, A
         return json.load(f)
 
 
-def trace_table(table_name: str, env: str = "dev") -> Dict[str, Any]:
+def trace_table(table_name: str, env: str = "dev") -> dict[str, Any]:
     """
     Trace a resolved target table back to its sources (AC-18, FR-G).
     Accepts table names like 'silver.cc.credit_card_txn' or 'bronze.cc.credit_card'.
@@ -44,7 +42,7 @@ def trace_table(table_name: str, env: str = "dev") -> Dict[str, Any]:
 
     lineage = resolved.get("lineage", {})
 
-    trace_result: Dict[str, Any] = {
+    trace_result: dict[str, Any] = {
         "table": resolved.get("table"),
         "layer": layer,
         "config_id": resolved.get("config_id"),
@@ -72,7 +70,7 @@ def trace_table(table_name: str, env: str = "dev") -> Dict[str, Any]:
     return trace_result
 
 
-def format_trace(trace: Dict[str, Any]) -> str:
+def format_trace(trace: dict[str, Any]) -> str:
     """Format a trace result as human-readable output (Thai)."""
     lines = [
         f"📊 Lineage: {trace['table']}",
@@ -82,7 +80,8 @@ def format_trace(trace: Dict[str, Any]) -> str:
     if trace.get("bronze_input"):
         b = trace["bronze_input"]
         lines.append(
-            f"   Bronze input: {b['table']} (contract {b['contract_id']}, sha256 {b['contract_sha256'][:12]}…)"
+            f"   Bronze input: {b['table']} (contract {b['contract_id']}, sha256 "
+            f"{b['contract_sha256'][:12]}…)"
         )
     lines.extend(
         [
@@ -106,8 +105,8 @@ def find_orphans(base_dir: Path | str = "DataContract") -> OrphanReport:
     is done manually here to enumerate rather than fail.
     """
     base = Path(base_dir)
-    orphan_contracts: List[str] = []
-    orphan_pipelines: List[str] = []
+    orphan_contracts: list[str] = []
+    orphan_pipelines: list[str] = []
 
     for src_dir in sorted(base.iterdir()) if base.exists() else []:
         if not src_dir.is_dir() or src_dir.name.startswith("_") or src_dir.name.startswith("."):

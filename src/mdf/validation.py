@@ -1,7 +1,8 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
+
 import jsonschema
 
 from mdf.dq import DQLibrary, DQValidationError, resolve_column_dq_rules
@@ -11,7 +12,7 @@ from mdf.loading import (
     discover_datasets,
     load_yaml_file,
 )
-from mdf.rules import Rule, RuleViolation, evaluate_rules, load_rules_json
+from mdf.rules import Rule, evaluate_rules, load_rules_json
 
 
 @dataclass
@@ -19,8 +20,8 @@ class ValidationIssue:
     code: str
     message: str
     file_path: str
-    field: Optional[str] = None
-    fix: Optional[str] = None
+    field: str | None = None
+    fix: str | None = None
     severity: str = "error"  # "error" | "warning"
 
     def format_thai(self) -> str:
@@ -35,18 +36,18 @@ class ValidationIssue:
 
 @dataclass
 class ValidationReport:
-    issues: List[ValidationIssue] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
 
     @property
     def is_valid(self) -> bool:
         return not any(i.severity == "error" for i in self.issues)
 
     @property
-    def errors(self) -> List[ValidationIssue]:
+    def errors(self) -> list[ValidationIssue]:
         return [i for i in self.issues if i.severity == "error"]
 
     @property
-    def warnings(self) -> List[ValidationIssue]:
+    def warnings(self) -> list[ValidationIssue]:
         return [i for i in self.issues if i.severity == "warning"]
 
     def add_error(
@@ -54,8 +55,8 @@ class ValidationReport:
         code: str,
         message: str,
         file_path: str,
-        field: Optional[str] = None,
-        fix: Optional[str] = None,
+        field: str | None = None,
+        fix: str | None = None,
     ) -> None:
         self.issues.append(
             ValidationIssue(
@@ -73,8 +74,8 @@ class ValidationReport:
         code: str,
         message: str,
         file_path: str,
-        field: Optional[str] = None,
-        fix: Optional[str] = None,
+        field: str | None = None,
+        fix: str | None = None,
     ) -> None:
         self.issues.append(
             ValidationIssue(
@@ -92,11 +93,14 @@ class ValidationReport:
             warn_msg = f" (พบข้อควรระวัง {len(self.warnings)} รายการ)" if self.warnings else ""
             return f"✅ การตรวจสอบความถูกต้องผ่านเรียบร้อย (PASS){warn_msg}"
 
-        grouped: Dict[str, List[ValidationIssue]] = {}
+        grouped: dict[str, list[ValidationIssue]] = {}
         for issue in self.issues:
             grouped.setdefault(issue.file_path, []).append(issue)
 
-        out = [f"❌ ตรวจพบข้อผิดพลาด {len(self.errors)} รายการ (และคำเตือน {len(self.warnings)} รายการ):\n"]
+        out = [
+            f"❌ ตรวจพบข้อผิดพลาด {len(self.errors)} รายการ (และคำเตือน {len(self.warnings)} "
+            "รายการ):\n"
+        ]
         for file_path, items in grouped.items():
             out.append(f"📁 ไฟล์: {file_path}")
             for item in items:
@@ -105,9 +109,9 @@ class ValidationReport:
         return "\n".join(out)
 
 
-def get_contract_column_names(contract_data: Dict[str, Any]) -> Set[str]:
+def get_contract_column_names(contract_data: dict[str, Any]) -> set[str]:
     """Extract all column names defined in contract schema properties."""
-    columns: Set[str] = set()
+    columns: set[str] = set()
     schemas = contract_data.get("schema", [])
     if isinstance(schemas, list):
         for s in schemas:
@@ -123,10 +127,10 @@ def get_contract_column_names(contract_data: Dict[str, Any]) -> Set[str]:
 def validate_contract_file(
     contract_path: Path,
     odcs_schema_validator: jsonschema.Draft202012Validator,
-    contract_rules: List[Rule],
+    contract_rules: list[Rule],
     dq_library: DQLibrary,
     report: ValidationReport,
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Validate a single ODCS DataContract file."""
     path_str = str(contract_path)
     try:
@@ -171,9 +175,13 @@ def validate_contract_file(
     violations = evaluate_rules(contract_rules, data)
     for v in violations:
         if v.severity == "warning":
-            report.add_warning(code=v.rule_id, message=v.message, file_path=path_str, field=v.path, fix=v.fix)
+            report.add_warning(
+                code=v.rule_id, message=v.message, file_path=path_str, field=v.path, fix=v.fix
+            )
         else:
-            report.add_error(code=v.rule_id, message=v.message, file_path=path_str, field=v.path, fix=v.fix)
+            report.add_error(
+                code=v.rule_id, message=v.message, file_path=path_str, field=v.path, fix=v.fix
+            )
 
     # 3. Validate DQ tags & quality[]
     schemas = data.get("schema", [])
@@ -196,7 +204,8 @@ def validate_contract_file(
                                     fix=(
                                         "ลบ 'quality[]' และเปลี่ยนไปใช้ 'tags: [dq:<rule>]'"
                                         if dq_err.code == "USE_TAG"
-                                        else "ตรวจสอบนิยามใน config/dq_library.yaml และพารามิเตอร์ที่จำเป็น"
+                                        else "ตรวจสอบนิยามใน config/dq_library.yaml "
+                                        "และพารามิเตอร์ที่จำเป็น"
                                     ),
                                 )
 
@@ -205,10 +214,10 @@ def validate_contract_file(
 
 def validate_pipeline_file(
     pipeline_path: Path,
-    pipeline_rules: List[Rule],
-    contract_data: Optional[Dict[str, Any]],
+    pipeline_rules: list[Rule],
+    contract_data: dict[str, Any] | None,
     report: ValidationReport,
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Validate a single Pipeline file and its cross-references to contract."""
     path_str = str(pipeline_path)
     try:
@@ -240,7 +249,9 @@ def validate_pipeline_file(
     # 1. Structural rules (unknown keys check via allowed_keys)
     violations = evaluate_rules(pipeline_rules, data)
     for v in violations:
-        report.add_error(code=v.rule_id, message=v.message, file_path=path_str, field=v.path, fix=v.fix)
+        report.add_error(
+            code=v.rule_id, message=v.message, file_path=path_str, field=v.path, fix=v.fix
+        )
 
     # 2. Cross-reference checks against contract schema
     if contract_data:
@@ -253,10 +264,12 @@ def validate_pipeline_file(
                 if col_name not in contract_cols:
                     report.add_error(
                         code="UNKNOWN_COLUMN_REF",
-                        message=f"Pipeline กำหนด configuration ให้คอลัมน์ '{col_name}' แต่ไม่มีคอลัมน์นี้ใน DataContract",
+                        message=f"Pipeline กำหนด configuration ให้คอลัมน์ '{col_name}' แต่ไม่มีคอลัมน์นี้ใน "
+                        "DataContract",
                         file_path=path_str,
                         field=f"columns.{col_name}",
-                        fix=f"ตรวจสอบชื่อคอลัมน์ให้ตรงกับ DataContract (คอลัมน์ที่มี: {sorted(contract_cols)})",
+                        fix="ตรวจสอบชื่อคอลัมน์ให้ตรงกับ DataContract (คอลัมน์ที่มี: "
+                        f"{sorted(contract_cols)})",
                     )
 
         # Check actions block
@@ -268,7 +281,8 @@ def validate_pipeline_file(
                     if col_name not in contract_cols:
                         report.add_error(
                             code="UNKNOWN_COLUMN_REF",
-                            message=f"Action '{action_key}' อ้างถึงคอลัมน์ '{col_name}' ที่ไม่มีใน DataContract",
+                            message=f"Action '{action_key}' อ้างถึงคอลัมน์ '{col_name}' ที่ไม่มีใน "
+                            "DataContract",
                             file_path=path_str,
                             field=f"actions.{action_key}",
                             fix="ตรวจสอบชื่อคอลัมน์ใน action ให้ตรงกับ DataContract",
@@ -315,7 +329,7 @@ def validate_project(
         report.add_warning("NO_DATASETS", "ไม่พบ dataset ในโฟลเดอร์ DataContract", str(base_dir))
         return report
 
-    contracts_by_id: Dict[str, Tuple[Path, Dict[str, Any]]] = {}
+    contracts_by_id: dict[str, tuple[Path, dict[str, Any]]] = {}
 
     # Validate each discovered dataset
     for ds in datasets:
@@ -344,16 +358,17 @@ def validate_project(
 
 
 def validate_foreign_key_references(
-    contracts_by_id: Dict[str, Tuple[Path, Dict[str, Any]]],
+    contracts_by_id: dict[str, tuple[Path, dict[str, Any]]],
     report: ValidationReport,
 ) -> None:
     """
-    Validate foreign_key config references across datasets according to FR-B.14, D-P4-7 ก, and AC-33.
+    Validate foreign_key config references across datasets
+    (FR-B.14, D-P4-7 ก, AC-33).
     Format must be <source>.<dataset>.<column>.
     """
     # Build column lookup: "<source>.<dataset>.<column>" -> property_dict
-    col_lookup: Dict[str, Dict[str, Any]] = {}
-    for ds_id, (c_path, c_data) in contracts_by_id.items():
+    col_lookup: dict[str, dict[str, Any]] = {}
+    for ds_id, (_c_path, c_data) in contracts_by_id.items():
         schemas = c_data.get("schema", [])
         if isinstance(schemas, list):
             for s in schemas:
@@ -365,7 +380,7 @@ def validate_foreign_key_references(
                                 col_lookup[f"{ds_id}.{p['name']}"] = p
 
     # Now inspect all columns with foreign_key in customProperties
-    for ds_id, (c_path, c_data) in contracts_by_id.items():
+    for _ds_id, (c_path, c_data) in contracts_by_id.items():
         path_str = str(c_path)
         schemas = c_data.get("schema", [])
         if isinstance(schemas, list):
@@ -391,7 +406,8 @@ def validate_foreign_key_references(
                             if len(parts) != 3:
                                 report.add_error(
                                     code="FK_TARGET_NOT_FOUND",
-                                    message=f"รูปแบบ foreign_key '{fk_val}' ไม่ถูกต้อง ต้องเป็น <source>.<dataset>.<column>",
+                                    message=f"รูปแบบ foreign_key '{fk_val}' ไม่ถูกต้อง ต้องเป็น "
+                                    "<source>.<dataset>.<column>",
                                     file_path=path_str,
                                     field=f"properties[{col_name}].customProperties.foreign_key",
                                     fix="กำหนด foreign_key ในรูปแบบ <source>.<dataset>.<column>",
@@ -405,17 +421,20 @@ def validate_foreign_key_references(
                             if target_ds not in contracts_by_id:
                                 report.add_error(
                                     code="FK_TARGET_NOT_FOUND",
-                                    message=f"Foreign key '{fk_val}' ชี้ไปหา dataset '{target_ds}' ที่ไม่มีอยู่ในระบบ",
+                                    message=f"Foreign key '{fk_val}' ชี้ไปหา dataset '{target_ds}' "
+                                    "ที่ไม่มีอยู่ในระบบ",
                                     file_path=path_str,
                                     field=f"properties[{col_name}].customProperties.foreign_key",
-                                    fix=f"ตรวจสอบชื่อ target dataset ให้ตรงกับ contract ที่มี (datasets: {sorted(contracts_by_id.keys())})",
+                                    fix="ตรวจสอบชื่อ target dataset ให้ตรงกับ contract ที่มี (datasets: "
+                                    f"{sorted(contracts_by_id.keys())})",
                                 )
                                 continue
 
                             if target_full_key not in col_lookup:
                                 report.add_error(
                                     code="FK_TARGET_NOT_FOUND",
-                                    message=f"Foreign key '{fk_val}' ชี้ไปหาคอลัมน์ '{target_col}' ที่ไม่มีใน dataset '{target_ds}'",
+                                    message=f"Foreign key '{fk_val}' ชี้ไปหาคอลัมน์ '{target_col}' "
+                                    f"ที่ไม่มีใน dataset '{target_ds}'",
                                     file_path=path_str,
                                     field=f"properties[{col_name}].customProperties.foreign_key",
                                     fix=f"ตรวจสอบชื่อคอลัมน์ใน target dataset '{target_ds}'",
@@ -428,7 +447,8 @@ def validate_foreign_key_references(
                             if src_type and tgt_type and src_type != tgt_type:
                                 report.add_error(
                                     code="FK_TYPE_MISMATCH",
-                                    message=f"Foreign key '{fk_val}' มี logicalType ไม่ตรงกัน: source '{col_name}' เป็น {src_type} แต่ target เป็น {tgt_type}",
+                                    message=f"Foreign key '{fk_val}' มี logicalType ไม่ตรงกัน: source "
+                                    f"'{col_name}' เป็น {src_type} แต่ target เป็น {tgt_type}",
                                     file_path=path_str,
                                     field=f"properties[{col_name}].customProperties.foreign_key",
                                     fix=f"ปรับ logicalType ให้ตรงกัน ({src_type} vs {tgt_type})",

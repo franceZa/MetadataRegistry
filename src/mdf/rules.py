@@ -2,16 +2,16 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union, Tuple
+from typing import Any
 
 
 class RuleConfigError(Exception):
     """Raised when a rule configuration file fails self-checking (FR-C.6)."""
 
-    def __init__(self, message: str, rule_id: Optional[str] = None, file_path: Optional[str] = None):
+    def __init__(self, message: str, rule_id: str | None = None, file_path: str | None = None):
         self.rule_id = rule_id
         self.file_path = file_path
-        prefix = f"[RuleConfigError] "
+        prefix = "[RuleConfigError] "
         if rule_id:
             prefix += f"Rule '{rule_id}': "
         if file_path:
@@ -25,10 +25,10 @@ class RuleViolation:
     field: str
     message: str
     severity: str = "error"  # "error" | "warning"
-    fix: Optional[str] = None
-    path: Optional[str] = None
+    fix: str | None = None
+    path: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "rule_id": self.rule_id,
             "field": self.field,
@@ -49,12 +49,12 @@ class Rule:
     severity: str = "error"
     message: str = ""
     value: Any = None
-    when: Optional[Dict[str, Any]] = None
-    fix: Optional[str] = None
+    when: dict[str, Any] | None = None
+    fix: str | None = None
     enabled: bool = True
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Rule":
+    def from_dict(cls, data: dict[str, Any]) -> "Rule":
         return cls(
             id=data["id"],
             description=data.get("description", ""),
@@ -96,7 +96,9 @@ ALLOWED_OPERATORS = {
 }
 
 
-def validate_rule_definition(rule_dict: Dict[str, Any], seen_ids: Set[str], file_path: Optional[str] = None) -> Rule:
+def validate_rule_definition(
+    rule_dict: dict[str, Any], seen_ids: set[str], file_path: str | None = None
+) -> Rule:
     """Validate a single rule definition for self-consistency (FR-C.6)."""
     if not isinstance(rule_dict, dict):
         raise RuleConfigError("Rule item must be a dictionary", file_path=file_path)
@@ -106,37 +108,59 @@ def validate_rule_definition(rule_dict: Dict[str, Any], seen_ids: Set[str], file
         raise RuleConfigError("Rule 'id' must be a non-empty string", file_path=file_path)
 
     if rule_id in seen_ids:
-        raise RuleConfigError(f"Duplicate rule id '{rule_id}'", rule_id=rule_id, file_path=file_path)
+        raise RuleConfigError(
+            f"Duplicate rule id '{rule_id}'", rule_id=rule_id, file_path=file_path
+        )
     seen_ids.add(rule_id)
 
     desc = rule_dict.get("description")
     if not desc or not isinstance(desc, str) or not desc.strip():
-        raise RuleConfigError("Rule 'description' is required and cannot be empty", rule_id=rule_id, file_path=file_path)
+        raise RuleConfigError(
+            "Rule 'description' is required and cannot be empty",
+            rule_id=rule_id,
+            file_path=file_path,
+        )
 
     scope = rule_dict.get("scope")
     if scope not in ALLOWED_SCOPES:
-        raise RuleConfigError(f"Unknown scope '{scope}'. Allowed: {sorted(ALLOWED_SCOPES)}", rule_id=rule_id, file_path=file_path)
+        raise RuleConfigError(
+            f"Unknown scope '{scope}'. Allowed: {sorted(ALLOWED_SCOPES)}",
+            rule_id=rule_id,
+            file_path=file_path,
+        )
 
     operator = rule_dict.get("operator")
     if operator not in ALLOWED_OPERATORS:
-        raise RuleConfigError(f"Unknown operator '{operator}'. Allowed: {sorted(ALLOWED_OPERATORS)}", rule_id=rule_id, file_path=file_path)
+        raise RuleConfigError(
+            f"Unknown operator '{operator}'. Allowed: {sorted(ALLOWED_OPERATORS)}",
+            rule_id=rule_id,
+            file_path=file_path,
+        )
 
     field = rule_dict.get("field")
     if field is None:
-        raise RuleConfigError("Rule 'field' must be specified", rule_id=rule_id, file_path=file_path)
+        raise RuleConfigError(
+            "Rule 'field' must be specified", rule_id=rule_id, file_path=file_path
+        )
 
     msg = rule_dict.get("message")
     if not msg or not isinstance(msg, str) or not msg.strip():
-        raise RuleConfigError("Rule 'message' is required and cannot be empty", rule_id=rule_id, file_path=file_path)
+        raise RuleConfigError(
+            "Rule 'message' is required and cannot be empty", rule_id=rule_id, file_path=file_path
+        )
 
     severity = rule_dict.get("severity", "error")
     if severity not in ("error", "warning"):
-        raise RuleConfigError(f"Invalid severity '{severity}'. Must be 'error' or 'warning'", rule_id=rule_id, file_path=file_path)
+        raise RuleConfigError(
+            f"Invalid severity '{severity}'. Must be 'error' or 'warning'",
+            rule_id=rule_id,
+            file_path=file_path,
+        )
 
     return Rule.from_dict(rule_dict)
 
 
-def load_rules_json(filepath: Union[Path, str]) -> List[Rule]:
+def load_rules_json(filepath: Path | str) -> list[Rule]:
     """Load and self-check a rules JSON file according to FR-C.5 and FR-C.6."""
     p = Path(filepath)
     if not p.exists():
@@ -146,16 +170,18 @@ def load_rules_json(filepath: Union[Path, str]) -> List[Rule]:
         with p.open("r", encoding="utf-8") as f:
             raw = json.load(f)
     except json.JSONDecodeError as e:
-        raise RuleConfigError(f"Malformed JSON in rules file: {e}", file_path=str(p))
+        raise RuleConfigError(f"Malformed JSON in rules file: {e}", file_path=str(p)) from e
 
     if not isinstance(raw, list):
         if isinstance(raw, dict) and "rules" in raw and isinstance(raw["rules"], list):
             raw = raw["rules"]
         else:
-            raise RuleConfigError("Rules JSON must contain a list of rules (or {'rules': [...]})", file_path=str(p))
+            raise RuleConfigError(
+                "Rules JSON must contain a list of rules (or {'rules': [...]})", file_path=str(p)
+            )
 
-    seen_ids: Set[str] = set()
-    rules: List[Rule] = []
+    seen_ids: set[str] = set()
+    rules: list[Rule] = []
     for item in raw:
         rule = validate_rule_definition(item, seen_ids, file_path=str(p))
         rules.append(rule)
@@ -163,7 +189,7 @@ def load_rules_json(filepath: Union[Path, str]) -> List[Rule]:
     return rules
 
 
-def _get_nested_field(data: Any, field_path: str) -> Tuple[bool, Any]:
+def _get_nested_field(data: Any, field_path: str) -> tuple[bool, Any]:
     """Resolve a dot-separated field path in a dictionary. Returns (exists, value)."""
     if not field_path:
         return True, data
@@ -188,7 +214,9 @@ def _get_nested_field(data: Any, field_path: str) -> Tuple[bool, Any]:
     return True, curr
 
 
-def evaluate_operator(operator: str, value: Any, param: Any, context: Optional[Dict[str, Any]] = None) -> bool:
+def evaluate_operator(
+    operator: str, value: Any, param: Any, context: dict[str, Any] | None = None
+) -> bool:
     """Evaluate a single operator. Returns True if passed, False if violated."""
     if operator == "required" or operator == "not_null":
         if value is None:
@@ -256,7 +284,9 @@ def evaluate_operator(operator: str, value: Any, param: Any, context: Optional[D
     return True
 
 
-def evaluate_rule_on_item(rule: Rule, item: Any, item_path: str = "", context: Optional[Dict[str, Any]] = None) -> List[RuleViolation]:
+def evaluate_rule_on_item(
+    rule: Rule, item: Any, item_path: str = "", context: dict[str, Any] | None = None
+) -> list[RuleViolation]:
     """Evaluate a rule against a single target dictionary or item."""
     if not rule.enabled:
         return []
@@ -278,7 +308,9 @@ def evaluate_rule_on_item(rule: Rule, item: Any, item_path: str = "", context: O
 
     exists, target_val = _get_nested_field(item, rule.field)
 
-    passed = evaluate_operator(rule.operator, target_val if exists else None, rule.value, context=context)
+    passed = evaluate_operator(
+        rule.operator, target_val if exists else None, rule.value, context=context
+    )
 
     if not passed:
         loc = item_path
@@ -298,12 +330,12 @@ def evaluate_rule_on_item(rule: Rule, item: Any, item_path: str = "", context: O
 
 
 def evaluate_rules(
-    rules: List[Rule],
-    document: Dict[str, Any],
-    context: Optional[Dict[str, Any]] = None,
-) -> List[RuleViolation]:
+    rules: list[Rule],
+    document: dict[str, Any],
+    context: dict[str, Any] | None = None,
+) -> list[RuleViolation]:
     """Evaluate a list of rules across a target document structure according to rule scopes."""
-    violations: List[RuleViolation] = []
+    violations: list[RuleViolation] = []
 
     for rule in rules:
         if not rule.enabled:
@@ -316,7 +348,9 @@ def evaluate_rules(
             schemas = document.get("schema", [])
             if isinstance(schemas, list):
                 for i, s in enumerate(schemas):
-                    violations.extend(evaluate_rule_on_item(rule, s, item_path=f"schema[{i}]", context=context))
+                    violations.extend(
+                        evaluate_rule_on_item(rule, s, item_path=f"schema[{i}]", context=context)
+                    )
 
         elif rule.scope == "properties":
             schemas = document.get("schema", [])
@@ -324,7 +358,11 @@ def evaluate_rules(
                 for i, s in enumerate(schemas):
                     props = s.get("properties", []) if isinstance(s, dict) else []
                     if isinstance(props, list):
-                        violations.extend(evaluate_rule_on_item(rule, props, item_path=f"schema[{i}].properties", context=context))
+                        violations.extend(
+                            evaluate_rule_on_item(
+                                rule, props, item_path=f"schema[{i}].properties", context=context
+                            )
+                        )
 
         elif rule.scope == "property":
             schemas = document.get("schema", [])
@@ -334,26 +372,41 @@ def evaluate_rules(
                     if isinstance(props, list):
                         for j, p in enumerate(props):
                             col_name = p.get("name", str(j)) if isinstance(p, dict) else str(j)
-                            violations.extend(evaluate_rule_on_item(rule, p, item_path=f"schema[{i}].properties[{col_name}]", context=context))
+                            violations.extend(
+                                evaluate_rule_on_item(
+                                    rule,
+                                    p,
+                                    item_path=f"schema[{i}].properties[{col_name}]",
+                                    context=context,
+                                )
+                            )
 
         elif rule.scope == "columns":
             cols = document.get("columns", {})
             if isinstance(cols, dict):
                 for col_name, col_cfg in cols.items():
                     if isinstance(col_cfg, dict):
-                        violations.extend(evaluate_rule_on_item(rule, col_cfg, item_path=f"columns.{col_name}", context=context))
+                        violations.extend(
+                            evaluate_rule_on_item(
+                                rule, col_cfg, item_path=f"columns.{col_name}", context=context
+                            )
+                        )
 
         elif rule.scope == "rules":
             rules_list = document.get("rules", [])
             if isinstance(rules_list, list):
                 for i, r in enumerate(rules_list):
                     r_id = r.get("id", str(i)) if isinstance(r, dict) else str(i)
-                    violations.extend(evaluate_rule_on_item(rule, r, item_path=f"rules[{r_id}]", context=context))
+                    violations.extend(
+                        evaluate_rule_on_item(rule, r, item_path=f"rules[{r_id}]", context=context)
+                    )
 
         elif rule.scope == "servers":
             servers = document.get("servers", [])
             if isinstance(servers, list):
                 for i, s in enumerate(servers):
-                    violations.extend(evaluate_rule_on_item(rule, s, item_path=f"servers[{i}]", context=context))
+                    violations.extend(
+                        evaluate_rule_on_item(rule, s, item_path=f"servers[{i}]", context=context)
+                    )
 
     return violations

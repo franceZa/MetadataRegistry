@@ -1,7 +1,8 @@
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any
+
 from mdf.loading import load_yaml_file
 from mdf.rules import RuleConfigError
 
@@ -9,7 +10,7 @@ from mdf.rules import RuleConfigError
 class DQValidationError(Exception):
     """Raised when DQ tag or contract configuration violates DQ model rules."""
 
-    def __init__(self, code: str, message: str, column: Optional[str] = None):
+    def __init__(self, code: str, message: str, column: str | None = None):
         self.code = code
         self.message = message
         self.column = column
@@ -22,23 +23,23 @@ class DQLibraryRule:
     name: str
     description: str
     kind: str  # "sql" | "function"
-    sql: Optional[str] = None
-    function: Optional[str] = None
-    params: Dict[str, str] = field(default_factory=dict)
+    sql: str | None = None
+    function: str | None = None
+    params: dict[str, str] = field(default_factory=dict)
     default_action: str = "reject"  # "reject" | "flag" | "block"
-    auto: Optional[str] = None
+    auto: str | None = None
     enabled: bool = True
 
 
 class DQLibrary:
     """Manages DQ Rule Library loaded from config/dq_library.yaml."""
 
-    def __init__(self, rules: Dict[str, DQLibraryRule], version: int = 1):
+    def __init__(self, rules: dict[str, DQLibraryRule], version: int = 1):
         self.version = version
         self.rules = rules
 
     @classmethod
-    def load(cls, filepath: Union[Path, str] = "config/dq_library.yaml") -> "DQLibrary":
+    def load(cls, filepath: Path | str = "config/dq_library.yaml") -> "DQLibrary":
         p = Path(filepath)
         if not p.exists():
             raise FileNotFoundError(f"DQ library file not found: {p}")
@@ -50,9 +51,11 @@ class DQLibrary:
         version = data.get("library_version", 1)
         raw_rules = data.get("rules", {})
         if not isinstance(raw_rules, dict):
-            raise RuleConfigError("DQ library 'rules' must be a dictionary of rules", file_path=str(p))
+            raise RuleConfigError(
+                "DQ library 'rules' must be a dictionary of rules", file_path=str(p)
+            )
 
-        rules: Dict[str, DQLibraryRule] = {}
+        rules: dict[str, DQLibraryRule] = {}
         for r_name, r_cfg in raw_rules.items():
             rule = cls._validate_rule(r_name, r_cfg, str(p))
             rules[r_name] = rule
@@ -60,44 +63,76 @@ class DQLibrary:
         return cls(rules=rules, version=version)
 
     @staticmethod
-    def _validate_rule(name: str, cfg: Dict[str, Any], filepath: str) -> DQLibraryRule:
+    def _validate_rule(name: str, cfg: dict[str, Any], filepath: str) -> DQLibraryRule:
         """Self-check rule definition per FR-C.6."""
         if not isinstance(cfg, dict):
-            raise RuleConfigError(f"Rule definition for '{name}' must be a mapping", rule_id=name, file_path=filepath)
+            raise RuleConfigError(
+                f"Rule definition for '{name}' must be a mapping", rule_id=name, file_path=filepath
+            )
 
         desc = cfg.get("description")
         if not desc or not isinstance(desc, str) or not desc.strip():
-            raise RuleConfigError("Rule description is required and cannot be empty", rule_id=name, file_path=filepath)
+            raise RuleConfigError(
+                "Rule description is required and cannot be empty", rule_id=name, file_path=filepath
+            )
 
         kind = cfg.get("kind")
         if kind not in ("sql", "function"):
-            raise RuleConfigError(f"Invalid kind '{kind}'. Must be 'sql' or 'function'", rule_id=name, file_path=filepath)
+            raise RuleConfigError(
+                f"Invalid kind '{kind}'. Must be 'sql' or 'function'",
+                rule_id=name,
+                file_path=filepath,
+            )
 
         sql_expr = cfg.get("sql")
         func_name = cfg.get("function")
 
         params = cfg.get("params", {})
         if not isinstance(params, dict):
-            raise RuleConfigError("Rule 'params' must be a mapping of param name to contract property", rule_id=name, file_path=filepath)
+            raise RuleConfigError(
+                "Rule 'params' must be a mapping of param name to contract property",
+                rule_id=name,
+                file_path=filepath,
+            )
 
         if kind == "sql":
             if not sql_expr or not isinstance(sql_expr, str):
-                raise RuleConfigError("Rule with kind 'sql' requires a non-empty 'sql' string", rule_id=name, file_path=filepath)
+                raise RuleConfigError(
+                    "Rule with kind 'sql' requires a non-empty 'sql' string",
+                    rule_id=name,
+                    file_path=filepath,
+                )
             # Check placeholders in sql
             placeholders = set(re.findall(r"\{([a-zA-Z0-9_]+)\}", sql_expr))
             if "col" not in placeholders:
-                raise RuleConfigError("SQL expression must contain '{col}' placeholder", rule_id=name, file_path=filepath)
+                raise RuleConfigError(
+                    "SQL expression must contain '{col}' placeholder",
+                    rule_id=name,
+                    file_path=filepath,
+                )
             for ph in placeholders - {"col"}:
                 if ph not in params:
-                    raise RuleConfigError(f"SQL placeholder '{{{ph}}}' not declared in 'params'", rule_id=name, file_path=filepath)
+                    raise RuleConfigError(
+                        f"SQL placeholder '{{{ph}}}' not declared in 'params'",
+                        rule_id=name,
+                        file_path=filepath,
+                    )
 
         elif kind == "function":
             if not func_name or not isinstance(func_name, str):
-                raise RuleConfigError("Rule with kind 'function' requires a 'function' name", rule_id=name, file_path=filepath)
+                raise RuleConfigError(
+                    "Rule with kind 'function' requires a 'function' name",
+                    rule_id=name,
+                    file_path=filepath,
+                )
 
         action = cfg.get("default_action", "reject")
         if action not in ("reject", "flag", "block"):
-            raise RuleConfigError(f"Invalid default_action '{action}'. Must be reject, flag, or block", rule_id=name, file_path=filepath)
+            raise RuleConfigError(
+                f"Invalid default_action '{action}'. Must be reject, flag, or block",
+                rule_id=name,
+                file_path=filepath,
+            )
 
         return DQLibraryRule(
             name=name,
@@ -120,12 +155,12 @@ class DQResolvedRule:
     description: str
     action: str
     stage: str = "pre_tokenise"
-    sql: Optional[str] = None
-    function: Optional[str] = None
-    params: Dict[str, Any] = field(default_factory=dict)
+    sql: str | None = None
+    function: str | None = None
+    params: dict[str, Any] = field(default_factory=dict)
 
 
-def _get_custom_property(col_def: Dict[str, Any], prop_name: str) -> Any:
+def _get_custom_property(col_def: dict[str, Any], prop_name: str) -> Any:
     for cp in col_def.get("customProperties", []):
         if isinstance(cp, dict) and cp.get("property") == prop_name:
             return cp.get("value")
@@ -133,10 +168,10 @@ def _get_custom_property(col_def: Dict[str, Any], prop_name: str) -> Any:
 
 
 def resolve_column_dq_rules(
-    col_def: Dict[str, Any],
+    col_def: dict[str, Any],
     dq_library: DQLibrary,
-    pipeline_actions: Optional[Dict[str, str]] = None,
-) -> List[DQResolvedRule]:
+    pipeline_actions: dict[str, str] | None = None,
+) -> list[DQResolvedRule]:
     """
     Resolve and validate DQ rules for a given contract column definition.
     Enforces DQ-1..DQ-4 and raises DQValidationError for violations.
@@ -151,12 +186,12 @@ def resolve_column_dq_rules(
             column=col_name,
         )
 
-    resolved: List[DQResolvedRule] = []
+    resolved: list[DQResolvedRule] = []
     actions = pipeline_actions or {}
 
     # Extract tags
     raw_tags = col_def.get("tags", [])
-    dq_tags: List[str] = []
+    dq_tags: list[str] = []
     if isinstance(raw_tags, list):
         for t in raw_tags:
             if isinstance(t, str) and t.startswith("dq:"):
@@ -203,7 +238,7 @@ def resolve_column_dq_rules(
         if not r_def.enabled:
             continue
 
-        resolved_params: Dict[str, Any] = {}
+        resolved_params: dict[str, Any] = {}
         for p_name, p_target in r_def.params.items():
             val = None
             if p_target == "logicalTypeOptions.pattern":
@@ -215,7 +250,8 @@ def resolve_column_dq_rules(
             if val is None:
                 raise DQValidationError(
                     code="TAG_WITHOUT_PARAM",
-                    message=f"Tag 'dq:{tag_name}' requires parameter '{p_name}' ({p_target}), but value is missing in contract.",
+                    message=f"Tag 'dq:{tag_name}' requires parameter '{p_name}' ({p_target}), but "
+                    "value is missing in contract.",
                     column=col_name,
                 )
             resolved_params[p_name] = val
@@ -229,7 +265,9 @@ def resolve_column_dq_rules(
             fmt_dict.update(resolved_params)
             # handle valid_values formatting if list
             if "valid_values" in fmt_dict and isinstance(fmt_dict["valid_values"], list):
-                quoted_vals = [f"'{v}'" if isinstance(v, str) else str(v) for v in fmt_dict["valid_values"]]
+                quoted_vals = [
+                    f"'{v}'" if isinstance(v, str) else str(v) for v in fmt_dict["valid_values"]
+                ]
                 fmt_dict["valid_values"] = ", ".join(quoted_vals)
             sql_rendered = r_def.sql.format(**fmt_dict)
 

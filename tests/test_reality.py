@@ -1,5 +1,6 @@
 import subprocess
 from pathlib import Path
+
 import pytest
 
 CONTRACTS = [
@@ -8,9 +9,10 @@ CONTRACTS = [
     "DataContract/cc/contract/customer.odcs.yaml",
 ]
 
+
 @pytest.mark.parametrize("contract_path", CONTRACTS)
 def test_reality_lines_byte_for_byte(contract_path):
-    """AC-17: REALITY oracle - verify that all lines containing REALITY match commit 88b982d byte-for-byte."""
+    """AC-17: REALITY oracle - every REALITY line matches commit 88b982d byte-for-byte."""
     res = subprocess.run(
         ["git", "show", f"88b982d:{contract_path}"],
         capture_output=True,
@@ -19,7 +21,7 @@ def test_reality_lines_byte_for_byte(contract_path):
     )
     orig_reality_lines = [line for line in res.stdout.splitlines() if "REALITY" in line]
 
-    with open(contract_path, "r", encoding="utf-8") as f:
+    with open(contract_path, encoding="utf-8") as f:
         curr_reality_lines = [line for line in f.read().splitlines() if "REALITY" in line]
 
     assert len(orig_reality_lines) > 0, f"Expected REALITY lines in {contract_path}"
@@ -28,6 +30,7 @@ def test_reality_lines_byte_for_byte(contract_path):
         f"Expected: {orig_reality_lines}\n"
         f"Actual: {curr_reality_lines}"
     )
+
 
 def test_no_quality_blocks_in_contracts():
     """Verify that quality[] blocks have been completely migrated out of all contracts."""

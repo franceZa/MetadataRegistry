@@ -1,6 +1,6 @@
-import pytest
-import yaml
 from pathlib import Path
+
+import yaml
 
 RELEASE_YML = Path(".github/workflows/release.yml")
 

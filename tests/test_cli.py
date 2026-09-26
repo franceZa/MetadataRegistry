@@ -1,5 +1,5 @@
 import pytest
-from pathlib import Path
+
 from mdf.cli import main
 
 
@@ -48,6 +48,7 @@ def test_verify_package_ok(capsys):
     """verify-package on intact package exits 0."""
     # Build fresh package first (already done in test_package, rebuild here to be safe)
     from mdf.package import build_package
+
     pkg = build_package(env="dev")
     rc = main(["verify-package", str(pkg)])
     assert rc == 0
@@ -56,7 +57,9 @@ def test_verify_package_ok(capsys):
 def test_verify_package_tampered_exit_one(tmp_path, capsys):
     """verify-package on tampered package exits 1."""
     import shutil
+
     from mdf.package import build_package
+
     pkg = build_package(env="dev")
     tampered = tmp_path / "tampered"
     shutil.copytree(pkg, tampered)
@@ -75,7 +78,8 @@ def test_package_release_gate_exit_one(tmp_path, capsys):
     """package --release with dummy env is refused (exit 1)."""
     # Real dev config has dummy: false and a real secret_scope — the gate passes.
     # To test the refusal path we point --config-dir at a dummy config via direct call:
-    from mdf.package import check_release_gate, ReleaseGateError
+    from mdf.package import ReleaseGateError, check_release_gate
+
     cfg = tmp_path / "config"
     (cfg / "env").mkdir(parents=True)
     (cfg / "env" / "dummyenv.yaml").write_text(

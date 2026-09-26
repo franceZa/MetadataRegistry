@@ -1,12 +1,12 @@
 import pytest
-from pathlib import Path
+
 from mdf.loading import (
-    load_yaml,
-    load_yaml_file,
-    DuplicateKeyError,
     DiscoveryError,
+    DuplicateKeyError,
     discover_datasets,
+    load_yaml,
 )
+
 
 def test_duplicate_key_detection_ac02():
     """AC-02: Duplicate YAML key is rejected and reports line number."""
@@ -24,6 +24,7 @@ version: 2.0.0
     assert err.line == 5
     assert "Duplicate key 'version' found at line 5" in str(err)
 
+
 def test_duplicate_key_nested():
     yaml_text = """schema:
   name: test
@@ -35,6 +36,7 @@ def test_duplicate_key_nested():
     assert exc_info.value.key == "name"
     assert exc_info.value.line == 3
 
+
 def test_valid_yaml_loading():
     yaml_text = """apiVersion: v3.0.2
 kind: DataContract
@@ -44,6 +46,7 @@ status: active
     data = load_yaml(yaml_text)
     assert data["apiVersion"] == "v3.0.2"
     assert data["version"] == "1.0.0"
+
 
 def test_discover_datasets_success():
     """Verify discovery finds the 3 cc datasets and skips _template."""
@@ -58,6 +61,7 @@ def test_discover_datasets_success():
         assert d.contract_path.exists()
         assert d.pipeline_path.exists()
 
+
 def test_discover_legacy_layout_error(tmp_path):
     """Verify legacy dq/ folder triggers LEGACY_LAYOUT."""
     dc = tmp_path / "DataContract"
@@ -70,6 +74,7 @@ def test_discover_legacy_layout_error(tmp_path):
     with pytest.raises(DiscoveryError) as exc_info:
         discover_datasets(dc)
     assert exc_info.value.code == "LEGACY_LAYOUT"
+
 
 def test_discover_missing_pipeline_error(tmp_path):
     """Verify missing pipeline triggers FILE_LAYOUT."""

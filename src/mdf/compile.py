@@ -1,11 +1,11 @@
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from mdf.dq import DQLibrary, resolve_column_dq_rules
 from mdf.loading import discover_datasets, load_yaml_file
-from mdf.validation import get_contract_column_names, validate_project
+from mdf.validation import validate_project
 
 
 def sha256_file(path: Path) -> str:
@@ -16,7 +16,9 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def resolve_template(template: str, env_cfg: Dict[str, Any], source: str, dataset: str, layer: str) -> str:
+def resolve_template(
+    template: str, env_cfg: dict[str, Any], source: str, dataset: str, layer: str
+) -> str:
     """Resolve a naming/landing template with variables from env config (FR-D.2)."""
     catalog = env_cfg.get("catalog", "{env}_catalog".replace("{env}", env_cfg.get("env", "dev")))
     return template.format(
@@ -28,7 +30,7 @@ def resolve_template(template: str, env_cfg: Dict[str, Any], source: str, datase
     )
 
 
-def load_env_config(config_dir: Path | str, env: str) -> Dict[str, Any]:
+def load_env_config(config_dir: Path | str, env: str) -> dict[str, Any]:
     """Load config/env/<env>.yaml."""
     env_path = Path(config_dir) / "env" / f"{env}.yaml"
     if not env_path.exists():
@@ -36,7 +38,7 @@ def load_env_config(config_dir: Path | str, env: str) -> Dict[str, Any]:
     return load_yaml_file(env_path)
 
 
-def load_naming_config(config_dir: Path | str) -> Dict[str, str]:
+def load_naming_config(config_dir: Path | str) -> dict[str, str]:
     """Load config/naming.yaml."""
     naming_path = Path(config_dir) / "naming.yaml"
     if not naming_path.exists():
@@ -45,7 +47,7 @@ def load_naming_config(config_dir: Path | str) -> Dict[str, str]:
 
 
 def _deterministic_json_bytes(data: Any) -> bytes:
-    """Serialize to deterministic JSON bytes: sorted keys, no extra whitespace, LF endings (AC-11)."""
+    """Serialize to deterministic JSON: sorted keys, fixed indent, LF endings (AC-11)."""
     return json.dumps(data, sort_keys=True, ensure_ascii=False, indent=2).encode("utf-8")
 
 
@@ -53,7 +55,7 @@ def compile_project(
     env: str = "dev",
     base_dir: Path | str = "DataContract",
     config_dir: Path | str = "config",
-) -> List[Path]:
+) -> list[Path]:
     """
     Compile all discovered datasets into resolved JSON configs (FR-D.1, FR-D.3).
     - Validates first; on error, writes nothing.
@@ -64,8 +66,8 @@ def compile_project(
     report = validate_project(base_dir=base_dir, config_dir=config_dir)
     if not report.is_valid:
         raise RuntimeError(
-            f"Validation failed with {len(report.errors)} errors — compile aborted, nothing written.\n"
-            + report.format_thai_summary()
+            f"Validation failed with {len(report.errors)} errors — compile aborted, nothing "
+            "written.\n" + report.format_thai_summary()
         )
 
     cfg_base = Path(config_dir)
@@ -78,7 +80,7 @@ def compile_project(
     output_dir = Path("build") / env / "resolved"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    written: List[Path] = []
+    written: list[Path] = []
     for ds in datasets:
         contract = load_yaml_file(ds.contract_path)
         pipeline = load_yaml_file(ds.pipeline_path)
@@ -89,12 +91,12 @@ def compile_project(
         contract_version = contract.get("version", "unknown")
 
         # Resolve pipeline actions overrides (rule@col -> action)
-        pipeline_actions: Dict[str, str] = {}
+        pipeline_actions: dict[str, str] = {}
         if isinstance(pipeline.get("actions"), dict):
             pipeline_actions = pipeline["actions"]
 
         # Expand DQ checks per column (FR-D.3, DQ-5 staging)
-        checks: List[Dict[str, Any]] = []
+        checks: list[dict[str, Any]] = []
         schemas = contract.get("schema", [])
         if isinstance(schemas, list):
             for s in schemas:
@@ -139,12 +141,12 @@ def compile_project(
         schema_version = contract.get("version", "unknown")
 
         # Column schema from contract
-        columns: List[Dict[str, Any]] = []
+        columns: list[dict[str, Any]] = []
         for s in schemas:
             if isinstance(s, dict):
                 for p in s.get("properties", []):
                     if isinstance(p, dict) and "name" in p:
-                        col: Dict[str, Any] = {
+                        col: dict[str, Any] = {
                             "name": p["name"],
                             "logicalType": p.get("logicalType"),
                             "physicalType": p.get("physicalType"),
@@ -156,17 +158,27 @@ def compile_project(
 
         for layer in ("bronze", "silver"):
             resolved = {
-                "config_id": resolve_template(naming["config_id"], env_cfg, ds.source, ds.dataset, layer),
+                "config_id": resolve_template(
+                    naming["config_id"], env_cfg, ds.source, ds.dataset, layer
+                ),
                 "layer": layer,
                 "source": ds.source,
                 "dataset": ds.dataset,
                 "contract_id": contract_id,
                 "table": resolve_template(naming["table"], env_cfg, ds.source, ds.dataset, layer),
-                "landing": resolve_template(naming["landing"], env_cfg, ds.source, ds.dataset, layer),
-                "quarantine": resolve_template(naming["quarantine"], env_cfg, ds.source, ds.dataset, layer),
+                "landing": resolve_template(
+                    naming["landing"], env_cfg, ds.source, ds.dataset, layer
+                ),
+                "quarantine": resolve_template(
+                    naming["quarantine"], env_cfg, ds.source, ds.dataset, layer
+                ),
                 "vault": resolve_template(naming["vault"], env_cfg, ds.source, ds.dataset, layer),
-                "checkpoint": resolve_template(naming["checkpoint"], env_cfg, ds.source, ds.dataset, layer),
-                "run_log": resolve_template(naming["run_log"], env_cfg, ds.source, ds.dataset, layer),
+                "checkpoint": resolve_template(
+                    naming["checkpoint"], env_cfg, ds.source, ds.dataset, layer
+                ),
+                "run_log": resolve_template(
+                    naming["run_log"], env_cfg, ds.source, ds.dataset, layer
+                ),
                 "schema": columns,
                 "checks": checks,
                 "pipeline": pipeline,

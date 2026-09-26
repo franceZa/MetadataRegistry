@@ -1,9 +1,8 @@
 import hashlib
 import json
 import shutil
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from mdf.compile import compile_project, load_env_config
 
@@ -72,7 +71,7 @@ def build_package(
         shutil.rmtree(package_dir)
     package_dir.mkdir(parents=True, exist_ok=True)
 
-    files_meta: List[Dict[str, str]] = []
+    files_meta: list[dict[str, str]] = []
     for src in resolved_files:
         dest = package_dir / src.name
         shutil.copy2(src, dest)
@@ -96,7 +95,7 @@ def build_package(
     return package_dir
 
 
-def verify_package(package_dir: Path | str) -> Dict[str, Any]:
+def verify_package(package_dir: Path | str) -> dict[str, Any]:
     """
     Standalone tamper-evident verifier (AC-15): recompute sha256 of every file
     listed in manifest.json and compare. Any mismatch = TAMPERED (raises TamperError).
@@ -111,7 +110,7 @@ def verify_package(package_dir: Path | str) -> Dict[str, Any]:
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
-        raise TamperError(f"[TAMPERED] manifest.json อ่านไม่ได้ (JSON เสียหาย): {e}")
+        raise TamperError(f"[TAMPERED] manifest.json อ่านไม่ได้ (JSON เสียหาย): {e}") from e
 
     listed_files = set()
     for entry in manifest.get("files", []):
@@ -126,7 +125,8 @@ def verify_package(package_dir: Path | str) -> Dict[str, Any]:
         actual_sha = _sha256_file(target)
         if actual_sha != expected_sha:
             raise TamperError(
-                f"[TAMPERED] ไฟล์ '{fname}' ถูกดัดแปลง (sha256 ไม่ตรง: expected {expected_sha[:12]}…, got {actual_sha[:12]}…)"
+                f"[TAMPERED] ไฟล์ '{fname}' ถูกดัดแปลง (sha256 ไม่ตรง: expected {expected_sha[:12]}…, "
+                f"got {actual_sha[:12]}…)"
             )
 
     # Detect extra files not in manifest (excluding manifest itself)

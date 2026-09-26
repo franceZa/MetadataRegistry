@@ -1,6 +1,3 @@
-import json
-import pytest
-from pathlib import Path
 from mdf.trace import find_orphans, format_trace, load_dataset, trace_table
 
 
@@ -55,8 +52,12 @@ def test_find_orphans_detects_orphans(tmp_path):
     # paired dataset
     (dc / "src_ok" / "contract").mkdir(parents=True)
     (dc / "src_ok" / "pipeline").mkdir(parents=True)
-    (dc / "src_ok" / "contract" / "paired.odcs.yaml").write_text("id: t" + chr(10), encoding="utf-8")
-    (dc / "src_ok" / "pipeline" / "paired.pipeline.yaml").write_text("columns: {}" + chr(10), encoding="utf-8")
+    (dc / "src_ok" / "contract" / "paired.odcs.yaml").write_text(
+        "id: t" + chr(10), encoding="utf-8"
+    )
+    (dc / "src_ok" / "pipeline" / "paired.pipeline.yaml").write_text(
+        "columns: {}" + chr(10), encoding="utf-8"
+    )
 
     # orphan contract
     (dc / "src_a" / "contract").mkdir(parents=True)
@@ -64,7 +65,9 @@ def test_find_orphans_detects_orphans(tmp_path):
 
     # orphan pipeline
     (dc / "src_b" / "pipeline").mkdir(parents=True)
-    (dc / "src_b" / "pipeline" / "lone.pipeline.yaml").write_text("columns: {}" + chr(10), encoding="utf-8")
+    (dc / "src_b" / "pipeline" / "lone.pipeline.yaml").write_text(
+        "columns: {}" + chr(10), encoding="utf-8"
+    )
 
     report = find_orphans(dc)
     assert any("src_a.lonely" in c for c in report.orphan_contracts)

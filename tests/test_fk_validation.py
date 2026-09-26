@@ -1,6 +1,7 @@
-import pytest
 from pathlib import Path
-from mdf.validation import validate_foreign_key_references, ValidationReport
+
+from mdf.validation import ValidationReport, validate_foreign_key_references
+
 
 def test_valid_fk_references():
     report = ValidationReport()
@@ -12,9 +13,7 @@ def test_valid_fk_references():
                 "schema": [
                     {
                         "name": "customer",
-                        "properties": [
-                            {"name": "customer_id", "logicalType": "string"}
-                        ],
+                        "properties": [{"name": "customer_id", "logicalType": "string"}],
                     }
                 ],
             },
@@ -43,6 +42,7 @@ def test_valid_fk_references():
     validate_foreign_key_references(contracts, report)
     assert report.is_valid is True
     assert len(report.errors) == 0
+
 
 def test_fk_target_dataset_not_found_ac33():
     report = ValidationReport()
@@ -73,6 +73,7 @@ def test_fk_target_dataset_not_found_ac33():
     err = next(e for e in report.errors if e.code == "FK_TARGET_NOT_FOUND")
     assert "unknown_dataset" in err.message
 
+
 def test_fk_target_column_not_found_ac33():
     report = ValidationReport()
     contracts = {
@@ -83,9 +84,7 @@ def test_fk_target_column_not_found_ac33():
                 "schema": [
                     {
                         "name": "customer",
-                        "properties": [
-                            {"name": "customer_id", "logicalType": "string"}
-                        ],
+                        "properties": [{"name": "customer_id", "logicalType": "string"}],
                     }
                 ],
             },
@@ -116,6 +115,7 @@ def test_fk_target_column_not_found_ac33():
     err = next(e for e in report.errors if e.code == "FK_TARGET_NOT_FOUND")
     assert "missing_col" in err.message
 
+
 def test_fk_type_mismatch_ac33():
     report = ValidationReport()
     contracts = {
@@ -126,9 +126,7 @@ def test_fk_type_mismatch_ac33():
                 "schema": [
                     {
                         "name": "customer",
-                        "properties": [
-                            {"name": "customer_id", "logicalType": "integer"}
-                        ],
+                        "properties": [{"name": "customer_id", "logicalType": "integer"}],
                     }
                 ],
             },

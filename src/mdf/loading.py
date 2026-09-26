@@ -1,13 +1,13 @@
-import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
+
 import yaml
 
 
 class DuplicateKeyError(ValueError):
     """Raised when a YAML document contains duplicate mapping keys."""
 
-    def __init__(self, key: str, line: int, column: int = 1, filepath: Optional[str] = None):
+    def __init__(self, key: str, line: int, column: int = 1, filepath: str | None = None):
         self.key = key
         self.line = line
         self.column = column
@@ -21,7 +21,7 @@ class DuplicateKeyError(ValueError):
 class DiscoveryError(Exception):
     """Raised when discovering datasets violates layout requirements."""
 
-    def __init__(self, code: str, message: str, path: Optional[str] = None):
+    def __init__(self, code: str, message: str, path: str | None = None):
         self.code = code
         self.message = message
         self.path = path
@@ -34,12 +34,14 @@ class DiscoveryError(Exception):
 class UniqueKeyLoader(yaml.SafeLoader):
     """PyYAML SafeLoader that prohibits duplicate keys in mappings."""
 
-    filepath: Optional[str] = None
+    filepath: str | None = None
 
 
-def _construct_mapping(loader: UniqueKeyLoader, node: yaml.MappingNode, deep: bool = False) -> Dict[str, Any]:
+def _construct_mapping(
+    loader: UniqueKeyLoader, node: yaml.MappingNode, deep: bool = False
+) -> dict[str, Any]:
     loader.flatten_mapping(node)
-    mapping: Dict[str, Any] = {}
+    mapping: dict[str, Any] = {}
     for key_node, value_node in node.value:
         key = loader.construct_object(key_node, deep=deep)
         if key in mapping:
@@ -61,7 +63,7 @@ UniqueKeyLoader.add_constructor(
 )
 
 
-def load_yaml(content: str, filepath: Optional[str] = None) -> Any:
+def load_yaml(content: str, filepath: str | None = None) -> Any:
     """Load a YAML string, rejecting duplicate keys."""
     loader = UniqueKeyLoader(content)
     loader.filepath = filepath
@@ -98,7 +100,7 @@ class DiscoveredDataset:
         return f"DiscoveredDataset({self.source}.{self.dataset})"
 
 
-def discover_datasets(base_dir: Path | str = "DataContract") -> List[DiscoveredDataset]:
+def discover_datasets(base_dir: Path | str = "DataContract") -> list[DiscoveredDataset]:
     """
     Discover dataset contracts and pipelines under base_dir according to FR-A.1.
     - Expected layout: DataContract/<source>/contract/<dataset>.odcs.yaml
@@ -124,7 +126,7 @@ def discover_datasets(base_dir: Path | str = "DataContract") -> List[DiscoveredD
                 path=str(dq_dir),
             )
 
-    discovered: List[DiscoveredDataset] = []
+    discovered: list[DiscoveredDataset] = []
 
     for src_dir in sorted(base.iterdir()):
         if not src_dir.is_dir():
@@ -147,7 +149,8 @@ def discover_datasets(base_dir: Path | str = "DataContract") -> List[DiscoveredD
             if not p_file.exists():
                 raise DiscoveryError(
                     code="FILE_LAYOUT",
-                    message=f"Missing corresponding pipeline file for contract '{c_file}' (expected '{p_file}')",
+                    message=f"Missing corresponding pipeline file for contract '{c_file}' "
+                    f"(expected '{p_file}')",
                     path=str(p_file),
                 )
 

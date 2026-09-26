@@ -1,6 +1,5 @@
 import argparse
 import sys
-from typing import List, Optional
 
 from mdf.compile import compile_project
 from mdf.diff import run_diff
@@ -18,8 +17,12 @@ def _cmd_validate(args) -> int:
 
 def _cmd_compile(args) -> int:
     try:
-        written = compile_project(env=args.env, base_dir=args.datacontract_dir, config_dir=args.config_dir)
-        print(f"✅ compile สำเร็จ: เขียน resolved JSON {len(written)} ไฟล์ลง build/{args.env}/resolved/")
+        written = compile_project(
+            env=args.env, base_dir=args.datacontract_dir, config_dir=args.config_dir
+        )
+        print(
+            f"✅ compile สำเร็จ: เขียน resolved JSON {len(written)} ไฟล์ลง build/{args.env}/resolved/"
+        )
         for p in written:
             print(f"   - {p}")
         return 0
@@ -53,7 +56,9 @@ def _cmd_package(args) -> int:
 def _cmd_verify_package(args) -> int:
     try:
         result = verify_package(args.package_dir)
-        print(f"✅ package ผ่านการตรวจสอบ (OK): env={result['env']}, files={result['verified_files']}")
+        print(
+            f"✅ package ผ่านการตรวจสอบ (OK): env={result['env']}, files={result['verified_files']}"
+        )
         return 0
     except RuntimeError as e:
         print(str(e))
@@ -73,7 +78,8 @@ def _cmd_trace(args) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mdf",
-        description="mdf — Metadata-driven Data Contract validator & Bronze/Silver config generator (Phase 1)",
+        description="mdf — Metadata-driven Data Contract validator & Bronze/Silver config "
+        "generator (Phase 1)",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -81,7 +87,9 @@ def build_parser() -> argparse.ArgumentParser:
     _add_common_args(p_validate)
     p_validate.set_defaults(func=_cmd_validate)
 
-    p_compile = sub.add_parser("compile", help="สร้าง resolved JSON configs ลง build/<env>/resolved/")
+    p_compile = sub.add_parser(
+        "compile", help="สร้าง resolved JSON configs ลง build/<env>/resolved/"
+    )
     _add_common_args(p_compile)
     p_compile.add_argument("--env", default="dev", help="ชื่อ environment (default: dev)")
     p_compile.set_defaults(func=_cmd_compile)
@@ -97,11 +105,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_package.add_argument("--release", action="store_true", help="บังคับ release gate (AC-16)")
     p_package.set_defaults(func=_cmd_package)
 
-    p_verify = sub.add_parser("verify-package", help="ตรวจสอบความถูกต้อง (tamper-evident) ของ package")
+    p_verify = sub.add_parser(
+        "verify-package", help="ตรวจสอบความถูกต้อง (tamper-evident) ของ package"
+    )
     p_verify.add_argument("package_dir", help="โฟลเดอร์ package ที่มี manifest.json")
     p_verify.set_defaults(func=_cmd_verify_package)
 
-    p_trace = sub.add_parser("trace", help="แสดง lineage ของ target table (เช่น silver.cc.credit_card_txn)")
+    p_trace = sub.add_parser(
+        "trace", help="แสดง lineage ของ target table (เช่น silver.cc.credit_card_txn)"
+    )
     p_trace.add_argument("table", help="ชื่อ table รูปแบบ <layer>.<source>.<dataset>")
     p_trace.add_argument("--env", default="dev", help="ชื่อ environment (default: dev)")
     p_trace.set_defaults(func=_cmd_trace)
@@ -110,11 +122,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _add_common_args(p) -> None:
-    p.add_argument("--datacontract-dir", default="DataContract", help="โฟลเดอร์ DataContract (default: DataContract)")
+    p.add_argument(
+        "--datacontract-dir",
+        default="DataContract",
+        help="โฟลเดอร์ DataContract (default: DataContract)",
+    )
     p.add_argument("--config-dir", default="config", help="โฟลเดอร์ config (default: config)")
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
