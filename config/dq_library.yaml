@@ -1,0 +1,44 @@
+# config/dq_library.yaml — DQ Rule Library (SSOT ของกฎพื้นฐาน)
+library_version: 1
+rules:
+  not_null:
+    description: "ต้องมีค่า ห้ามว่าง (NULL)"
+    kind: sql
+    sql: "{col} IS NOT NULL"
+    auto: required
+    default_action: reject
+    enabled: true
+
+  pattern:
+    description: "ค่าต้องตรงกับรูปแบบ regex ที่ contract กำหนด"
+    kind: sql
+    sql: "{col} IS NULL OR {col} RLIKE {pattern}"
+    params:
+      pattern: logicalTypeOptions.pattern
+    default_action: reject
+    enabled: true
+
+  valid_values:
+    description: "ค่าต้องอยู่ในรายการที่อนุญาต"
+    kind: sql
+    sql: "{col} IS NULL OR {col} IN ({valid_values})"
+    params:
+      valid_values: customProperties.valid_values
+    default_action: reject
+    enabled: true
+
+  luhn:
+    description: "เลขบัตรต้องผ่าน Luhn checksum"
+    kind: function
+    function: luhn_valid
+    default_action: reject
+    enabled: true
+
+  fk:
+    description: "ค่าต้องมีอยู่ในตารางแม่ ถ้าไม่เจอให้ใช้ FK defect -> ส่ง BA คุยกับ source ห้าม drop (D-P4-7)"
+    kind: function
+    function: fk_exists
+    params:
+      ref: customProperties.foreign_key
+    default_action: flag
+    enabled: true

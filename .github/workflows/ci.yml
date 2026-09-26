@@ -1,47 +1,56 @@
-# CI — runs on every PR into main. Any failing step blocks the merge
-# (enable "Require status checks to pass" for job `ci` in branch protection).
-name: CI
+name: CI (PR -> master)
 
 on:
   pull_request:
-    branches: [main]
+    branches: [master]
 
 permissions:
   contents: read
 
-concurrency:
-  group: ci-${{ github.head_ref }}
-  cancel-in-progress: true
-
 jobs:
-  ci:
+  validate-and-test:
+    name: Validate, compile preview, test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: astral-sh/setup-uv@v6
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          python-version: "3.11"
+          fetch-depth: 0
 
-      - name: Install (locked)
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies (locked)
         run: uv sync --locked
 
-      # 1) เหมือนที่ BA รันบนเครื่อง — error จะขึ้นเป็น comment บนบรรทัดใน PR ด้วย
-      - name: Validate Data Contracts
+      - name: Lint (ruff)
+        run: uv run ruff check src tests
+
+      - name: Validate DataContracts
         run: uv run mdf validate
 
-      # 2) BA ต้อง commit config ที่ generate แล้วมาใน PR เดียวกัน (reviewer เห็น diff ของ config)
-      - name: Generated configs are up to date
-        run: uv run mdf generate --check
+      - name: Diff against PR base
+        run: uv run mdf diff --base ${{ github.event.pull_request.base.sha }}
 
-      # 3) contract <-> bronze <-> silver ต้องชี้หากันครบ ไม่มี orphan
-      - name: Reference check
-        run: uv run mdf check-refs
+      - name: Compile preview
+        run: uv run mdf compile --env dev
 
-      - name: Lint
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
+      - name: Build preview package
+        run: uv run mdf package --env dev
 
-      - name: Unit tests
+      - name: Verify package integrity
+        run: uv run mdf verify-package build/dev/release
+
+      - name: Run test suite
         run: uv run pytest
+
+      - name: Upload preview + report artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdf-preview-${{ github.run_id }}
+          path: |
+            build/dev/release
+            build/dev/resolved
+          retention-days: 7

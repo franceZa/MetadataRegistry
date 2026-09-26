@@ -34,7 +34,7 @@ servers:
     environment: dev
     type: custom
     format: csv
-    location: "/Volumes/dev_catalog/landing_cc/files/customer/"
+    location: "/Volumes/{catalog}/landing_{source}/files/customer/"
 
 slaProperties:
   - property: frequency
@@ -86,6 +86,7 @@ schema:
           pattern:
             "^[0-9]{13}$" # REALITY: one row per file is "123". The gate
             # must FAIL this claim, not silently pass.
+        tags: ["dq:pattern"]
         description: "Thai national ID. Source claims always 13 digits."
         customProperties:
           - { property: pii, value: true }
@@ -146,14 +147,12 @@ schema:
         physicalType: string
         required: true
         classification: none
+        tags: ["dq:valid_values"]
         description: "Lifecycle status of customer account."
-        quality:
-          - type: library
-            rule: validValues
-            validValues: [ACTIVE, DORMANT, CLOSED]
         customProperties:
           - { property: pii, value: false }
           - { property: pci, value: false }
+          - { property: valid_values, value: ["ACTIVE", "DORMANT", "CLOSED"] }
 
       - name: business_date
         logicalType: date

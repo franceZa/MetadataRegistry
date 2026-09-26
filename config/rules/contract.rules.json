@@ -1,0 +1,76 @@
+[
+  {
+    "id": "CTR_API_VERSION",
+    "description": "apiVersion must be v3.0.2",
+    "scope": "file",
+    "field": "apiVersion",
+    "operator": "regex",
+    "value": "^v3\\.0\\.2$",
+    "message": "apiVersion ต้องเป็น v3.0.2 เท่านั้น",
+    "fix": "กำหนด apiVersion: v3.0.2",
+    "severity": "error"
+  },
+  {
+    "id": "CTR_KIND",
+    "description": "kind must be DataContract",
+    "scope": "file",
+    "field": "kind",
+    "operator": "regex",
+    "value": "^DataContract$",
+    "message": "kind ต้องเป็น DataContract",
+    "fix": "กำหนด kind: DataContract",
+    "severity": "error"
+  },
+  {
+    "id": "CTR_ID_FORMAT",
+    "description": "id must follow <source>.<dataset> format",
+    "scope": "file",
+    "field": "id",
+    "operator": "regex",
+    "value": "^[a-z0-9_]+\\.[a-z0-9_]+$",
+    "message": "id ต้องอยู่ในรูปแบบ <source>.<dataset> ตัวพิมพ์เล็ก snake_case",
+    "severity": "error"
+  },
+  {
+    "id": "CTR_STATUS",
+    "description": "status must be draft, active, or deprecated",
+    "scope": "file",
+    "field": "status",
+    "operator": "in",
+    "value": [
+      "draft",
+      "active",
+      "deprecated"
+    ],
+    "message": "status ต้องเป็น draft, active หรือ deprecated",
+    "severity": "error"
+  },
+  {
+    "id": "CTR_SERVERS_REQUIRED",
+    "description": "servers must be specified",
+    "scope": "file",
+    "field": "servers",
+    "operator": "required",
+    "message": "ต้องระบุ servers สำหรับ landing location",
+    "severity": "error"
+  },
+  {
+    "id": "CTR_COL_DESC",
+    "description": "Every column in schema properties must have a description (DQ-7)",
+    "scope": "property",
+    "field": "description",
+    "operator": "required",
+    "message": "ทุกคอลัมน์ใน schema ต้องมีคำอธิบาย (description)",
+    "fix": "ใส่ description อธิบายความหมายของคอลัมน์",
+    "severity": "error"
+  },
+  {
+    "id": "CTR_COL_PHYSICAL_TYPE",
+    "description": "Every column must have physicalType",
+    "scope": "property",
+    "field": "physicalType",
+    "operator": "required",
+    "message": "ทุกคอลัมน์ต้องระบุ physicalType",
+    "severity": "error"
+  }
+]

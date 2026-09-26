@@ -28,7 +28,7 @@ servers:
     environment: dev
     type: custom
     format: csv
-    location: "/Volumes/dev_catalog/landing_cc/files/credit_card/"
+    location: "/Volumes/{catalog}/landing_{source}/files/credit_card/"
 
 slaProperties:
   - property: frequency
@@ -74,10 +74,7 @@ schema:
             "^[0-9]{15,16}$" # REALITY: fails on the spaced variant
             # BEFORE normalisation - which is the
             # behaviour we want to observe
-        quality:
-          - type: custom
-            engine: mdf
-            implementation: luhn_valid
+        tags: ["dq:pattern", "dq:luhn"]
         description: "Card PAN. Test BINs only in this environment."
         customProperties:
           - { property: pii, value: true }
@@ -92,6 +89,7 @@ schema:
         physicalType: string
         required: true
         classification: none
+        tags: ["dq:fk"]
         description: "REALITY: one row per file references CUST999999, which
           does not exist. Silver join must not silently drop it
           (prawden 8)."
@@ -105,14 +103,12 @@ schema:
         physicalType: string
         required: true
         classification: none
+        tags: ["dq:valid_values"]
         description: "Card brand scheme (VISA, MASTERCARD, AMEX)."
-        quality:
-          - type: library
-            rule: validValues
-            validValues: [VISA, MASTERCARD, AMEX]
         customProperties:
           - { property: pii, value: false }
           - { property: pci, value: false }
+          - { property: valid_values, value: ["VISA", "MASTERCARD", "AMEX"] }
 
       - name: issue_date
         logicalType: date
@@ -150,14 +146,12 @@ schema:
         physicalType: string
         required: true
         classification: none
+        tags: ["dq:valid_values"]
         description: "Operational status of credit card account."
-        quality:
-          - type: library
-            rule: validValues
-            validValues: [ACTIVE, BLOCKED, EXPIRED]
         customProperties:
           - { property: pii, value: false }
           - { property: pci, value: false }
+          - { property: valid_values, value: ["ACTIVE", "BLOCKED", "EXPIRED"] }
 
       - name: business_date
         logicalType: date

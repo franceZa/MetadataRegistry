@@ -1,0 +1,27 @@
+# CODEOWNERS.example — ตัวอย่างเท่านั้น (ยังไม่บังคับใช้)
+#
+# ⚠️ ไฟล์นี้เป็น .example — ต้อง copy เป็น .github/CODEOWNERS และเติมชื่อ team/คนจริง
+#    เมื่อมี GitHub remote repo (DEP-1) ตาม AS-7: ห้ามเดาชื่อ team
+#
+# รูปแบบ: <path> <owner(s)>
+
+# ---------- Data Contracts (เจ้าของ: BA / Data Steward) ----------
+# ไฟล์ contract = คำมั่นของต้นทาง — แก้ได้โดย BA/Steward เท่านั้น
+DataContract/*/contract/**   @data-steward-team
+DataContract/_template/contract/**  @data-steward-team
+
+# ---------- Pipeline (เจ้าของ: Data Engineer) ----------
+# กฎเฉพาะ dataset (BU constraint), derived, dedup, load, retention
+DataContract/*/pipeline/**  @data-engineer-team
+DataContract/_template/pipeline/**  @data-engineer-team
+
+# ---------- DQ Rule Library (เจ้าของร่วม: BU + DE ตาม DQ-6) ----------
+# แก้กฎข้อเดียวมี blast radius ข้าม dataset — ต้อง review ทั้งสองฝ่าย
+config/dq_library.yaml       @data-steward-team @data-engineer-team
+
+# ---------- Config & Workflows (เจ้าของ: Platform) ----------
+config/**                   @platform-team
+.github/workflows/**        @platform-team
+pyproject.toml              @platform-team
+src/**                      @platform-team
+tests/**                    @platform-team
