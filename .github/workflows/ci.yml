@@ -1,0 +1,47 @@
+# CI — runs on every PR into main. Any failing step blocks the merge
+# (enable "Require status checks to pass" for job `ci` in branch protection).
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install (locked)
+        run: uv sync --locked
+
+      # 1) เหมือนที่ BA รันบนเครื่อง — error จะขึ้นเป็น comment บนบรรทัดใน PR ด้วย
+      - name: Validate Data Contracts
+        run: uv run mdf validate
+
+      # 2) BA ต้อง commit config ที่ generate แล้วมาใน PR เดียวกัน (reviewer เห็น diff ของ config)
+      - name: Generated configs are up to date
+        run: uv run mdf generate --check
+
+      # 3) contract <-> bronze <-> silver ต้องชี้หากันครบ ไม่มี orphan
+      - name: Reference check
+        run: uv run mdf check-refs
+
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Unit tests
+        run: uv run pytest

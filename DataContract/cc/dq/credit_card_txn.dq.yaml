@@ -1,0 +1,57 @@
+# DQ + pipeline spec - credit_card_txn
+#
+# ไฟล์นี้คือ "สิ่งที่ pipeline ต้องทำ" กับข้อมูลที่ contract รับปากไว้
+# (ส่วนตัว contract = DataContract/cc/contract/credit_card_txn.odcs.yaml)
+# converted from DataContract/_legacy/cc/credit_card_txn.yaml
+
+dq_version: 1
+contract_ref: cc.credit_card_txn@1
+framework: "1.x"
+
+columns:
+  card_pan:
+    tokenise: true
+    normalise:
+      - strip_whitespace
+
+derived: []
+
+business_rules:
+  - name: approved_amount_positive
+    expression: "NOT (txn_status = 'APPROVED' AND amount <= 0)"
+    severity: reject
+    origin: source
+
+  - name: txn_timestamp_present
+    expression: "txn_timestamp IS NOT NULL"
+    severity: reject
+    origin: source
+
+  - name: txn_timestamp_matches_business_date
+    expression: "txn_timestamp IS NULL OR to_date(txn_timestamp) = business_date"
+    severity: flag
+    origin: source
+
+  - name: amount_within_sane_bound
+    expression: "amount <= 1000000"
+    severity: flag
+    origin: internal
+
+dedup:
+  keys: [txn_id]
+  order_by: txn_timestamp
+
+quarantine:
+  enabled: true
+
+dq_policy: latency_first
+
+ops:
+  reconciliation_interval: 2h
+  min_dq_pass_rate: 0.99
+
+retention:
+  bronze: 30d
+  silver: 1825d
+  quarantine: 90d
+  vault: null

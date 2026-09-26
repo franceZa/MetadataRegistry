@@ -1,0 +1,4 @@
+# Generated configs are compared byte-for-byte by `mdf generate --check`.
+# Force LF everywhere so Windows checkouts produce the same bytes as CI (Linux).
+* text=auto eol=lf
+*.json text eol=lf

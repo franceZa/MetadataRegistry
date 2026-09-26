@@ -1,0 +1,63 @@
+# DQ + pipeline spec - credit_card
+#
+# ไฟล์นี้คือ "สิ่งที่ pipeline ต้องทำ" กับข้อมูลที่ contract รับปากไว้
+# (ส่วนตัว contract = DataContract/cc/contract/credit_card.odcs.yaml)
+# converted from DataContract/_legacy/cc/credit_card.yaml
+
+dq_version: 1
+contract_ref: cc.credit_card@1
+framework: "1.x"
+
+columns:
+  card_pan:
+    tokenise: true
+    normalise:
+      # REALITY: the same PAN is re-sent with spaces ("5555 5500 ...").
+      # Without this normalisation step the two forms tokenise to two
+      # different tokens and one card silently becomes two.
+      - strip_whitespace
+
+derived: []
+
+business_rules:
+  - name: expiry_after_issue
+    expression: "expiry_date > issue_date"
+    severity: reject
+    origin: source
+
+  - name: credit_limit_numeric_positive
+    expression: "CAST(credit_limit AS DECIMAL(18,2)) > 0"
+    severity: reject
+    origin: source
+
+  - name: pan_luhn_valid
+    expression: "card_pan IS NOT NULL"
+    severity: reject
+    origin: source
+    note: "real Luhn check runs in the DQ engine, not as a SQL expression"
+
+  - name: customer_exists
+    expression: "customer_id IS NOT NULL"
+    severity: flag
+    origin: internal
+    note: "true FK integrity is checked at the Silver join, not here"
+
+dedup:
+  keys: [card_pan]
+  order_by: business_date
+  note: "dedup runs AFTER normalisation, or the spaced-PAN duplicate survives"
+
+quarantine:
+  enabled: true
+
+dq_policy: quality_first
+
+ops:
+  reconciliation_interval: 2h
+  min_dq_pass_rate: 0.99
+
+retention:
+  bronze: 30d
+  silver: 1825d
+  quarantine: 180d
+  vault: 1825d

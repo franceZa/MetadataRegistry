@@ -1,0 +1,59 @@
+# CD — runs after a PR is merged into main.
+# CI already required the generated configs to be committed in the PR, so normally this
+# job finds nothing to change. It is a safety net: if main ever drifts (e.g. a direct push,
+# or two PRs merged that each were up to date alone), it regenerates and commits the result.
+# Git history of metadata/ = the version history of all metadata (no database).
+name: CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "DataContract/**"
+      - "metadata/**"
+      - "src/**"
+      - "uv.lock"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cd-main
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    # skip the commit this job itself pushes
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install (locked)
+        run: uv sync --locked
+
+      - name: Validate Data Contracts
+        run: uv run mdf validate
+
+      - name: Generate Bronze/Silver configs
+        run: uv run mdf generate
+
+      - name: Reference check
+        run: uv run mdf check-refs
+
+      - name: Commit generated configs (only if changed)
+        run: |
+          git add metadata/specs metadata/resolved
+          if git diff --cached --quiet; then
+            echo "configs already up to date — nothing to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(metadata): regenerate configs for ${GITHUB_SHA::7}"
+          git push

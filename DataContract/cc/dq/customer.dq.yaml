@@ -1,0 +1,62 @@
+# DQ + pipeline spec - customer
+#
+# ไฟล์นี้คือ "สิ่งที่ pipeline ต้องทำ" กับข้อมูลที่ contract รับปากไว้
+# (ส่วนตัว contract = DataContract/cc/contract/customer.odcs.yaml)
+# converted from DataContract/_legacy/cc/customer.yaml
+
+dq_version: 1
+contract_ref: cc.customer@1 # <contract id>@<major version ของ contract>
+framework: "1.x"
+
+# tokenise / normalise ต่อคอลัมน์ (คอลัมน์ที่ไม่ระบุ = ไม่แปลง)
+columns:
+  national_id:
+    tokenise: true
+    normalise: []
+  full_name:
+    tokenise: true
+    normalise: []
+
+derived: []
+
+business_rules:
+  - name: birth_date_not_future
+    expression: "birth_date <= current_date()"
+    severity: reject
+    origin: source
+
+  - name: national_id_well_formed
+    expression: "length(national_id) = 13 AND national_id RLIKE '^[0-9]+$'"
+    severity: reject
+    origin: source
+
+  - name: full_name_present
+    expression: "full_name IS NOT NULL AND trim(full_name) <> ''"
+    severity: reject
+    origin: source
+
+  - name: registered_after_birth
+    expression: "registered_date IS NULL OR registered_date > birth_date"
+    severity: flag
+    origin: source
+
+dedup:
+  keys: [customer_id]
+  order_by: business_date
+  # REALITY: one customer_id appears twice per file with differing
+  # customer_status. Dedup must collapse deterministically (prawden 3).
+
+quarantine:
+  enabled: true
+
+dq_policy: quality_first
+
+ops:
+  reconciliation_interval: 2h
+  min_dq_pass_rate: 0.99
+
+retention:
+  bronze: 90d
+  silver: 1825d
+  quarantine: 180d
+  vault: 1825d

@@ -1,0 +1,171 @@
+# Data contract - credit_card_txn (dataset 3/3)
+#
+# The high-volume fact table. One run = exactly one business_date.
+# All REALITY notes here are carried over unchanged.
+#
+# Format: ODCS v3.0.2 (converted from DataContract/_legacy/cc/credit_card_txn.yaml).
+# Pipeline behaviour lives in DataContract/cc/dq/credit_card_txn.dq.yaml
+
+apiVersion: v3.0.2
+kind: DataContract
+id: cc.credit_card_txn
+name: credit_card_txn
+version: 1.0.0
+status: active
+domain: card
+description:
+  purpose: "Card transactions. High volume fact, one file per business_date."
+
+team:
+  - username: patcharajak.yon@gmail.com
+    role: steward
+  - username: source-system-owner
+    role: owner
+
+servers:
+  - server: landing-dev
+    environment: dev
+    type: custom
+    format: csv
+    location: "/Volumes/dev_catalog/landing_cc/files/credit_card_txn/"
+
+slaProperties:
+  - property: frequency
+    value: daily
+  - property: latency # grace period before a file counts as missing
+    value: 4
+    unit: h
+  # REALITY: business_date=2026-09-11 arrives LATE (outside the normal
+  # window, inside grace). Per FR-E.6 this must NOT page anyone - a late
+  # file within grace is not an incident. It must still be recorded as LATE
+  # so the arrival-pattern history is honest (prawden 1, prawden 5).
+
+customProperties:
+  - property: source_system
+    value: cc
+  - property: source_type
+    value: batch_file
+  - property: file_pattern
+    value: "credit_card_txn_{{business_date}}*.csv"
+    # note the glob: the late file is named ..._2026-09-11.late.csv
+  - property: partition_pattern
+    value: ""
+  - property: header
+    value: true
+  - property: encoding
+    value: utf-8
+  - property: run_grain
+    value: business_date
+  - property: erasure_target
+    value: null
+
+schema:
+  - name: credit_card_txn
+    physicalType: table
+    properties:
+      - name: txn_id
+        logicalType: string
+        physicalType: string
+        required: true
+        primaryKey: true
+        primaryKeyPosition: 1
+        classification: none
+        description: "Unique transaction identifier primary key."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: card_pan
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: sensitive
+        description: "REALITY: one row per file uses a PAN that appears in no
+          credit_card file (prawden 8). Also: every txn on
+          business_date=2026-09-10 references cards whose master
+          file was never delivered - the join must degrade
+          gracefully rather than dropping a day of revenue."
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: true }
+          - { property: foreign_key, value: cc.credit_card.card_pan }
+
+      - name: txn_timestamp
+        logicalType: date
+        physicalType: timestamp
+        required: true
+        classification: none
+        description: "REALITY: one row per file is empty."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: amount
+        logicalType: number
+        physicalType: decimal(18,2)
+        required: true
+        classification: none
+        description: "REALITY: one APPROVED row per file has a negative amount."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: currency
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: none
+        description: "ISO currency code for transaction amount."
+        quality:
+          - type: library
+            rule: validValues
+            validValues: [THB]
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: merchant_name
+        logicalType: string
+        physicalType: string
+        required: false
+        classification: none
+        description: "Merchant commercial trading name."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: merchant_category
+        logicalType: string
+        physicalType: string
+        required: false
+        classification: none
+        description: "Merchant classification and category code."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: txn_status
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: none
+        description: "Transaction processing result status."
+        quality:
+          - type: library
+            rule: validValues
+            validValues: [APPROVED, DECLINED, REVERSED]
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: business_date
+        logicalType: date
+        physicalType: date
+        required: true
+        partitioned: true
+        partitionKeyPosition: 1
+        classification: none
+        description: "Business date partition key."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }

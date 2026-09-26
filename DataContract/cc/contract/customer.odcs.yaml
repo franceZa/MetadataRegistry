@@ -1,0 +1,168 @@
+# Data contract - customer (dataset 1/3)
+#
+# IMPORTANT: this contract is deliberately written to be PARTLY WRONG about
+# the real data. That is the point of testing - we do not trust the
+# source's data dictionary, so the contract-vs-reality gate must be able to
+# catch a source that claims something untrue. The claims marked
+# `# REALITY:` below are the planted lies.
+#
+# Nothing here should be "fixed" to match the data. Fixing it would delete
+# the test. Every `# REALITY:` line below is byte-for-byte unchanged.
+#
+# Format: ODCS v3.0.2 (converted from DataContract/_legacy/cc/customer.yaml).
+# Pipeline behaviour (business rules, dedup, tokenise, retention) lives in
+# DataContract/cc/dq/customer.dq.yaml
+
+apiVersion: v3.0.2
+kind: DataContract
+id: cc.customer
+name: customer
+version: 1.0.0
+status: active
+domain: customer
+description:
+  purpose: "Customer master with PII. One file per business_date."
+
+team:
+  - username: patcharajak.yon@gmail.com
+    role: steward
+  - username: source-system-owner
+    role: owner
+
+servers:
+  - server: landing-dev
+    environment: dev
+    type: custom
+    format: csv
+    location: "/Volumes/dev_catalog/landing_cc/files/customer/"
+
+slaProperties:
+  - property: frequency
+    value: daily
+  - property: latency # grace period before a file counts as missing
+    value: 4
+    unit: h
+
+customProperties:
+  - property: source_system
+    value: cc
+  - property: source_type
+    value: batch_file
+  - property: file_pattern
+    value: "customer_{{business_date}}.csv"
+  - property: partition_pattern
+    value: ""
+  - property: header
+    value: true
+  - property: encoding
+    value: utf-8
+  - property: run_grain
+    value: business_date
+  - property: erasure_target
+    value: vault
+
+schema:
+  - name: customer
+    physicalType: table
+    properties:
+      - name: customer_id
+        logicalType: string
+        physicalType: string
+        required: true
+        primaryKey: true
+        primaryKeyPosition: 1
+        classification: none
+        description: "Stable customer identifier"
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: national_id
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: sensitive
+        logicalTypeOptions:
+          pattern:
+            "^[0-9]{13}$" # REALITY: one row per file is "123". The gate
+            # must FAIL this claim, not silently pass.
+        description: "Thai national ID. Source claims always 13 digits."
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: false }
+
+      - name: full_name
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: sensitive
+        description: "REALITY: one row per file is empty despite nullable=false"
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: false }
+
+      - name: birth_date
+        logicalType: date
+        physicalType: date
+        required: true
+        classification: sensitive
+        description: "REALITY: one row per file is in the future"
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: false }
+
+      - name: email
+        logicalType: string
+        physicalType: string
+        required: false
+        classification: personal
+        description: "Customer primary contact email address."
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: false }
+
+      - name: phone
+        logicalType: string
+        physicalType: string
+        required: false
+        classification: personal
+        description: "Customer contact mobile phone number."
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: false }
+
+      - name: registered_date
+        logicalType: date
+        physicalType: date
+        required: false
+        classification: none
+        description: "Date when customer account was registered."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: customer_status
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: none
+        description: "Lifecycle status of customer account."
+        quality:
+          - type: library
+            rule: validValues
+            validValues: [ACTIVE, DORMANT, CLOSED]
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: business_date
+        logicalType: date
+        physicalType: date
+        required: true
+        partitioned: true
+        partitionKeyPosition: 1
+        classification: none
+        description: "Partition key. FR-D.5: one run handles exactly one."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }

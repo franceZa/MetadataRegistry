@@ -1,0 +1,63 @@
+# =============================================================================
+# DQ + pipeline Template (คู่กับ contract/<dataset>.odcs.yaml)
+# =============================================================================
+# วางไว้ที่ DataContract/<source>/dq/<dataset>.dq.yaml (ชื่อ dataset ต้องตรงกับ contract)
+# ไฟล์นี้เก็บ "สิ่งที่ pipeline ทำ": business rule + severity, tokenise/normalise,
+# derived column, dedup, quarantine, dq_policy, retention
+# =============================================================================
+
+dq_version: 1
+contract_ref: my_source.my_dataset@1 # <contract id>@<major version ของ contract>
+framework: "1.x"
+
+# tokenise / normalise ต่อคอลัมน์ — ชื่อคอลัมน์ต้องมีอยู่ใน contract
+# คอลัมน์ที่ pci=true ใน contract ต้อง tokenise: true (rule PCI_MUST_TOKENISE)
+columns:
+  national_id:
+    tokenise: true
+    normalise: [strip_whitespace] # strip_whitespace | upper | lower | trim | digits_only | normalise_nfc
+
+# คอลัมน์ที่คำนวณขึ้นใน Silver (ต้นทางไม่ได้ส่งมา)
+derived:
+  - name: age
+    type: integer
+    derivation: expression # expression | lookup | window
+    expr: "FLOOR(DATEDIFF(CURRENT_DATE(), birth_date) / 365.25)"
+    after: normalise # normalise | tokenise — คำนวณหลัง step ไหน
+    description: "อายุเต็มปี คำนวณจาก birth_date ตอนเขียน silver"
+
+business_rules:
+  - name: my_id_present
+    expression: "my_id IS NOT NULL" # SQL boolean ต่อแถว: true = ผ่าน
+    severity: reject # block = หยุด run | reject = ส่งไป quarantine | flag = นับเป็น metric
+    origin: source # source = ต้นทางรับปาก | internal = กฎภายในของเรา
+
+  - name: birth_date_not_future
+    expression: "birth_date <= current_date()"
+    severity: reject
+    origin: source
+    note: "วันเกิดต้องไม่เป็นวันที่ในอนาคต"
+
+  - name: age_within_sane_bound
+    expression: "age IS NULL OR age BETWEEN 0 AND 130"
+    severity: flag
+    origin: internal
+
+dedup:
+  keys: [my_id] # ต้องเป็นคอลัมน์ใน contract หรือ derived
+  order_by: business_date # แถวล่าสุดตามคอลัมน์นี้ชนะ
+
+quarantine:
+  enabled: true # ชื่อตาราง quarantine คำนวณจาก metadata/conventions.yaml
+
+dq_policy: quality_first # quality_first = หยุดถ้า DQ ต่ำ | latency_first = publish ต่อแต่ is_trusted=false
+
+ops:
+  reconciliation_interval: 2h
+  min_dq_pass_rate: 0.99 # 0.0 - 1.0
+
+retention:
+  bronze: 90d
+  silver: 1825d
+  quarantine: 180d
+  vault: 1825d # null ถ้าไม่มีคอลัมน์ที่ tokenise

@@ -1,0 +1,172 @@
+# Data contract - credit_card (dataset 2/3)
+#
+# card_pan is BOTH PCI data AND the business key used for join/upsert/partition.
+# As with customer_v1.yaml, some claims here are deliberately wrong. See
+# `# REALITY:` markers. All REALITY lines below are byte-for-byte unchanged.
+#
+# Format: ODCS v3.0.2 (converted from DataContract/_legacy/cc/credit_card.yaml).
+# Pipeline behaviour lives in DataContract/cc/dq/credit_card.dq.yaml
+
+apiVersion: v3.0.2
+kind: DataContract
+id: cc.credit_card
+name: credit_card
+version: 1.0.0
+status: active
+domain: card
+description:
+  purpose: "Card master. PCI. card_pan is the business key."
+
+team:
+  - username: patcharajak.yon@gmail.com
+    role: steward
+  - username: source-system-owner
+    role: owner
+
+servers:
+  - server: landing-dev
+    environment: dev
+    type: custom
+    format: csv
+    location: "/Volumes/dev_catalog/landing_cc/files/credit_card/"
+
+slaProperties:
+  - property: frequency
+    value: daily
+  - property: latency # grace period before a file counts as missing
+    value: 4
+    unit: h
+  # REALITY: the file for business_date=2026-09-10 is never delivered.
+  # Reconciliation must raise MISSING after the grace period (prawden 1),
+  # and must NOT silently treat the gap as "no cards issued that day".
+
+customProperties:
+  - property: source_system
+    value: cc
+  - property: source_type
+    value: batch_file
+  - property: file_pattern
+    value: "credit_card_{{business_date}}.csv"
+  - property: partition_pattern
+    value: ""
+  - property: header
+    value: true
+  - property: encoding
+    value: utf-8
+  - property: run_grain
+    value: business_date
+  - property: erasure_target
+    value: vault
+
+schema:
+  - name: credit_card
+    physicalType: table
+    properties:
+      - name: card_pan
+        logicalType: string
+        physicalType: string
+        required: true
+        primaryKey: true
+        primaryKeyPosition: 1
+        classification: sensitive
+        logicalTypeOptions:
+          pattern:
+            "^[0-9]{15,16}$" # REALITY: fails on the spaced variant
+            # BEFORE normalisation - which is the
+            # behaviour we want to observe
+        quality:
+          - type: custom
+            engine: mdf
+            implementation: luhn_valid
+        description: "Card PAN. Test BINs only in this environment."
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: true }
+        # REALITY: the same PAN is re-sent with spaces ("5555 5500 ...").
+        # Without this normalisation step the two forms tokenise to two
+        # different tokens and one card silently becomes two.
+        # (normalise: strip_whitespace -> DataContract/cc/dq/credit_card.dq.yaml)
+
+      - name: customer_id
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: none
+        description: "REALITY: one row per file references CUST999999, which
+          does not exist. Silver join must not silently drop it
+          (prawden 8)."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+          - { property: foreign_key, value: cc.customer.customer_id }
+
+      - name: card_type
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: none
+        description: "Card brand scheme (VISA, MASTERCARD, AMEX)."
+        quality:
+          - type: library
+            rule: validValues
+            validValues: [VISA, MASTERCARD, AMEX]
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: issue_date
+        logicalType: date
+        physicalType: date
+        required: true
+        classification: none
+        description: "Date when the credit card was issued."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: expiry_date
+        logicalType: date
+        physicalType: date
+        required: true
+        classification: none
+        description: "Expiration date of the credit card."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: credit_limit
+        logicalType: number
+        physicalType: decimal(18,2)
+        required: true
+        classification: none
+        description: "REALITY: one row per file contains the text 'UNLIMITED'
+          in this numeric column."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: card_status
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: none
+        description: "Operational status of credit card account."
+        quality:
+          - type: library
+            rule: validValues
+            validValues: [ACTIVE, BLOCKED, EXPIRED]
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: business_date
+        logicalType: date
+        physicalType: date
+        required: true
+        partitioned: true
+        partitionKeyPosition: 1
+        classification: none
+        description: "Business date partition key."
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
