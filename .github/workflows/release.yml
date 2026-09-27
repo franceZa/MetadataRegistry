@@ -20,12 +20,12 @@ jobs:
       release_id: ${{ steps.meta.outputs.release_id }}
     steps:
       - name: Checkout (exact SHA)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
@@ -56,7 +56,7 @@ jobs:
           echo "release_id=$(jq -r '.release_id' build/dev/release/manifest.json)" >> "$GITHUB_OUTPUT"
 
       - name: Upload package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mdf-release-${{ github.sha }}
           path: build/dev/release
@@ -73,10 +73,10 @@ jobs:
       RELEASE_ID: ${{ needs.build-and-verify.outputs.release_id }}
     steps:
       - name: Checkout (exact SHA)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
@@ -84,7 +84,7 @@ jobs:
         run: uv sync --locked
 
       - name: Download package artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: mdf-release-${{ github.sha }}
           path: build/dev/release
