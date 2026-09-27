@@ -1,0 +1,82 @@
+name: Deploy release to Databricks (dev)
+
+# T-40 · FR-L.2 / FR-L.9 / AC-41 · ADR-004
+# Keyless auth: GitHub OIDC -> Databricks service-principal federation (DATABRICKS_AUTH_TYPE=github-oidc).
+# No long-lived Databricks PAT / service-principal OAuth secret anywhere. All CD logic lives in scripts/deliver_release.sh
+# (the same script the manual U2M path runs), so enabling this workflow changes WHO runs CD, not HOW.
+#
+# Databricks Free Edition has no account console -> federation cannot be configured (R-20), so this
+# workflow is BUILD evidence only until a workspace with account admin exists. It stays dormant
+# unless repo variable MDF_CD_ENABLED == 'true' (set only after DATABRICKS_HOST / DATABRICKS_CLIENT_ID
+# variables and the `dev` environment exist).
+on:
+  workflow_call:
+    inputs:
+      release_id:
+        description: GitHub Release to deliver (mdf-<sha12>)
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: GitHub Release to deliver (mdf-<sha12>)
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deliver:
+    name: Deliver ${{ inputs.release_id }} (CD-1…8)
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      DATABRICKS_AUTH_TYPE: github-oidc
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      MDF_CATALOG: dev_catalog
+      MDF_TARGET: dev
+      MDF_ACTOR: github-oidc
+      RELEASE_ID: ${{ inputs.release_id }}
+    steps:
+      - name: Validate release_id
+        run: '[[ "$RELEASE_ID" =~ ^mdf-[0-9a-f]{12}$ ]]'
+
+      # The release tag points at the exact commit the package was built from, so the bundle
+      # (job definition + wheel) deployed in CD-5 matches the release being delivered.
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_id }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies (locked)
+        run: uv sync --locked
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Deliver (CD-1…8)
+        run: bash scripts/deliver_release.sh "$RELEASE_ID"
+
+      - name: Upload delivery evidence (masked)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdf-delivery-${{ inputs.release_id }}
+          path: build/deliver/${{ inputs.release_id }}/evidence.md
+          if-no-files-found: ignore
+          retention-days: 90

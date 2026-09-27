@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 
 from mdf.compile import compile_project
@@ -44,7 +45,9 @@ def _cmd_diff(args) -> int:
 def _cmd_package(args) -> int:
     try:
         pkg_dir = build_package(env=args.env, release=args.release)
+        manifest = json.loads((pkg_dir / "manifest.json").read_text(encoding="utf-8"))
         print(f"✅ package สร้างที่: {pkg_dir}")
+        print(f"   release_id={manifest['release_id']} preview={str(manifest['preview']).lower()}")
         if not args.release:
             print("   (โหมด preview — ใช้ --release เพื่อบังคับ release gate)")
         return 0
@@ -55,9 +58,11 @@ def _cmd_package(args) -> int:
 
 def _cmd_verify_package(args) -> int:
     try:
-        result = verify_package(args.package_dir)
+        result = verify_package(args.package_dir, expect_release_id=args.expect_release_id)
         print(
-            f"✅ package ผ่านการตรวจสอบ (OK): env={result['env']}, files={result['verified_files']}"
+            f"✅ package ผ่านการตรวจสอบ (OK): env={result['env']}, "
+            f"files={result['verified_files']}, release_id={result['release_id']}, "
+            f"manifest_sha256={result['manifest_sha256']}"
         )
         return 0
     except RuntimeError as e:
@@ -109,6 +114,11 @@ def build_parser() -> argparse.ArgumentParser:
         "verify-package", help="ตรวจสอบความถูกต้อง (tamper-evident) ของ package"
     )
     p_verify.add_argument("package_dir", help="โฟลเดอร์ package ที่มี manifest.json")
+    p_verify.add_argument(
+        "--expect-release-id",
+        default=None,
+        help="fail ถ้า manifest.release_id ไม่ตรงกับค่านี้ (FR-F.6)",
+    )
     p_verify.set_defaults(func=_cmd_verify_package)
 
     p_trace = sub.add_parser(

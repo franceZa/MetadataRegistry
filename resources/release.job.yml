@@ -1,0 +1,40 @@
+# T-38 · FR-L.7 / FR-L.8 / AC-42 · job mdf_release_register_dev
+# Serverless (environments), no schedule. release_id has NO usable default: the job fails
+# unless the caller passes one (never "latest").
+resources:
+  jobs:
+    mdf_release_register_dev:
+      name: mdf_release_register_dev
+      max_concurrent_runs: 1
+      parameters:
+        - name: release_id
+          default: ""
+        - name: mode
+          default: register
+        - name: actor
+          default: manual
+        - name: github_release_url
+          default: ""
+      environments:
+        - environment_key: mdf
+          spec:
+            client: "2"
+            dependencies:
+              - ../dist/*.whl
+      tasks:
+        - task_key: register
+          environment_key: mdf
+          python_wheel_task:
+            package_name: mdf
+            entry_point: mdf-register
+            parameters:
+              - --release-id
+              - "{{job.parameters.release_id}}"
+              - --mode
+              - "{{job.parameters.mode}}"
+              - --catalog
+              - ${var.catalog}
+              - --actor
+              - "{{job.parameters.actor}}"
+              - --github-release-url
+              - "{{job.parameters.github_release_url}}"
