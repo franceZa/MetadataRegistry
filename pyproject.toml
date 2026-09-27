@@ -10,6 +10,7 @@ dependencies = [
 
 [project.scripts]
 mdf = "mdf.cli:main"
+mdf-register = "mdf.register:entrypoint"
 
 [dependency-groups]
 dev = [

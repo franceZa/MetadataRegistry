@@ -1,0 +1,31 @@
+# T-38 · FR-J.1 / FR-L.6 · ADR-004
+# One target (dev, serverless). No host and no secret in this file: the host comes from the
+# CLI profile (`databricks -p <profile>`) or DATABRICKS_HOST at CD time (repo is public).
+bundle:
+  name: mdf
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for this target
+    default: dev_catalog
+  active_release_id:
+    description: >-
+      Release currently ACTIVATED (CD-8, FR-L.8). Default release_id for scheduled
+      runtime jobs in Phase 3. Empty until the first activation.
+    default: ""
+
+artifacts:
+  mdf_wheel:
+    type: whl
+    build: uv build --wheel
+    path: .
+
+targets:
+  dev:
+    mode: development
+    default: true
+    variables:
+      catalog: dev_catalog

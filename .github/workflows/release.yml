@@ -1,9 +1,10 @@
 name: Release (push master)
 
+# FR-L.1 / A-18: every push to master publishes GitHub Release `mdf-<sha12>`.
+# Idempotent: an existing release with identical content is skipped; different content fails.
 on:
   push:
     branches: [master]
-    tags: ['v*']
 
 concurrency:
   group: release-${{ github.ref }}
@@ -15,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      release_id: ${{ steps.meta.outputs.release_id }}
     steps:
       - name: Checkout (exact SHA)
         uses: actions/checkout@v4
@@ -32,17 +35,25 @@ jobs:
       - name: Validate DataContracts
         run: uv run mdf validate
 
+      # Tests rebuild build/dev/release as a preview package, so they must run
+      # BEFORE the release package is built (otherwise the artifact is preview).
+      - name: Run test suite
+        run: uv run pytest
+
       - name: Compile resolved configs
         run: uv run mdf compile --env dev
 
       - name: Build release package (gated)
         run: uv run mdf package --env dev --release
 
-      - name: Verify package integrity
-        run: uv run mdf verify-package build/dev/release
+      - name: Verify package integrity and release_id
+        run: uv run mdf verify-package build/dev/release --expect-release-id "mdf-${GITHUB_SHA::12}"
 
-      - name: Run test suite
-        run: uv run pytest
+      - name: Read release metadata
+        id: meta
+        run: |
+          test "$(jq -r '.preview' build/dev/release/manifest.json)" = "false"
+          echo "release_id=$(jq -r '.release_id' build/dev/release/manifest.json)" >> "$GITHUB_OUTPUT"
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
@@ -55,12 +66,22 @@ jobs:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     needs: build-and-verify
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     permissions:
       contents: write
+    env:
+      RELEASE_ID: ${{ needs.build-and-verify.outputs.release_id }}
     steps:
       - name: Checkout (exact SHA)
         uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies (locked)
+        run: uv sync --locked
 
       - name: Download package artifact
         uses: actions/download-artifact@v4
@@ -70,13 +91,43 @@ jobs:
 
       - name: Verify downloaded package
         run: |
-          uv run mdf verify-package build/dev/release
+          test "$RELEASE_ID" = "mdf-${GITHUB_SHA::12}"
+          uv run mdf verify-package build/dev/release --expect-release-id "$RELEASE_ID"
+          test "$(jq -r '.preview' build/dev/release/manifest.json)" = "false"
 
-      - name: Create GitHub Release
+      - name: Publish or skip if identical release exists
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "mdf ${{ github.ref_name }}" \
-            --generate-notes \
+          if gh release view "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            mkdir -p build/existing
+            gh release download "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" --dir build/existing
+            uv run mdf verify-package build/existing --expect-release-id "$RELEASE_ID"
+            # ci_run_url differs between runs of the same commit; everything else must match.
+            if ! diff <(jq -S 'del(.ci_run_url)' build/existing/manifest.json) \
+                      <(jq -S 'del(.ci_run_url)' build/dev/release/manifest.json); then
+              echo "::error::release $RELEASE_ID exists with different content"
+              exit 1
+            fi
+            echo "release $RELEASE_ID already published with identical content - skip"
+            exit 0
+          fi
+          gh release create "$RELEASE_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$RELEASE_ID" \
+            --notes "mdf release package for ${GITHUB_SHA}" \
             build/dev/release/*
+
+  # T-40 · AC-41: automated CD (CD-1…8) via GitHub OIDC. Dormant until repo variable
+  # MDF_CD_ENABLED == 'true' (needs workspace federation; not possible on Free Edition → manual path).
+  deliver:
+    name: Deliver to Databricks (dev)
+    needs: [build-and-verify, publish]
+    if: vars.MDF_CD_ENABLED == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/deploy-dev.yml
+    with:
+      release_id: ${{ needs.build-and-verify.outputs.release_id }}

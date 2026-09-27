@@ -27,7 +27,7 @@ def test_build_package_creates_manifest(built_package):
     assert len(manifest["files"]) == 6
     for entry in manifest["files"]:
         assert len(entry["sha256"]) == 64
-        assert (built_package / entry["file"]).exists()
+        assert (built_package / entry["path"]).exists()
 
 
 def test_verify_intact_package_passes(built_package):
