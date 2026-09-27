@@ -48,7 +48,7 @@ def test_ac41_no_long_lived_secrets():
 
 def test_ac41_single_delivery_script():
     runs = [s.get("run", "") for s in _job(_load(DEPLOY))["steps"]]
-    cd = [r for r in runs if "deliver_release.sh" in r]
+    cd = [r for r in runs if r.lstrip().startswith("bash scripts/deliver_release.sh")]
     assert cd == ['bash scripts/deliver_release.sh "$RELEASE_ID"']
     joined = "\n".join(runs)
     for inline in ("databricks fs", "databricks bundle", "release_registry", "INSERT"):
@@ -75,10 +75,29 @@ def test_evidence_uploaded_even_on_failure():
     assert up["with"]["path"].endswith("/evidence.md")
 
 
-def test_release_calls_deploy_guarded_after_publish():
-    job = _load(RELEASE)["jobs"]["deliver"]
+def test_release_calls_deploy_only_for_mode_auto_after_publish():
+    """FR-L.12 / AC-43: the switch is config/env/dev.yaml delivery_mode, not a repo variable."""
+    rel = _load(RELEASE)
+    job = rel["jobs"]["deliver"]
     assert job["uses"] == "./.github/workflows/deploy-dev.yml"
-    assert job["if"] == "vars.MDF_CD_ENABLED == 'true'"
+    assert job["if"] == "needs.build-and-verify.outputs.delivery_mode == 'auto'"
     assert set(job["needs"]) == {"build-and-verify", "publish"}
     assert job["permissions"] == {"contents": "read", "id-token": "write"}
     assert job["with"]["release_id"] == "${{ needs.build-and-verify.outputs.release_id }}"
+    build = rel["jobs"]["build-and-verify"]
+    assert build["outputs"]["delivery_mode"] == "${{ steps.meta.outputs.delivery_mode }}"
+    meta = next(s for s in build["steps"] if s.get("id") == "meta")
+    assert "config/env/dev.yaml" in meta["run"] and "delivery_mode" in meta["run"]
+    assert "MDF_CD_ENABLED" not in RELEASE.read_text(encoding="utf-8")
+
+
+def test_auto_preflight_stops_with_guidance_before_delivery():
+    """T-46(3) / AS-28: missing federation vars -> fail at preflight with next steps."""
+    steps = _job(_load(DEPLOY))["steps"]
+    names = [s.get("name", "") for s in steps]
+    pre = names.index("Preflight (mode auto needs DEP-3 federation)")
+    assert pre < names.index("Deliver (CD-1…8)")
+    run = steps[pre]["run"]
+    assert "DATABRICKS_HOST" in run and "DATABRICKS_CLIENT_ID" in run
+    assert "exit 1" in run and "GITHUB_STEP_SUMMARY" in run
+    assert "delivery_mode: u2m" in run and "runbooks/release-delivery.md" in run

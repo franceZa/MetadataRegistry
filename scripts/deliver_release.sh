@@ -66,6 +66,22 @@ ev ""
 ev "- actor: ${ACTOR} · catalog: ${CATALOG} · target: ${TARGET} · started: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 [ "$ACTOR" = "manual" ] && ev "- ⚠️ manual run (D-P5-6): automated CD (deploy-dev.yml) NOT proven by this run"
 
+# ---------- preflight (FR-L.14 ค · T-45) ----------
+# Stop BEFORE any step with a concrete next action when the tools or the login are missing.
+next_manual="ขั้นต่อไป: ใช้ mode manual (ไม่ต้องมี CLI) → python scripts/next_steps.py manual ${RELEASE_ID} · ดู runbooks/release-delivery.md"
+command -v databricks >/dev/null 2>&1 || { echo "❌ [PREFLIGHT] ไม่พบคำสั่ง databricks (Databricks CLI)" >&2; echo "ขั้นต่อไป: ติดตั้ง CLI https://docs.databricks.com/dev-tools/cli/install.html แล้วรันใหม่ — หรือ ${next_manual#ขั้นต่อไป: }" >&2; exit 1; }
+[ -n "$FROM_DIR" ] || command -v gh >/dev/null 2>&1 || { echo "❌ [PREFLIGHT] ไม่พบคำสั่ง gh (GitHub CLI) สำหรับดาวน์โหลด release" >&2; echo "ขั้นต่อไป: ติดตั้ง gh หรือดาวน์โหลดไฟล์จากหน้า Release เองแล้วรันด้วย --from-dir <โฟลเดอร์> — หรือ ${next_manual#ขั้นต่อไป: }" >&2; exit 1; }
+if ! AUTH_OUT="$(databricks current-user me --output json 2>&1)"; then
+  echo "❌ [PREFLIGHT] login Databricks ไม่ผ่าน: $(printf '%s' "$AUTH_OUT" | head -1 | mask)" >&2
+  if [ "$ACTOR" = "github-oidc" ]; then
+    echo "ขั้นต่อไป: ตรวจ federation policy + repo variables DATABRICKS_HOST / DATABRICKS_CLIENT_ID (DEP-3) — หรือเปลี่ยน config/env/dev.yaml เป็น delivery_mode: u2m" >&2
+  else
+    echo "ขั้นต่อไป: databricks auth login --host https://<workspace-host> --profile ${DATABRICKS_CONFIG_PROFILE:-<profile>} แล้วรันคำสั่งเดิมอีกครั้ง" >&2
+    echo "ถ้า login ไม่ได้จริง ๆ: ${next_manual#ขั้นต่อไป: }" >&2
+  fi
+  exit 1
+fi
+
 # ---------- CD-1 ----------
 PKG="$WORK/pkg"
 RELEASE_URL=""

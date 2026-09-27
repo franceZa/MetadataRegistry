@@ -6,9 +6,9 @@ name: Deploy release to Databricks (dev)
 # (the same script the manual U2M path runs), so enabling this workflow changes WHO runs CD, not HOW.
 #
 # Databricks Free Edition has no account console -> federation cannot be configured (R-20), so this
-# workflow is BUILD evidence only until a workspace with account admin exists. It stays dormant
-# unless repo variable MDF_CD_ENABLED == 'true' (set only after DATABRICKS_HOST / DATABRICKS_CLIENT_ID
-# variables and the `dev` environment exist).
+# workflow is BUILD evidence only until a workspace with account admin exists. release.yml calls it
+# only when config/env/dev.yaml has delivery_mode: auto (FR-L.12); the preflight step below stops
+# with next-step guidance if the federation variables are missing (DEP-3).
 on:
   workflow_call:
     inputs:
@@ -50,6 +50,24 @@ jobs:
     steps:
       - name: Validate release_id
         run: '[[ "$RELEASE_ID" =~ ^mdf-[0-9a-f]{12}$ ]]'
+
+      # T-46(3) · AS-28: mode `auto` without federation must stop here with guidance, not half-deliver.
+      - name: Preflight (mode auto needs DEP-3 federation)
+        run: |
+          if [ -z "$DATABRICKS_HOST" ] || [ -z "$DATABRICKS_CLIENT_ID" ]; then
+            {
+              echo "## ❌ delivery_mode: auto — ยังตั้ง federation ไม่ครบ (DEP-3)"
+              echo "ต้องมี repo variables DATABRICKS_HOST + DATABRICKS_CLIENT_ID และ federation policy บน workspace ที่ไม่ใช่ Free Edition"
+              echo ""
+              echo "ขั้นต่อไป: เปลี่ยน config/env/dev.yaml เป็น delivery_mode: u2m แล้วรัน"
+              echo '```'
+              echo "bash scripts/deliver_release.sh $RELEASE_ID"
+              echo '```'
+              echo "หรือดู runbooks/release-delivery.md"
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "::error::delivery_mode auto requires DATABRICKS_HOST and DATABRICKS_CLIENT_ID (DEP-3)"
+            exit 1
+          fi
 
       # The release tag points at the exact commit the package was built from, so the bundle
       # (job definition + wheel) deployed in CD-5 matches the release being delivered.

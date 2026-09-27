@@ -354,7 +354,35 @@ def validate_project(
     # Run FK reference checks across all valid contracts
     validate_foreign_key_references(contracts_by_id, report)
 
+    validate_env_configs(cfg_base, report)
+
     return report
+
+
+DELIVERY_MODES = ("auto", "u2m", "manual")
+
+
+def validate_env_configs(cfg_base: Path, report: ValidationReport) -> None:
+    """FR-L.12 / AC-43: every config/env/<env>.yaml declares delivery_mode (auto|u2m|manual)."""
+    for env_path in sorted((cfg_base / "env").glob("*.yaml")):
+        try:
+            data = load_yaml_file(env_path) or {}
+        except Exception as e:  # noqa: BLE001 - surfaced as a validation error
+            report.add_error("ENV_CONFIG_INVALID", f"อ่านไฟล์ env ไม่ได้: {e}", str(env_path))
+            continue
+        mode = data.get("delivery_mode") if isinstance(data, dict) else None
+        if mode not in DELIVERY_MODES:
+            got = "ไม่มี key นี้" if mode is None else f"ได้ค่า '{mode}'"
+            report.add_error(
+                code="DELIVERY_MODE_INVALID",
+                message=f"delivery_mode ต้องเป็น auto, u2m หรือ manual ({got})",
+                file_path=str(env_path),
+                field="delivery_mode",
+                fix=(
+                    "ใส่ delivery_mode: u2m (login เองแล้วสคริปต์ทำต่อ) · auto (GitHub Actions · "
+                    "ต้องมี federation ไม่ใช่ Free Edition) · manual (ทำเองในเบราว์เซอร์)"
+                ),
+            )
 
 
 def validate_foreign_key_references(

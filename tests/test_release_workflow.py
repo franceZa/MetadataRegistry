@@ -124,3 +124,15 @@ def test_ac36_existing_release_skip_if_identical_fail_if_different():
     assert "verify-package build/existing" in existing
     assert "diff" in existing and "exit 1" in existing
     assert "exit 0" in existing
+
+
+def test_t45_publish_writes_next_steps_summary_for_configured_mode():
+    """FR-L.14 (ก): after publish/skip, the job summary shows next steps for delivery_mode."""
+    steps = _load()["jobs"]["publish"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    i = names.index("Next steps (job summary)")
+    assert i > names.index("Publish or skip if identical release exists")
+    step = steps[i]
+    assert step["env"]["DELIVERY_MODE"] == "${{ needs.build-and-verify.outputs.delivery_mode }}"
+    assert "scripts/next_steps.py" in step["run"] and "$RELEASE_ID" in step["run"]
+    assert "GITHUB_STEP_SUMMARY" in step["run"]
