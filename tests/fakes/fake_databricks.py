@@ -81,8 +81,17 @@ def fs(args):
         if dst.exists() and not overwrite:
             print(f"{paths[0]} -> {paths[1]} (skipped; already exists)")
             return 0
-        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.parent.is_dir():
+            # real CLI v1.17 (observed T-41, 2026-09-27): single-file cp does NOT create parents
+            print(
+                f"Error: no such directory: {paths[1].rsplit('/', 1)[0][len('dbfs:') :]}",
+                file=sys.stderr,
+            )
+            return 1
         shutil.copy2(src, dst)
+        return 0
+    if op == "mkdir":
+        _map(rest[0]).mkdir(parents=True, exist_ok=True)
         return 0
     return 2
 
