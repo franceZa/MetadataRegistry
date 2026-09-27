@@ -54,12 +54,12 @@ jobs:
       # The release tag points at the exact commit the package was built from, so the bundle
       # (job definition + wheel) deployed in CD-5 matches the release being delivered.
       - name: Checkout release commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.release_id }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
 
@@ -74,7 +74,7 @@ jobs:
 
       - name: Upload delivery evidence (masked)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mdf-delivery-${{ inputs.release_id }}
           path: build/deliver/${{ inputs.release_id }}/evidence.md
