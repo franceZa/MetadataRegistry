@@ -5,6 +5,10 @@ secret_scope: "mdf-dev"
 dummy: false
 # Real host is NOT committed (public repo): taken from the Databricks CLI profile / DATABRICKS_HOST at CD time (T-37, ADR-004).
 workspace_host: null
+# FR-L.12 · how releases reach Databricks: auto (GitHub OIDC, needs federation = not Free Edition)
+# | u2m (you `databricks auth login` once, scripts/deliver_release.sh does the rest)
+# | manual (browser only: runbooks/release-delivery.md). Change via PR.
+delivery_mode: u2m
 timezone: "Asia/Bangkok"
 default_catalog: false
 cluster_policy: null

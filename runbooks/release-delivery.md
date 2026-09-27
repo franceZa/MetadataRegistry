@@ -1,61 +1,124 @@
-# Runbook — ส่ง release ไป Databricks / rollback config (Phase 2 · E6)
+# Runbook — ส่ง release ไป Databricks · 3 mode · rollback (Phase 2 · E6)
 
-> ทุกคำสั่งในไฟล์นี้รันจริงแล้วบน Free Edition (T-41 และ T-42, 2026-09-27) · หลักฐาน: `qa-evidence/E6/T041/run.md`, `qa-evidence/E6/T042/run.md`
-> ตัวอย่างใช้ release จริง `mdf-98a182c99186` และ `mdf-ef2f425903b6` · host/email ของ workspace ไม่อยู่ใน repo (repo เป็น public)
+> คำสั่งและ SQL ทั้งหมดในไฟล์นี้รันจริงแล้วบน Free Edition (T-41, T-42, T-44 · 2026-09-27) · หลักฐาน: `qa-evidence/E6/T041/`, `T042/`, `T044/`
+> host/email ของ workspace ไม่อยู่ใน repo (repo เป็น public) · ตัวอย่างใช้ release จริง `mdf-ef2f425903b6`
 
-## 0. ภาพรวม
+## 0. เลือก mode
 
-```
-push master ──► release.yml ──► GitHub Release mdf-<sha12>      (อัตโนมัติ ทุก push)
-                                   │
-          คุณรัน (manual U2M) ─────┘
-          scripts/deliver_release.sh mdf-<sha12>
-            CD-1 ดาวน์โหลด asset          CD-5 bundle deploy (job mdf_release_register_dev)
-            CD-2 verify + release_id      CD-6 job: ตรวจ hash ใน workspace → REGISTERED
-            CD-3 คัดลอก → Volume (manifest ท้ายสุด = sealed)
-            CD-4 คัดลอกกลับ + verify      CD-7 query registry  · CD-8 job → ACTIVATED
+ตั้งใน `config/env/dev.yaml` บรรทัดเดียว แล้วแก้ผ่าน PR (merge แล้วมีผลกับ push ถัดไป):
+
+```yaml
+delivery_mode: u2m     # auto | u2m | manual
 ```
 
-- **ที่เก็บไฟล์:** `/Volumes/dev_catalog/ops/files/releases/<release_id>/` — มี `manifest.json` = sealed = ห้ามแก้
-- **แหล่งความจริงว่า release ไหนใช้งานอยู่:** แถว `ACTIVATED` ล่าสุดใน `dev_catalog.ops.release_registry` (append-only)
-- **CD อัตโนมัติ (`deploy-dev.yml`) ปิดอยู่** บน Free Edition — ดูข้อ 6
+| mode | ใครทำอะไร | ต้องมี | ใช้เมื่อ |
+|---|---|---|---|
+| `auto` | GitHub Actions ส่งเองหลัง push master · คุณแค่ approve Environment `dev` | workspace ที่ **ไม่ใช่** Free Edition + federation (ข้อ 5) | มี account admin |
+| `u2m` **(ค่าตั้งต้น)** | คุณ login ครั้งเดียว · สคริปต์ทำ CD-1…8 ให้ | Databricks CLI, GitHub CLI, uv, bash | ปกติบน Free Edition |
+| `manual` | คุณทำทุกขั้นในเบราว์เซอร์ | เบราว์เซอร์อย่างเดียว | ติดตั้ง/login CLI ไม่ได้จริง ๆ |
 
-## 1. เตรียมเครื่อง (ครั้งเดียว)
+**ถอยเมื่อไร:**
 
-| สิ่งที่ต้องมี | ตรวจด้วย |
+| เห็นอะไร | แปลว่า | ทำอะไร |
+|---|---|---|
+| mode `auto` · job หยุดที่ **Preflight (mode auto needs DEP-3 federation)** | ยังไม่มี federation | PR เปลี่ยนเป็น `u2m` → ทำข้อ 3 |
+| mode `u2m` · `❌ [PREFLIGHT] ไม่พบคำสั่ง databricks` / `gh` | เครื่องไม่มี CLI | ติดตั้งตามลิงก์ในข้อความ · ติดตั้งไม่ได้ → ข้อ 4 (manual) |
+| mode `u2m` · `❌ [PREFLIGHT] login Databricks ไม่ผ่าน` | token หมดอายุ/ไม่มี profile | รัน `databricks auth login …` ตามบรรทัด `ขั้นต่อไป:` · login ไม่ได้ → ข้อ 4 |
+
+ไม่ต้องจำ: หลัง push master เปิดหน้า run **Release (push master)** → job **Publish GitHub Release** → **Summary** จะมี "ขั้นต่อไป" ของ mode ปัจจุบันพร้อม `release_id` ใส่ไว้แล้ว · หรือรันเอง `python scripts/next_steps.py <mode> <release_id>`
+
+## 1. ภาพรวม
+
+```
+push master ─► release.yml ─► GitHub Release mdf-<sha12> + Summary "ขั้นต่อไป"
+                                 │
+      auto:   deploy-dev.yml ────┤  (OIDC · approve Environment dev)
+      u2m:    คุณรัน deliver_release.sh ┤  CD-1 ดาวน์โหลด  CD-2 verify  CD-3 คัดลอก (manifest ท้ายสุด)
+                                 │    CD-4 คัดลอกกลับ+verify  CD-5 bundle deploy  CD-6 REGISTERED
+                                 │    CD-7 query  CD-8 ACTIVATED
+      manual: คุณทำ M-1…M-7 ─────┘  อัปโหลดเอง + SQL สำเร็จรูป (ตรวจเท่ากับ job)
+                                 ▼
+      /Volumes/dev_catalog/ops/files/releases/<release_id>/     มี manifest.json = sealed ห้ามแก้
+      dev_catalog.ops.release_registry                          แถว ACTIVATED ล่าสุด = release ที่ใช้งาน
+```
+
+ทุก mode ได้ผลเหมือนกัน: REGISTERED 1 + ACTIVATED ≥1 ที่ `manifest_sha256` ตรงกับ `manifest.json` บนหน้า Release · ต่างกันแค่ `actor` (`github-oidc` / `manual` / `manual-ui`)
+
+## 2. mode `auto`
+
+1. หลัง push master เปิด run **Release (push master)** → job **Deliver to Databricks (dev)**
+2. ขึ้น *Waiting for review* → **Review deployments** → `dev` → **Approve**
+3. job เขียว → artifact `mdf-delivery-<release_id>` = หลักฐาน (masked)
+4. ตรวจตามข้อ 6 ต้องได้ `actor = github-oidc`
+
+ตั้งครั้งแรกตามข้อ 5 · ถ้าหยุดที่ Preflight = ยังตั้งไม่ครบ → ถอยไป `u2m`
+
+## 3. mode `u2m` (ค่าตั้งต้น)
+
+**เตรียมครั้งเดียว**
+
+| ต้องมี | ตรวจ |
 |---|---|
 | Databricks CLI ≥ 1.17 | `databricks --version` |
-| profile U2M ของ workspace | `databricks auth login --host <workspace-url> --profile mdf-free` แล้ว `databricks auth profiles` ต้องขึ้น `YES` |
-| GitHub CLI login | `gh auth status` |
+| profile U2M | `databricks auth login --host <workspace-url> --profile mdf-free` → `databricks auth profiles` ต้องขึ้น `YES` |
+| GitHub CLI | `gh auth status` |
 | uv | `uv --version` |
 | bash (Windows = git-bash) | `bash --version` |
 
-UC objects (ทำไปแล้วใน T-37 · รันซ้ำได้ไม่มีผล):
+**ส่ง release** (ทุกครั้ง · ~4–5 นาที)
+
 ```bash
-python run_sql.py <warehouse_id> sql/bootstrap/ops.sql   # หรือวาง SQL ใน SQL editor แทน ${catalog} ด้วย dev_catalog
+git fetch origin --tags
+git worktree add --detach ../mdf-rel-<sha12> mdf-<sha12>     # bundle ที่ deploy ต้องตรงกับ release
+cd ../mdf-rel-<sha12> && uv sync --locked
+export DATABRICKS_CONFIG_PROFILE=mdf-free
+export MDF_WAREHOUSE_ID=<id จาก `databricks warehouses list`>   # ไม่ตั้ง = ใช้ตัวแรก
+bash scripts/deliver_release.sh mdf-<sha12>
 ```
 
-## 2. ส่ง release ใหม่ (deploy)
+- จบด้วย `── ✅ delivered mdf-<sha12>` exit 0 · หลักฐาน `build/deliver/mdf-<sha12>/evidence.md`
+- `--no-activate` = register อย่างเดียว · `--from-dir DIR` = ใช้ package ในเครื่องแทนการดาวน์โหลด (เช่นเครื่องไม่มี `gh`)
+- รันซ้ำ id เดิมปลอดภัยเสมอ (ไม่คัดลอก ไม่เพิ่มแถว) · หยุดกลางทาง CD-3 → รันซ้ำจะคัดลอกต่อจนครบ
 
-1. หา release_id: `gh release list -R franceZa/MetadataRegistry` → เลือก `mdf-<sha12>` (แถว `Latest` = push ล่าสุด)
-2. **checkout commit ของ release นั้น** เพื่อให้ job/wheel ที่ deploy ตรงกับ package:
-   ```bash
-   git fetch origin --tags
-   git worktree add --detach ../mdf-rel-<sha12> <sha12>
-   cd ../mdf-rel-<sha12> && uv sync --locked
-   ```
-3. รัน:
-   ```bash
-   export DATABRICKS_CONFIG_PROFILE=mdf-free MDF_ACTOR=manual
-   export MDF_WAREHOUSE_ID=<id จาก `databricks warehouses list`>   # ไม่ตั้ง = ใช้ตัวแรก
-   bash scripts/deliver_release.sh mdf-<sha12>
-   ```
-   จบด้วย `── ✅ delivered mdf-<sha12>` และ exit 0 · ใช้เวลา ~4–5 นาที (serverless job 2 รอบ)
-4. หลักฐาน: `build/deliver/mdf-<sha12>/evidence.md` (mask host/email แล้ว) → คัดลอกไป `qa-evidence/` ถ้าต้องเก็บ
+## 4. mode `manual` (ไม่มี CLI · เบราว์เซอร์อย่างเดียว)
 
-ตัวเลือก: `--no-activate` = register อย่างเดียว ไม่เปลี่ยน release ที่ใช้งาน · `--from-dir DIR` = ใช้ package ในเครื่องแทน GitHub (ไม่มี URL ใน registry)
+ตรวจเท่ากับ job ทุกข้อ (hash ทุกไฟล์ · ไฟล์ขาด/เกิน · release_id · preview · hash เดิมที่ register ไว้) โดย SQL ใน `sql/manual/`
 
-## 3. ตรวจผล
+- [ ] **M-1** เปิดหน้า Release `https://github.com/franceZa/MetadataRegistry/releases/tag/mdf-<sha12>` → ดาวน์โหลดครบ 8 ไฟล์ (6 × `*.resolved.json`, `manifest.json`, `validation-report.json`)
+- [ ] **M-2** Databricks → **Catalog** → `dev_catalog` → `ops` → Volume `files` → โฟลเดอร์ `releases` → **Create directory** ชื่อ `mdf-<sha12>`
+  - มีโฟลเดอร์นี้แล้ว **และมี `manifest.json`** = ส่งไปแล้ว → ข้ามไป M-4
+  - มีโฟลเดอร์แต่ **ไม่มี** `manifest.json` = ค้างครึ่งทาง → อัปโหลดทับได้ (M-3)
+- [ ] **M-3** เข้าโฟลเดอร์ → **Upload to this volume** → อัปโหลดทุกไฟล์ **ยกเว้น `manifest.json`** → เสร็จแล้วค่อยอัปโหลด `manifest.json` **เป็นไฟล์สุดท้าย**
+- [ ] **M-4** **SQL Editor** → วางทั้งไฟล์ `sql/manual/register_release.sql` → ตั้ง parameter `release_id = mdf-<sha12>` → **Run all**
+- [ ] **M-5** ผล statement สุดท้าย: REGISTERED 1 แถว `actor = manual-ui` · `manifest_sha256` ต้องเท่ากับ sha256 ของ `manifest.json` บนหน้า Release (GitHub แสดงที่รายการ asset)
+- [ ] **M-6** วาง `sql/manual/activate_release.sql` → `release_id = mdf-<sha12>` → **Run all**
+- [ ] **M-7** ผลสุดท้าย `active_release_id = mdf-<sha12>`
+
+**error ที่ SQL บอก (ไม่มีแถวใหม่ทุกกรณี · ทดสอบจริงใน T-44):**
+
+| ข้อความ | ทำอะไร |
+|---|---|
+| `[BAD_RELEASE_ID]` | parameter ต้องเป็น `mdf-` + 12 ตัว hex |
+| `CF_PATH_DOES_NOT_EXIST_FOR_READ_FILES` | ยังไม่ได้สร้างโฟลเดอร์ / สะกดชื่อผิด → M-2 |
+| `[RELEASE_NOT_FOUND]` | ยังไม่ได้อัปโหลด `manifest.json` → M-3 ไฟล์สุดท้าย |
+| `[TAMPERED] … sha256 ไม่ตรง` / `หายไป` / `ไฟล์ที่ไม่มีใน manifest` | ไฟล์เสีย/ขาด/เกิน → ลบไฟล์นั้นในโฟลเดอร์ (ถ้ายังไม่มีแถว REGISTERED) แล้วอัปโหลดจากหน้า Release ใหม่ |
+| `[RELEASE_ID_MISMATCH]` | อัปโหลดผิดโฟลเดอร์ (ชื่อโฟลเดอร์ ≠ release ใน manifest) |
+| `[HASH_CONFLICT]` | id นี้ถูก register ด้วยเนื้อหาอื่นแล้ว · **ห้ามแก้** · ใช้ release ใหม่ |
+| `[NOT_REGISTERED]` (activate) | ทำ M-4 ก่อน |
+
+## 5. ตั้งค่า mode `auto` ครั้งแรก (ต้องมี account admin · ทำไม่ได้บน Free Edition)
+
+1. account console → สร้าง service principal · สิทธิ์ `USE CATALOG`, `USE SCHEMA`, `READ/WRITE VOLUME` (ops.files), `MODIFY` + `SELECT` (ops.release_registry), ใช้ SQL warehouse, สร้าง job
+2. federation policy ของ SP: issuer `https://token.actions.githubusercontent.com` · audience = account id · subject `repo:franceZa/MetadataRegistry:environment:dev`
+3. GitHub → Settings → Environments → สร้าง `dev` (ใส่ required reviewer ได้)
+4. repo variables (ไม่ใช่ secret): `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`
+5. pin `databricks/setup-cli@main` ใน `deploy-dev.yml` เป็น SHA
+6. ทดสอบก่อน: Actions → **Deploy release to Databricks (dev)** → Run workflow → `release_id` → ต้องได้ CD-1…8 ครบ + `actor = github-oidc`
+7. แล้วค่อย PR เปลี่ยน `delivery_mode: auto`
+
+ถ้าข้อ 6 ยังไม่เคยผ่าน ต้องรายงานว่า **mode auto ยังไม่ได้พิสูจน์**
+
+## 6. ตรวจผล (ทุก mode)
 
 ```sql
 -- release ที่ใช้งานอยู่
@@ -66,46 +129,33 @@ WHERE event = 'ACTIVATED' ORDER BY event_ts DESC LIMIT 1;
 SELECT event, manifest_sha256, file_count, actor, event_ts
 FROM dev_catalog.ops.release_registry WHERE release_id = 'mdf-<sha12>' ORDER BY event_ts;
 ```
-```bash
-databricks fs ls dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>   # ต้องมี 8 ไฟล์ รวม manifest.json
-```
+Volume ต้องมี 8 ไฟล์ รวม `manifest.json`: `databricks fs ls dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>` หรือเปิดใน Catalog Explorer
 
-## 4. Rollback config (กลับไปใช้ release เก่า)
+## 7. Rollback config (ทุก mode)
 
-**ไม่ลบ ไม่ทับ ไม่ RESTORE** — แค่ activate release เก่าอีกครั้ง (append แถว `ACTIVATED` ใหม่)
+**ไม่ลบ ไม่ทับ ไม่ RESTORE** — activate release เก่าอีกครั้ง = append แถว `ACTIVATED` ใหม่ (ทดสอบจริงใน T-42: `ef2f425` → `98a182c` → `ef2f425`)
 
-```bash
-bash scripts/deliver_release.sh mdf-<sha12-เก่า>
-```
-- release เก่า sealed อยู่แล้ว → CD-3 `already sealed … skip copy` · CD-6 `REGISTERED skipped` · CD-8 `ACTIVATED appended`
-- ตรวจ: query ข้อ 3 ต้องได้ release เก่าเป็น ACTIVATED ล่าสุด
-- **ข้อควรระวัง:** รันจาก worktree ของ commit ใหม่ได้ (job logic เหมือนกัน) แต่ถ้า job definition เปลี่ยนระหว่าง release ให้ checkout commit ของ release เก่าตามข้อ 2.2
-- roll forward = รันคำสั่งเดิมกับ release ใหม่
+| mode | ทำ |
+|---|---|
+| `auto` | Actions → **Deploy release to Databricks (dev)** → Run workflow → `release_id` เก่า |
+| `u2m` | `bash scripts/deliver_release.sh mdf-<sha12-เก่า>` → `already sealed … skip copy` · `REGISTERED skipped` · `ACTIVATED appended` |
+| `manual` | M-6 ด้วย `release_id` เก่า |
 
-## 5. เมื่อไม่ผ่าน
+roll forward = ทำแบบเดียวกันกับ release ใหม่ · ตรวจด้วยข้อ 6
+
+## 8. `deliver_release.sh` ไม่ผ่าน (mode auto / u2m)
 
 | อาการ | ความหมาย | ทำอะไร |
 |---|---|---|
 | `❌ [USAGE]` | release_id ไม่ใช่ `mdf-<12 hex>` | แก้ argument |
+| `❌ [PREFLIGHT]` | ไม่มี CLI / login ไม่ผ่าน · **ยังไม่แตะอะไร** | ทำตามบรรทัด `ขั้นต่อไป:` · ไม่ได้ → ข้อ 4 |
 | `❌ [CD-1]` | ไม่มี GitHub Release นี้ | `gh release list` |
 | `❌ [CD-2]` + `[TAMPERED]` / `[RELEASE_ID_MISMATCH]` | package ไม่ตรง manifest · workspace **ไม่ถูกแตะ** | ห้ามส่ง · ตรวจที่มาของ package |
-| `❌ [CD-3] … sealed … DIFFERENT manifest … immutable` | id นี้ถูก seal ด้วยเนื้อหาอื่นแล้ว | ห้ามแก้โฟลเดอร์ใน Volume · สร้าง release ใหม่จาก commit ใหม่ |
-| หยุดกลางทาง CD-3 (เน็ตหลุด) | โฟลเดอร์ไม่มี `manifest.json` = ยังไม่ sealed | รันคำสั่งเดิมซ้ำ → `partial folder … resumed` |
-| `❌ [CD-6]` / `[CD-8]` + UI ขึ้น `INTERNAL_ERROR … SystemExit: 1` | job ปฏิเสธ | ดูข้อความจริงที่บรรทัดแรกของ task log: `databricks jobs get-run-output <task_run_id>` (`[NO_RELEASE_ID]`, `[RELEASE_NOT_FOUND]`, `[HASH_CONFLICT]`, `[VERIFY_FAILED]`, `[NOT_REGISTERED]`) |
-| `❌ [CD-7]` | registry ไม่ตรง (แถว/hash/file_count) | หยุด · query ข้อ 3 · ห้าม UPDATE/DELETE (ตารางปฏิเสธอยู่แล้ว) |
-| `Error: no such directory` ตอน CD-3 | สคริปต์เก่าก่อน PR #5 | ใช้ commit ≥ `ef2f425` |
+| `❌ [CD-3] … sealed … DIFFERENT manifest` | id นี้ถูก seal ด้วยเนื้อหาอื่นแล้ว | ห้ามแก้โฟลเดอร์ · ใช้ release ใหม่ |
+| หยุดกลางทาง CD-3 | โฟลเดอร์ยังไม่มี `manifest.json` | รันซ้ำ → `partial folder … resume` |
+| `❌ [CD-6]` / `[CD-8]` · UI ขึ้น `INTERNAL_ERROR … SystemExit: 1` | job ปฏิเสธ | ข้อความจริงอยู่บรรทัดแรกของ task log: `databricks jobs get-run-output <task_run_id>` |
+| `❌ [CD-7]` | registry ไม่ตรง | หยุด · query ข้อ 6 · ห้าม UPDATE/DELETE (ตารางปฏิเสธอยู่แล้ว) |
 
-รันซ้ำ id เดิมปลอดภัยเสมอ (ไม่คัดลอก ไม่เพิ่มแถว)
+## 9. UC objects (ทำแล้วใน T-37 · รันซ้ำไม่มีผล)
 
-## 6. เปิด CD อัตโนมัติ (เมื่อย้ายไป workspace ที่มี account admin)
-
-Free Edition ทำไม่ได้ (ไม่มี account console → ตั้ง federation ไม่ได้) · ขั้นตอนเมื่อมี workspace ที่ทำได้:
-
-1. account console → สร้าง service principal · ให้สิทธิ์ `USE CATALOG`, `USE SCHEMA`, `READ/WRITE VOLUME` (ops.files), `MODIFY` + `SELECT` (ops.release_registry), สิทธิ์ใช้ SQL warehouse
-2. federation policy ของ SP: issuer `https://token.actions.githubusercontent.com` · audience = account id · subject `repo:franceZa/MetadataRegistry:environment:dev`
-3. GitHub → Settings → Environments → สร้าง `dev` (ใส่ required reviewer ได้)
-4. repo variables (ไม่ใช่ secret): `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID` · แล้ว `MDF_CD_ENABLED=true`
-5. ทดสอบ: Actions → **Deploy release to Databricks (dev)** → Run workflow → `release_id` → ต้องได้ artifact `mdf-delivery-<id>` ที่ CD-1…8 ครบ และ `actor = github-oidc` ใน registry
-6. ก่อนเปิด: pin `databricks/setup-cli@main` เป็น SHA
-
-ถ้าข้อ 5 ยังไม่เคยผ่าน ต้องรายงานว่า **CD อัตโนมัติยังไม่ได้พิสูจน์** ทุกครั้ง
+วาง `sql/bootstrap/ops.sql` ใน SQL editor แทน `${catalog}` ด้วย `dev_catalog`

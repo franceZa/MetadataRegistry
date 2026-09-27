@@ -183,6 +183,13 @@ def main(argv):
     if args[:2] == ["warehouses", "list"]:
         print(json.dumps([{"id": "wh-fake"}]))
         return 0
+    if args[:2] == ["current-user", "me"]:
+        if FAIL_ON == "auth":
+            # real CLI v1.17 wording when the U2M token is missing/expired
+            print("Error: default auth: cannot configure default credentials", file=sys.stderr)
+            return 1
+        print(json.dumps({"userName": "someone@example.invalid"}))
+        return 0
     print(f"fake databricks: unsupported {argv}", file=sys.stderr)
     return 2
 

@@ -20,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "deliver_release.sh"
 FAKES = ROOT / "tests" / "fakes"
 REPO = "franceZa/MetadataRegistry"
+# fake CLI log line of the read-only login check (preflight) — the only call allowed before CD-1
+PREFLIGHT_CALL = "current-user me --output json"
 
 
 def _bash() -> str | None:
@@ -217,7 +219,8 @@ def test_ac38_tampered_package_fails_at_cd2_without_touching_workspace(world):
     r = _deliver(world, world["rid"])
     assert r.returncode != 0
     assert "[CD-2]" in r.stderr
-    assert not [c for c in _calls(world) if not c.startswith("gh ")]
+    # only the read-only login check (preflight) — no fs / bundle / api call reached Databricks
+    assert [c for c in _calls(world) if not c.startswith("gh ")] == [PREFLIGHT_CALL]
     assert not world["dest"].exists()
     assert _registry(world) == []
 
@@ -268,7 +271,8 @@ def test_unknown_github_release_fails_at_cd1(world):
     r = _deliver(world, "mdf-000000000000")
     assert r.returncode != 0
     assert "[CD-1]" in r.stderr
-    assert not [c for c in _calls(world) if not c.startswith("gh ")]
+    # only the read-only login check (preflight) may touch Databricks before CD-1
+    assert [c for c in _calls(world) if not c.startswith("gh ")] == [PREFLIGHT_CALL]
 
 
 def test_from_dir_skips_github(world):
@@ -285,3 +289,45 @@ def test_deploy_failure_stops_before_registry(world):
     r = _deliver(world, world["rid"])
     assert r.returncode != 0
     assert _registry(world) == []
+
+
+# ---------- T-45 · FR-L.14 (ค): fail early with a concrete next step ----------
+
+
+def test_auth_failure_stops_before_any_step_with_login_next_step(world):
+    world["env"]["FAKE_FAIL_ON"] = "auth"
+    world["env"]["DATABRICKS_CONFIG_PROFILE"] = "mdf-free"
+    r = _deliver(world, world["rid"])
+    assert r.returncode != 0
+    assert "[PREFLIGHT]" in r.stderr
+    assert "ขั้นต่อไป: databricks auth login" in r.stderr
+    assert "--profile mdf-free" in r.stderr
+    assert "python scripts/next_steps.py manual " + world["rid"] in r.stderr
+    # nothing downloaded, nothing copied, nothing registered
+    assert [c for c in _calls(world)] == [PREFLIGHT_CALL]
+    assert _registry(world) == []
+
+
+def test_auth_failure_in_ci_points_to_federation_or_u2m(world):
+    world["env"]["FAKE_FAIL_ON"] = "auth"
+    world["env"]["MDF_ACTOR"] = "github-oidc"
+    r = _deliver(world, world["rid"])
+    assert r.returncode != 0
+    assert "DEP-3" in r.stderr and "delivery_mode: u2m" in r.stderr
+
+
+def test_missing_databricks_cli_points_to_manual_mode(world, tmp_path):
+    bindir = tmp_path / "bin_no_dbx"
+    bindir.mkdir()
+    shutil.copy2(tmp_path / "bin" / "gh", bindir / "gh")
+    # keep only system tools + gh on PATH (no databricks)
+    system = [
+        d
+        for d in world["env"]["PATH"].split(os.pathsep)[1:]
+        if not shutil.which("databricks", path=d)
+    ]
+    world["env"]["PATH"] = os.pathsep.join([str(bindir), *system])
+    r = _deliver(world, world["rid"])
+    assert r.returncode != 0
+    assert "ไม่พบคำสั่ง databricks" in r.stderr
+    assert "mode manual" in r.stderr and "runbooks/release-delivery.md" in r.stderr
