@@ -107,6 +107,8 @@ if LISTING="$(databricks fs ls "$DEST" --output json 2>/dev/null)"; then
   fi
 fi
 if [ ! -f "$WORK/remote-manifest.json" ]; then
+  # single-file `fs cp` does not create parent folders on a UC Volume (observed T-41)
+  databricks fs mkdir "$DEST" >/dev/null
   for f in "$PKG"/*; do
     name="$(basename "$f")"
     [ "$name" = "manifest.json" ] && continue
