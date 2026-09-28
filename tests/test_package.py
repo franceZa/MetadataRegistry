@@ -1,3 +1,4 @@
+import hashlib
 import json
 
 import pytest
@@ -96,6 +97,172 @@ def test_release_gate_dummy_rejected(tmp_path):
     with pytest.raises(ReleaseGateError) as exc_info:
         check_release_gate("dummyenv", cfg)
     assert "dummy" in str(exc_info.value)
+
+
+def _write_manifest(pkg_dir, files_meta, manifest_version, extra=None):
+    manifest = {
+        "manifest_version": manifest_version,
+        "release_id": "mdf-testrelease",
+        "environment": "dev",
+        "source_commit": "abc123",
+        "compiler_revision": "0+test",
+        "uv_lock_sha256": None,
+        "ci_run_url": None,
+        "file_count": len(files_meta),
+        "files": files_meta,
+        "validation_report_sha256": None,
+        "preview": True,
+    }
+    if extra:
+        manifest.update(extra)
+    report_bytes = b"{}\n"
+    (pkg_dir / "validation-report.json").write_bytes(report_bytes)
+    manifest["validation_report_sha256"] = hashlib.sha256(report_bytes).hexdigest()
+    (pkg_dir / "manifest.json").write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+
+def _make_v1_flat_package(tmp_path):
+    """T-49 AC-48: minimal manifest_version:1 flat package (bare filenames)."""
+    pkg = tmp_path / "v1_pkg"
+    pkg.mkdir()
+    content = b'{"x": 1}\n'
+    (pkg / "bronze.cc.customer.resolved.json").write_bytes(content)
+    files_meta = [
+        {"path": "bronze.cc.customer.resolved.json", "sha256": hashlib.sha256(content).hexdigest()}
+    ]
+    _write_manifest(pkg, files_meta, manifest_version=1)
+    return pkg
+
+
+def _make_v2_package(tmp_path, name="v2_pkg"):
+    """T-49 AC-46/47/48: manifest_version:2 with <source>/<file> layout."""
+    pkg = tmp_path / name
+    pkg.mkdir()
+    (pkg / "cc").mkdir()
+    content = b'{"x": 2}\n'
+    (pkg / "cc" / "bronze.cc.customer.resolved.json").write_bytes(content)
+    files_meta = [
+        {
+            "path": "cc/bronze.cc.customer.resolved.json",
+            "sha256": hashlib.sha256(content).hexdigest(),
+        }
+    ]
+    _write_manifest(pkg, files_meta, manifest_version=2)
+    return pkg
+
+
+def test_verify_v1_flat_package_ok_with_legacy_warning(tmp_path):
+    """AC-48 (And, รอบ 6): v1 passes with [WARN] legacy flat layout, no fail."""
+    pkg = _make_v1_flat_package(tmp_path)
+    result = verify_package(pkg)
+    assert result["status"] == "OK"
+    assert result["warnings"] == ["[WARN] legacy flat layout (manifest_version 1)"]
+
+
+def test_verify_v2_package_ok_no_warning(tmp_path):
+    """AC-48: v2 passes with no warnings."""
+    pkg = _make_v2_package(tmp_path)
+    result = verify_package(pkg)
+    assert result["status"] == "OK"
+    assert result["warnings"] == []
+
+
+def test_verify_v2_rejects_dotdot_traversal(tmp_path):
+    """AC-47: path with '..' segment -> TAMPERED before reading content."""
+    pkg = _make_v2_package(tmp_path)
+    manifest_path = pkg / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"] = [{"path": "../evil.json", "sha256": "0" * 64}]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "TAMPERED" in str(exc_info.value)
+
+
+def test_verify_v2_rejects_backslash(tmp_path):
+    """AC-47: backslash path -> TAMPERED."""
+    pkg = _make_v2_package(tmp_path)
+    manifest_path = pkg / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"] = [{"path": "cc\\x.json", "sha256": "0" * 64}]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "TAMPERED" in str(exc_info.value)
+
+
+def test_verify_v2_rejects_absolute_path(tmp_path):
+    """AC-47: absolute path -> TAMPERED."""
+    pkg = _make_v2_package(tmp_path)
+    manifest_path = pkg / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"] = [{"path": "/etc/passwd", "sha256": "0" * 64}]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "TAMPERED" in str(exc_info.value)
+
+
+def test_verify_v2_rejects_too_deep_path(tmp_path):
+    """SSOT FR-F.8 / AC-47 per HRM correction: path deeper than 2 segments -> TAMPERED
+    (HRM corrected ticket AC-47 wording which contradicted SSOT)."""
+    pkg = _make_v2_package(tmp_path)
+    (pkg / "cc" / "sub").mkdir()
+    (pkg / "cc" / "sub" / "x.json").write_bytes(b"{}")
+    manifest_path = pkg / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"].append({"path": "cc/sub/x.json", "sha256": "0" * 64})
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "TAMPERED" in str(exc_info.value)
+
+
+def test_verify_v2_rejects_source_mismatch(tmp_path):
+    """AC-47/FR-F.8(4): first segment must equal source parsed from filename."""
+    pkg = _make_v2_package(tmp_path)
+    manifest_path = pkg / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"] = [
+        {"path": "xyz/bronze.cc.customer.resolved.json", "sha256": manifest["files"][0]["sha256"]}
+    ]
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "TAMPERED" in str(exc_info.value)
+
+
+def test_verify_v2_rejects_extra_file_in_subfolder(tmp_path):
+    """AC-47 (And): extra file in subfolder not in manifest -> TAMPERED, recursive check."""
+    pkg = _make_v2_package(tmp_path)
+    (pkg / "cc" / "extra.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "TAMPERED" in str(exc_info.value)
+
+
+def test_verify_v2_rejects_empty_extra_folder(tmp_path):
+    """AC-47 (And): empty folder not in manifest -> TAMPERED."""
+    pkg = _make_v2_package(tmp_path)
+    (pkg / "xyz").mkdir()
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "TAMPERED" in str(exc_info.value)
+
+
+def test_verify_unknown_manifest_version(tmp_path):
+    """AC-48: manifest_version 3 (unknown) -> TAMPERED unknown manifest_version."""
+    pkg = _make_v2_package(tmp_path)
+    manifest_path = pkg / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["manifest_version"] = 3
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(TamperError) as exc_info:
+        verify_package(pkg)
+    assert "unknown manifest_version" in str(exc_info.value)
+    assert "TAMPERED" in str(exc_info.value)
 
 
 def test_release_gate_placeholder_secret_scope(tmp_path):

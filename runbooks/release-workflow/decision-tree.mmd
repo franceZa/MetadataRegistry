@@ -1,0 +1,60 @@
+flowchart TD
+    Start([มีการเปลี่ยนแปลงใน repository]) --> Event{เหตุการณ์ใด?}
+
+    Event -->|PR เข้า master| PR[CI: lint, validate, diff,<br/>compile, preview package, verify, pytest]
+    Event -->|PR เข้า master| PRSecurity[Security: Bandit + Gitleaks]
+    PR --> PRResult{PR พร้อม merge?}
+    PRSecurity --> PRResult
+    PRResult -->|ไม่ผ่าน| Fix[แก้ PR แล้วรัน checks ใหม่]
+    Fix --> PR
+    PRResult -->|ผ่านและ merge| Master[เกิด push เข้า master]
+
+    Event -->|push สาขาอื่น| SecurityOnly[Security workflow เท่านั้น]
+    SecurityOnly --> StopOther([ไม่มี GitHub Release])
+    Event -->|push เข้า master โดยตรง| Master
+    Event -->|Actions: Run workflow<br/>deploy-dev.yml| Dispatch[ระบุ release_id ที่เผยแพร่แล้ว]
+    Dispatch --> Federation
+
+    Master --> Build[Release: validate → pytest → compile<br/>→ package --release → verify]
+    Master -.-> PushSecurity[Security รันแยกบนทุก push]
+    Build --> BuildResult{build และ release gate ผ่าน?}
+    BuildResult -->|ไม่ผ่าน| StopBuild([หยุด: ไม่มี release ใหม่])
+    BuildResult -->|ผ่าน| Existing{GitHub Release<br/>mdf-sha12 มีอยู่แล้ว?}
+    Existing -->|ไม่มี| Publish[สร้าง tag และ GitHub Release<br/>แนบไฟล์ package]
+    Existing -->|มี| Same{manifest เหมือนเดิม<br/>ยกเว้น ci_run_url?}
+    Same -->|ไม่เหมือน| Conflict([หยุด: content conflict])
+    Same -->|เหมือน| Skip[ข้ามการ publish ซ้ำ]
+    Publish --> Mode{delivery_mode<br/>ใน config/env/dev.yaml}
+    Skip --> Mode
+
+    Mode -->|auto| Federation{ตั้ง GitHub OIDC federation<br/>และตัวแปรครบ?}
+    Federation -->|ไม่ครบ| AutoFail([preflight หยุด<br/>เปลี่ยนเป็น u2m ผ่าน PR])
+    Federation -->|ครบ| Approval{Environment dev<br/>ต้องอนุมัติ?}
+    Approval -->|ใช่| Review[ผู้มีสิทธิ์อนุมัติ deployment]
+    Approval -->|ไม่| AutoRun[GitHub Actions รัน deploy-dev.yml]
+    Review --> AutoRun
+    AutoRun --> Script[deliver_release.sh: CD-1 ถึง CD-8]
+
+    Mode -->|u2m ค่าปัจจุบัน| Login{มี CLI และ login<br/>Databricks ได้?}
+    Login -->|ได้| UserRun[checkout release tag แล้วรัน<br/>deliver_release.sh]
+    UserRun --> Script
+    Login -->|ไม่ได้| Manual[ใช้ขั้นตอน manual ใน browser]
+    Mode -->|manual| Manual
+    Manual --> ManualSteps[ดาวน์โหลด/อัปโหลดไฟล์<br/>register_release.sql → activate_release.sql]
+
+    Script --> Delivered([Volume sealed + REGISTERED<br/>+ ACTIVATED ใน registry])
+    ManualSteps --> Delivered
+    Delivered --> Verify[ตรวจ ACTIVATED ล่าสุด<br/>ใน dev_catalog.ops.release_registry]
+    Verify --> Rollback{ต้อง rollback?}
+    Rollback -->|ไม่| Done([จบ])
+    Rollback -->|ใช่| Old[activate release เก่าอีกครั้ง]
+    Old --> Verify
+
+    classDef action fill:#e8f3ff,stroke:#5584a6,color:#10253d
+    classDef decision fill:#fff2d8,stroke:#b48a42,color:#3c2a0d
+    classDef success fill:#dcf4e8,stroke:#5b9b74,color:#153b29
+    classDef stop fill:#fce6e6,stroke:#b87575,color:#4b1f1f
+    class PR,PRSecurity,Master,Build,Publish,Skip,Review,AutoRun,Script,UserRun,Manual,ManualSteps,Verify,Old,SecurityOnly,PushSecurity,Fix,Dispatch action
+    class Event,PRResult,BuildResult,Existing,Same,Mode,Federation,Approval,Login,Rollback decision
+    class Delivered,Done success
+    class StopOther,StopBuild,Conflict,AutoFail stop

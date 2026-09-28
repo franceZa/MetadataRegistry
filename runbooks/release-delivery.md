@@ -1,5 +1,7 @@
 # Runbook — ส่ง release ไป Databricks · 3 mode · rollback (Phase 2 · E6)
 
+> 📘 ยังไม่เคยดูแลระบบนี้? อ่าน [`release-delivery-guide.md`](release-delivery-guide.md) ก่อน — อธิบายสถาปัตยกรรม, ขั้น CD-1…8, และวิธี maintain
+
 > คำสั่งและ SQL ทั้งหมดในไฟล์นี้รันจริงแล้วบน Free Edition (T-41, T-42, T-44 · 2026-09-27) · หลักฐาน: `qa-evidence/E6/T041/`, `T042/`, `T044/`
 > host/email ของ workspace ไม่อยู่ใน repo (repo เป็น public) · ตัวอย่างใช้ release จริง `mdf-ef2f425903b6`
 

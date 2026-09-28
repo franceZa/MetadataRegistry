@@ -64,6 +64,8 @@ def _cmd_verify_package(args) -> int:
             f"files={result['verified_files']}, release_id={result['release_id']}, "
             f"manifest_sha256={result['manifest_sha256']}"
         )
+        for warning in result.get("warnings", []):
+            print(f"   {warning}")
         return 0
     except RuntimeError as e:
         print(str(e))

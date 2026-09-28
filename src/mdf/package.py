@@ -283,11 +283,55 @@ def verify_package(package_dir: Path | str, expect_release_id: str | None = None
             f"แต่คาดว่า '{expect_release_id}' — ห้ามส่ง package นี้แทน release ที่ระบุ"
         )
 
+    manifest_version = manifest["manifest_version"]
+    warnings: list[str] = []
+    pkg_resolved = pkg.resolve()
+
+    if manifest_version == 1:
+        warnings.append("[WARN] legacy flat layout (manifest_version 1)")
+    elif manifest_version == 2:
+        pass
+    else:
+        raise TamperError(f"[TAMPERED] unknown manifest_version: {manifest_version!r}")
+
     listed_files = set()
     for entry in manifest["files"]:
         fname = entry.get("path", "")
         expected_sha = entry.get("sha256", "")
+
+        if manifest_version == 1:
+            # v1: bare filename only, no '/' allowed (FR-F.2 legacy flat layout)
+            if "/" in fname or "\\" in fname:
+                raise TamperError(
+                    f"[TAMPERED] path '{fname}' ผิดรูปแบบ manifest_version 1 (ต้องเป็นชื่อไฟล์เปล่า ไม่มี '/')"
+                )
+        else:
+            # v2: FR-F.8 — string-level checks BEFORE any resolve()/file read
+            if "\\" in fname:
+                raise TamperError(f"[TAMPERED] path '{fname}' มี backslash ซึ่งไม่อนุญาตใน manifest_version 2")
+            if fname.startswith("/") or (len(fname) > 1 and fname[1] == ":"):
+                raise TamperError(f"[TAMPERED] path '{fname}' เป็น absolute path ซึ่งไม่อนุญาต")
+            segments = fname.split("/")
+            if any(seg in ("..", "") for seg in segments) or len(segments) != 2:
+                raise TamperError(
+                    f"[TAMPERED] path '{fname}' ต้องมีรูปแบบ '<source>/<file>' เป๊ะ 2 segment "
+                    "(ห้าม '..' หรือ segment ว่าง)"
+                )
+            source_seg, file_seg = segments
+            # FR-F.8(4): first segment must equal source encoded in the filename
+            # {layer}.{source}.{dataset}.resolved.json
+            name_parts = file_seg.split(".")
+            if len(name_parts) < 2 or name_parts[1] != source_seg:
+                raise TamperError(
+                    f"[TAMPERED] path '{fname}' segment แรก ('{source_seg}') ไม่ตรงกับ source "
+                    f"ที่เข้ารหัสในชื่อไฟล์ '{file_seg}'"
+                )
+
         target = pkg / fname
+        resolved_target = target.resolve()
+        if not resolved_target.is_relative_to(pkg_resolved):
+            raise TamperError(f"[TAMPERED] path '{fname}' resolve หลุดออกนอก package root")
+
         listed_files.add(fname)
 
         if not target.exists():
@@ -308,14 +352,33 @@ def verify_package(package_dir: Path | str, expect_release_id: str | None = None
             f"[TAMPERED] ไฟล์ '{VALIDATION_REPORT_NAME}' ถูกดัดแปลง (sha256 ไม่ตรงกับ manifest)"
         )
 
-    # Detect extra files not in manifest (excluding manifest + validation report)
-    actual_files = {p.name for p in pkg.iterdir() if p.is_file()} - {
-        MANIFEST_NAME,
-        VALIDATION_REPORT_NAME,
-    }
-    extra = actual_files - listed_files
+    # Detect extra files/folders not in manifest — recursive walk (FR-F.8 (2)(3), AC-47 And)
+    listed_paths = {(pkg / fname).resolve() for fname in listed_files}
+    root_exempt = {MANIFEST_NAME, VALIDATION_REPORT_NAME}
+    extra: list[str] = []
+    for p in pkg.rglob("*"):
+        if p.is_dir():
+            continue
+        if p.parent == pkg and p.name in root_exempt:
+            continue
+        if p.resolve() not in listed_paths:
+            extra.append(str(p.relative_to(pkg).as_posix()))
     if extra:
-        raise TamperError(f"[TAMPERED] พบไฟล์แปลกปลอมใน package ที่ไม่มีใน manifest: {sorted(extra)}")
+        raise TamperError(
+            f"[TAMPERED] พบไฟล์แปลกปลอมใน package ที่ไม่มีใน manifest: {sorted(extra)}"
+        )
+
+    # Empty (or listed-file-less) directories also count as tampering evidence
+    for d in pkg.rglob("*"):
+        if not d.is_dir():
+            continue
+        has_listed_file = any(
+            (lp.exists() and lp.is_relative_to(d.resolve())) for lp in listed_paths
+        )
+        if not has_listed_file:
+            raise TamperError(
+                f"[TAMPERED] พบโฟลเดอร์ '{d.relative_to(pkg).as_posix()}' ที่ไม่มีไฟล์ใน manifest"
+            )
 
     return {
         "status": "OK",
@@ -325,4 +388,5 @@ def verify_package(package_dir: Path | str, expect_release_id: str | None = None
         "file_count": manifest.get("file_count"),
         "verified_files": len(listed_files),
         "manifest_sha256": _sha256_file(manifest_path),
+        "warnings": warnings,
     }
