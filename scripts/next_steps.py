@@ -76,24 +76,31 @@ def _manual(rid: str, repo: str, run_url: str | None) -> list[str]:
     return [
         f"## ขั้นต่อไป — `{rid}` · mode **manual** (ทำเองในเบราว์เซอร์ ไม่ต้องมี CLI)",
         "",
-        f"- [ ] **M-1** เปิด [หน้า Release]({rel}) → ดาวน์โหลดไฟล์ทั้ง 8 ไฟล์ "
-        "(6 × `*.resolved.json`, `manifest.json`, `validation-report.json`)",
-        "- [ ] **M-2** Databricks → **Catalog** → `dev_catalog` → `ops` → Volume `files` → "
-        f"โฟลเดอร์ `releases` → **Create directory** ชื่อ `{rid}`",
-        "  - ถ้ามีโฟลเดอร์นี้อยู่แล้ว **และมี `manifest.json`** = ส่งไปแล้ว ข้ามไป M-4",
-        f"- [ ] **M-3** เข้า `{vol}` → **Upload to this volume** → อัปโหลดทุกไฟล์ "
-        "**ยกเว้น `manifest.json`** → เสร็จแล้วค่อยอัปโหลด `manifest.json` เป็นไฟล์สุดท้าย",
-        "- [ ] **M-4** **SQL Editor** → วางไฟล์ `sql/manual/register_release.sql` → ตั้ง parameter "
-        f"`release_id = {rid}` → **Run all**",
-        "  - ถ้า error `[TAMPERED]` / `[RELEASE_ID_MISMATCH]` / `[RELEASE_NOT_FOUND]` → "
-        "แก้ตามข้อความ (ส่วนใหญ่คืออัปโหลดไม่ครบหรือผิดโฟลเดอร์) แล้ว Run all ใหม่",
-        "- [ ] **M-5** ดูผล statement สุดท้าย: REGISTERED 1 แถว · `actor = manual-ui` · "
-        "`manifest_sha256` ต้องตรงกับ "
-        "digest ของ `manifest.json` บนหน้า Release (กดที่ชื่อไฟล์จะเห็น sha256)",
+        f"- [ ] **M-1** Catalog Explorer → `dev_catalog` → `ops` → Volume `files` → `releases/` "
+        f"→ ถ้ามีโฟลเดอร์ `{rid}` ที่มี `manifest.json` แล้ว **ห้ามอัปโหลด** ข้ามไป M-5",
+        f"- [ ] **M-2** เปิด [หน้า GitHub Release]({rel}) → ดาวน์โหลด asset เดียว `{rid}.zip` "
+        "→ แตก zip ในเครื่องตัวเอง → จด `manifest_sha256` จาก release notes ของหน้านี้ "
+        "**หรือ** Job Summary ของ run `release.yml` (เลือกที่ใดก็ได้ — ไม่ใช่ digest ของไฟล์ zip "
+        "ที่หน้า Release แสดง เพราะเลขนั้นเป็นของ zip ไม่ใช่ของ `manifest.json`)",
+        # T-57 · FR-M.9: v3 packages also carry `<source>/<dataset>.odcs.yaml` — say so
+        # explicitly and never hardcode a file count (it changes with the number of datasets).
+        f"- [ ] **M-3** สร้างโฟลเดอร์ `{vol}` แล้วสร้างโฟลเดอร์ย่อย `<source>/` ทีละ source "
+        "(ดูจากโฟลเดอร์ที่แตก zip ได้ใน M-2 ว่ามีกี่ source) → อัปโหลด**ทุกไฟล์**ในโฟลเดอร์ "
+        "`<source>/` ที่แตกจาก zip เข้าโฟลเดอร์ `<source>/` เดียวกัน — ทั้ง `*.resolved.json` "
+        "**และ `*.odcs.yaml`** (ลืม `*.odcs.yaml` = M-5 หยุดด้วย `[TAMPERED]`) · "
+        "จำนวนไฟล์ทั้งหมดใน `<source>/` = `file_count` ใน `manifest.json` "
+        "(**ห้ามอัปโหลดไว้ที่ราก/แบบ flat**) "
+        f"แล้วค่อยอัปโหลด `validation-report.json` ที่ราก `{vol}`",
+        f"- [ ] **M-4** อัปโหลด `manifest.json` เป็นไฟล์สุดท้าย ที่ราก `{vol}` (ไม่ใช่ในโฟลเดอร์ `<source>/`)",
+        "- [ ] **M-5** **SQL Editor** → วางไฟล์ `sql/manual/register_release.sql` → ตั้ง parameter "
+        f"`release_id = {rid}` → **Run all** → ต้องได้ `REGISTERED` และ `manifest_sha256` "
+        "ตรงกับที่จดใน M-2 (จาก Job Summary ของ `release.yml` ไม่ใช่หน้า Release) · error "
+        "(รวมถึงกรณีอัปโหลดผิดโฟลเดอร์/flat) = หยุด ห้ามแก้ไฟล์ใน Volume เอง",
         "- [ ] **M-6** วาง `sql/manual/activate_release.sql` → `release_id = "
         + rid
         + "` → **Run all**",
-        f"- [ ] **M-7** ผลสุดท้ายต้องขึ้น `active_release_id = {rid}`",
+        f"- [ ] **M-7** query ตรวจ: แถว `ACTIVATED` ล่าสุด = `{rid}` · เก็บผล query เป็นหลักฐาน "
+        "(ป้าย `manual-ui`) · ผลสุดท้ายต้องขึ้น `active_release_id = " + rid + "`",
         "",
         f"รายละเอียดพร้อมภาพหน้าจอ: `{RUNBOOK}` · rollback = ทำ M-6 ด้วย release เก่า",
     ]

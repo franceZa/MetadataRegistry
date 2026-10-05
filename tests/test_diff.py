@@ -98,3 +98,45 @@ def test_run_diff_against_baseline_rev():
     # Either empty or only non-column-related; columns are identical across revs
     assert "column_removed" not in breaking_cats
     assert "column_type_changed" not in breaking_cats
+
+
+def test_fr_m11_pci_flag_change_is_review_not_breaking():
+    """FR-M.11: pci true->false is reported as a review item, never auto-breaking."""
+    cur_cols = dict(BASE_TXN_COLS)
+    cur_cols["card_pan"] = dict(
+        cur_cols["card_pan"], customProperties=[{"property": "pci", "value": False}]
+    )
+    base_cols = dict(BASE_TXN_COLS)
+    base_cols["card_pan"] = dict(
+        base_cols["card_pan"], customProperties=[{"property": "pci", "value": True}]
+    )
+
+    baseline = {"cc.credit_card_txn": _mk_contract("cc.credit_card_txn", "1.0.0", base_cols)}
+    current = {"cc.credit_card_txn": _mk_contract("cc.credit_card_txn", "1.0.0", cur_cols)}
+
+    changes = diff_contracts(current, baseline)
+    reviews = [c for c in changes if c.category == "privacy_flag_changed"]
+    assert len(reviews) == 1
+    assert reviews[0].kind == "non_breaking"
+    assert "pci" in reviews[0].detail
+    assert not any(c.kind == "breaking" for c in changes)
+
+
+def test_fr_m11_calendar_change_is_review_not_breaking():
+    """FR-M.11: a calendar change (e.g. recovery_window) is reported as a review item."""
+    base = _mk_contract("cc.credit_card_txn", "1.0.0", BASE_TXN_COLS)
+    base["slaProperties"] = [{"property": "frequency", "value": "daily"}]
+    cur = _mk_contract("cc.credit_card_txn", "1.0.0", BASE_TXN_COLS)
+    cur["slaProperties"] = [
+        {"property": "frequency", "value": "daily"},
+        {"property": "recovery_window", "value": 2, "unit": "d"},
+    ]
+
+    baseline = {"cc.credit_card_txn": base}
+    current = {"cc.credit_card_txn": cur}
+
+    changes = diff_contracts(current, baseline)
+    reviews = [c for c in changes if c.category == "calendar_changed"]
+    assert len(reviews) == 1
+    assert reviews[0].kind == "non_breaking"
+    assert not any(c.kind == "breaking" for c in changes)

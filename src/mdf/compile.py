@@ -1,8 +1,10 @@
 import hashlib
 import json
+import shutil
 from pathlib import Path
 from typing import Any
 
+from mdf.calendar import compiled_calendar, custom_property
 from mdf.dq import DQLibrary, resolve_column_dq_rules
 from mdf.loading import discover_datasets, load_yaml_file
 from mdf.validation import validate_project
@@ -51,15 +53,44 @@ def _deterministic_json_bytes(data: Any) -> bytes:
     return json.dumps(data, sort_keys=True, ensure_ascii=False, indent=2).encode("utf-8")
 
 
+def build_reader(contract: dict[str, Any], env: str) -> dict[str, Any]:
+    """FR-M.5: the `reader` object compiled into bronze AND silver resolved JSON.
+
+    `format` comes from the `servers[]` entry whose `environment` matches `env`
+    (None if no such server -- mdf validate must reject this before compile runs,
+    see validate_servers_for_envs in mdf.validation). The rest come from the
+    contract's dataset-level `customProperties`. `file_pattern`/`partition_pattern`
+    keep their `{{business_date}}`/`*` templates untouched -- never resolved here.
+    """
+    server = next(
+        (
+            s
+            for s in contract.get("servers", []) or []
+            if isinstance(s, dict) and s.get("environment") == env
+        ),
+        None,
+    )
+    return {
+        "format": server.get("format") if server else None,
+        "file_pattern": custom_property(contract, "file_pattern"),
+        "partition_pattern": custom_property(contract, "partition_pattern"),
+        "header": custom_property(contract, "header"),
+        "encoding": custom_property(contract, "encoding"),
+        "run_grain": custom_property(contract, "run_grain"),
+        "source_type": custom_property(contract, "source_type"),
+    }
+
+
 def compile_project(
     env: str = "dev",
     base_dir: Path | str = "DataContract",
     config_dir: Path | str = "config",
 ) -> list[Path]:
     """
-    Compile all discovered datasets into resolved JSON configs (FR-D.1, FR-D.3).
-    - Validates first; on error, writes nothing.
-    - Writes resolved JSON per target table (bronze, silver) to build/<env>/resolved/.
+    Compile all discovered datasets into resolved JSON configs (FR-D.1, FR-D.3, FR-D.8).
+    - Validates first; on error, writes nothing (and nothing is cleaned/deleted either).
+    - Writes resolved JSON per target table (bronze, silver) to
+      build/<env>/resolved/<source>/{layer}.<source>.<dataset>.resolved.json (layout v2).
     - Deterministic: same input -> byte-identical output (AC-11).
     """
     # Validate first (FR-D.1): if errors exist, write nothing
@@ -78,6 +109,10 @@ def compile_project(
 
     datasets = discover_datasets(base_dir)
     output_dir = Path("build") / env / "resolved"
+    # HRM correction (H-103 #2): clean stale resolved/ (flat leftovers from pre-v2 compiles)
+    # only AFTER validation passed, and strictly under build/ (FR-B.6).
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     written: list[Path] = []
@@ -133,6 +168,10 @@ def compile_project(
             "contract_version": contract_version,
             "contract_file": str(ds.contract_path).replace("\\", "/"),
             "contract_sha256": contract_sha,
+            # FR-M.7: path of the ODCS contract bundled into the v3 release package
+            # (`mdf package` copies the bytes of `contract_file` above there) -- same value on
+            # bronze and silver, deterministic from source/dataset only.
+            "contract_bundle_path": f"{ds.source}/{ds.dataset}.odcs.yaml",
             "pipeline_file": str(ds.pipeline_path).replace("\\", "/"),
             "pipeline_sha256": pipeline_sha,
             "dq_library_sha256": dq_lib_sha,
@@ -153,8 +192,21 @@ def compile_project(
                             "required": p.get("required", False),
                             "classification": p.get("classification", "none"),
                             "description": p.get("description", ""),
+                            # FR-M.6: privacy flags + tags, straight from the contract column.
+                            # mdf validate guarantees pii/pci are real bool before compile runs.
+                            "pii": custom_property(p, "pii"),
+                            "pci": custom_property(p, "pci"),
+                            "tags": list(p.get("tags", []) or []),
                         }
                         columns.append(col)
+
+        source_dir = output_dir / ds.source
+        source_dir.mkdir(parents=True, exist_ok=True)
+
+        # FR-M.3/FR-M.5: computed ONCE per dataset so bronze and silver get the
+        # exact same object (compared byte-for-byte via json.dumps(sort_keys=True)).
+        calendar = compiled_calendar(contract)
+        reader = build_reader(contract, env)
 
         for layer in ("bronze", "silver"):
             resolved = {
@@ -185,9 +237,11 @@ def compile_project(
                 "lineage": lineage,
                 "schema_version": schema_version,
                 "library_version": dq_lib.version,
+                "calendar": calendar,
+                "reader": reader,
             }
 
-            out_path = output_dir / f"{layer}.{ds.source}.{ds.dataset}.resolved.json"
+            out_path = source_dir / f"{layer}.{ds.source}.{ds.dataset}.resolved.json"
             out_path.write_bytes(_deterministic_json_bytes(resolved))
             written.append(out_path)
 

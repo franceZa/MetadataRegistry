@@ -91,20 +91,42 @@ if [ -n "$FROM_DIR" ]; then
   cp -R "$FROM_DIR" "$PKG"
   ev "- CD-1: local package (--from-dir) · no GitHub Release URL"
 else
-  log "CD-1 gh release download $RELEASE_ID -R $REPO"
-  gh release download "$RELEASE_ID" -R "$REPO" -D "$PKG" || die CD-1 "cannot download GitHub Release $RELEASE_ID"
-  RELEASE_URL="$(gh release view "$RELEASE_ID" -R "$REPO" --json url -q .url)"
-  ev "- CD-1: ${RELEASE_URL}"
+  # T-52 · FR-L.3a: choose the download method from the REAL assets of the release —
+  # never guess from manifest_version. New releases (rounds >= 5) have a single
+  # "<release_id>.zip" asset; releases published before T-52 (v1 legacy) still have the
+  # old flat multi-file assets and are downloaded the old way.
+  ZIP_ASSET="${RELEASE_ID}.zip"
+  # strip \r: python's stdout on Windows translates '\n' -> '\r\n' in text mode
+  ASSET_NAMES="$(gh release view "$RELEASE_ID" -R "$REPO" --json assets -q '.assets[].name' 2>/dev/null | tr -d '\r' || true)"
+  if printf '%s\n' "$ASSET_NAMES" | grep -qxF "$ZIP_ASSET"; then
+    log "CD-1 gh release download $RELEASE_ID -R $REPO -p $ZIP_ASSET (zip)"
+    ZIP_DIR="$WORK/zip-download"
+    mkdir -p "$ZIP_DIR"
+    gh release download "$RELEASE_ID" -R "$REPO" -D "$ZIP_DIR" -p "$ZIP_ASSET" || die CD-1 "cannot download GitHub Release asset $ZIP_ASSET"
+    "${PY[@]}" scripts/safe_unzip.py "$ZIP_DIR/$ZIP_ASSET" "$PKG" || die CD-1 "zip-slip guard rejected $ZIP_ASSET — refusing to extract"
+    RELEASE_URL="$(gh release view "$RELEASE_ID" -R "$REPO" --json url -q .url)"
+    ev "- CD-1: ${RELEASE_URL} · downloaded ${ZIP_ASSET} · extracted via scripts/safe_unzip.py"
+  else
+    log "CD-1 gh release download $RELEASE_ID -R $REPO (v1 legacy flat assets)"
+    gh release download "$RELEASE_ID" -R "$REPO" -D "$PKG" || die CD-1 "cannot download GitHub Release $RELEASE_ID"
+    RELEASE_URL="$(gh release view "$RELEASE_ID" -R "$REPO" --json url -q .url)"
+    ev "- CD-1: ${RELEASE_URL} · legacy flat assets (no ${ZIP_ASSET})"
+  fi
 fi
 
 # ---------- CD-2 ----------
 log "CD-2 verify-package (local)"
-verify "$PKG" || die CD-2 "package failed verification — nothing sent to the workspace"
+VERIFY_OUT="$(verify "$PKG")" || die CD-2 "package failed verification — nothing sent to the workspace"
+printf '%s\n' "$VERIFY_OUT"
 LOCAL_SHA="$(sha "$PKG/manifest.json")"
 FILE_COUNT="$(json_get 'd["file_count"]' < "$PKG/manifest.json")"
 ev "- CD-2: verify OK · manifest_sha256 \`${LOCAL_SHA}\` · file_count ${FILE_COUNT}"
+CD2_WARN="$(printf '%s\n' "$VERIFY_OUT" | grep -F '[WARN]' | sed 's/^[[:space:]]*//' || true)"
+[ -n "$CD2_WARN" ] && ev "- CD-2: ${CD2_WARN}"
 
 # ---------- CD-3 ----------
+# FR-L.4/L.4a/L.5 (T-50): file list comes from manifest.files[].path (v1 = bare name,
+# v2 = "<source>/<file>"), NOT from `find`/`ls`, so stray files are never uploaded.
 log "CD-3 sealed check $DEST"
 COPIED=0
 if LISTING="$(databricks fs ls "$DEST" --output json 2>/dev/null)"; then
@@ -125,24 +147,45 @@ fi
 if [ ! -f "$WORK/remote-manifest.json" ]; then
   # single-file `fs cp` does not create parent folders on a UC Volume (observed T-41)
   databricks fs mkdir "$DEST" >/dev/null
-  for f in "$PKG"/*; do
-    name="$(basename "$f")"
-    [ "$name" = "manifest.json" ] && continue
-    databricks fs cp "$f" "$DEST/$name" --overwrite >/dev/null
-  done
+  # strip \r: python's stdout on Windows translates '\n' -> '\r\n' in text mode
+  MANIFEST_PATHS="$(json_get 'chr(10).join(sorted(e["path"] for e in d["files"]))' < "$PKG/manifest.json" | tr -d '\r')"
+  MADE_DIRS=""
+  N_FILES=0
+  while IFS= read -r rel; do
+    [ -z "$rel" ] && continue
+    N_FILES=$((N_FILES + 1))
+    dir="$(dirname "$rel")"
+    if [ "$dir" != "." ]; then
+      case " $MADE_DIRS " in
+        *" $dir "*) : ;;
+        *)
+          databricks fs mkdir "$DEST/$dir" >/dev/null
+          MADE_DIRS="$MADE_DIRS $dir"
+          ;;
+      esac
+    fi
+    databricks fs cp "$PKG/$rel" "$DEST/$rel" --overwrite >/dev/null
+  done <<EOF
+$MANIFEST_PATHS
+EOF
+  # validation-report.json always lives at the package root (FR-F.2)
+  databricks fs cp "$PKG/validation-report.json" "$DEST/validation-report.json" --overwrite >/dev/null
   # manifest last (no --overwrite): its presence seals the folder
   databricks fs cp "$PKG/manifest.json" "$DEST/manifest.json" >/dev/null
   COPIED=1
-  ev "- CD-3: copied $(ls "$PKG" | wc -l | tr -d ' ') files · manifest.json last"
+  ev "- CD-3: copied $((N_FILES + 2)) files · manifest.json last"
 fi
 
 # ---------- CD-4 ----------
 log "CD-4 copy back + verify"
 databricks fs cp -r "$DEST" "$WORK/back" >/dev/null
-verify "$WORK/back" || die CD-4 "Volume copy failed verification"
+VERIFY_OUT="$(verify "$WORK/back")" || die CD-4 "Volume copy failed verification"
+printf '%s\n' "$VERIFY_OUT"
 BACK_SHA="$(sha "$WORK/back/manifest.json")"
 [ "$BACK_SHA" = "$LOCAL_SHA" ] || die CD-4 "Volume manifest ${BACK_SHA:0:12}… ≠ local ${LOCAL_SHA:0:12}…"
 ev "- CD-4: copy-back verify OK · manifest_sha256 matches CD-2"
+CD4_WARN="$(printf '%s\n' "$VERIFY_OUT" | grep -F '[WARN]' | sed 's/^[[:space:]]*//' || true)"
+[ -n "$CD4_WARN" ] && ev "- CD-4: ${CD4_WARN}"
 ev ""
 ev "\`\`\`"
 ev "\$ databricks fs ls ${DEST}"

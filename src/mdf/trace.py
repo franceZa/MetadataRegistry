@@ -15,7 +15,9 @@ def load_dataset(env: str, source: str, dataset: str, layer: str) -> dict[str, A
     Load a resolved dataset config from build/<env>/resolved/ (getter per FR-G).
     Raises FileNotFoundError if not compiled yet.
     """
-    resolved_path = Path("build") / env / "resolved" / f"{layer}.{source}.{dataset}.resolved.json"
+    resolved_path = (
+        Path("build") / env / "resolved" / source / f"{layer}.{source}.{dataset}.resolved.json"
+    )
     if not resolved_path.exists():
         raise FileNotFoundError(
             f"Resolved config not found: {resolved_path}. Run 'mdf compile --env {env}' first."

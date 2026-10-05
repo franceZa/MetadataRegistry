@@ -1,0 +1,87 @@
+flowchart TD
+    subgraph A[1 · Pull request เข้า master]
+        A1[เปิด PR] --> A2[ci.yml: lint → validate → diff<br/>→ compile → preview package → verify → pytest]
+        A1 --> A3[security.yml: Bandit + Gitleaks]
+        A2 --> A4{PR พร้อม merge?}
+        A3 --> A4
+    end
+
+    subgraph B[2 · Push เข้า master และสร้าง package จริง]
+        B1[release.yml: checkout commit SHA] --> B2[uv sync --locked → mdf validate → pytest]
+        B2 --> B3[mdf compile --env dev]
+        B3 --> B4[mdf package --env dev --release]
+        B4 --> B5[verify-package + preview=false<br/>release_id = mdf-sha12]
+        B5 --> B6[upload Actions artifact<br/>retention 30 วัน]
+        B4 -.->|release gate ไม่ผ่าน| BF([หยุด: ไม่มี package จริง])
+    end
+
+    subgraph C[3 · เผยแพร่ GitHub Release]
+        C1[download artifact และ verify ซ้ำ] --> C2{release id นี้มีอยู่?}
+        C2 -->|ไม่มี| C3[gh release create<br/>tag = mdf-sha12, target = commit SHA]
+        C2 -->|มี| C4{manifest เหมือนเดิม<br/>ยกเว้น ci_run_url?}
+        C4 -->|เหมือน| C5[skip publish]
+        C4 -->|ต่าง| C6([fail: ห้ามใช้ id เดิมกับเนื้อหาต่างกัน])
+        C3 --> C7[next_steps.py เขียนคำแนะนำ<br/>ลง job summary]
+        C5 --> C7
+    end
+
+    subgraph D[4 · เลือกวิธีส่งตาม delivery_mode]
+        D1{config/env/dev.yaml} -->|auto| D2[deploy-dev.yml: ตรวจ OIDC federation<br/>และ repo variables]
+        D1 -->|u2m · ค่าปัจจุบัน| D3[ผู้ใช้ checkout tag, login Databricks<br/>แล้วรัน deliver_release.sh]
+        D1 -->|manual| D4[M-1 ถึง M-3: ดาวน์โหลด zip เดียวแล้วแตก<br/>อัปโหลดทุกไฟล์ใน source รวม *.odcs.yaml<br/>manifest.json สุดท้าย]
+        D4 --> D9[M-4 ถึง M-5: register_release.sql<br/>ตรวจ REGISTERED และ manifest hash]
+        D9 --> D10[M-6 ถึง M-7: activate_release.sql<br/>ตรวจ active_release_id]
+        D2 --> D6{preflight ผ่าน?}
+        D6 -->|ไม่ผ่าน| D7([หยุด: ตั้ง federation หรือใช้ u2m])
+        D6 -->|ผ่าน| D8[Environment dev: review หากตั้งไว้<br/>checkout release tag และ sync dependencies]
+        D8 --> D5[deliver_release.sh]
+        D3 --> D5
+    end
+
+    subgraph E[5 · deliver_release.sh · auto และ u2m]
+        E0{preflight: มี CLI และ<br/>login Databricks ได้?} -->|ได้| E1[CD-1 ดาวน์โหลด GitHub Release<br/>หรือใช้ --from-dir]
+        E0 -->|ไม่ได้| EF([หยุดก่อนแตะ workspace<br/>แสดงวิธีแก้หรือใช้ manual])
+        E1 --> E2[CD-2 verify package ในเครื่อง]
+        E2 --> E3[CD-3 คัดลอกเข้า Volume<br/>manifest.json เป็นไฟล์สุดท้าย]
+        E3 --> E4[CD-4 คัดลอกกลับและ verify อีกครั้ง]
+        E4 --> E5[CD-5 databricks bundle deploy]
+        E5 --> E6[CD-6 รัน mdf_release_register_dev<br/>mode=register → REGISTERED]
+        E6 --> E7[CD-7 query registry<br/>ตรวจ hash, file_count, 1 REGISTERED]
+        E7 --> E8{--no-activate?}
+        E8 -->|ใช่| E9([จบที่ REGISTERED])
+        E8 -->|ไม่| E10[CD-8 รัน mode=activate → ACTIVATED<br/>deploy active_release_id แล้ว query ยืนยัน]
+    end
+
+    subgraph F[6 · สถานะและหลักฐาน]
+        F1[Volume: releases/mdf-sha12/<br/>มี manifest.json = sealed]
+        F2[(ops.release_registry<br/>append-only)]
+        F3[ACTIVATED ล่าสุดคือ release ที่ใช้งาน]
+        F4[rollback: activate release เก่า<br/>เพื่อ append ACTIVATED แถวใหม่]
+    end
+
+    A4 -->|ผ่าน| B1
+    A4 -->|ไม่ผ่าน| A5([แก้ PR และรันใหม่])
+    B6 --> C1
+    C7 --> D1
+    M[workflow_dispatch: ระบุ release_id<br/>เพื่อรัน deploy-dev.yml เอง] --> D2
+    D5 --> E0
+    D10 --> F1
+    D10 --> F2
+    E3 --> F1
+    E6 --> F2
+    E10 --> F2
+    E10 --> F3
+    F2 --> F3
+    F3 --> F4
+    F4 --> F2
+
+    S[security.yml รันแยกบนทุก push] -.-> B1
+
+    classDef action fill:#e8f3ff,stroke:#5584a6,color:#10253d
+    classDef decision fill:#fff2d8,stroke:#b48a42,color:#3c2a0d
+    classDef success fill:#dcf4e8,stroke:#5b9b74,color:#153b29
+    classDef stop fill:#fce6e6,stroke:#b87575,color:#4b1f1f
+    class A1,A2,A3,B1,B2,B3,B4,B5,B6,C1,C3,C5,C7,D2,D3,D4,D5,D8,D9,D10,E1,E2,E3,E4,E5,E6,E7,E10,F1,F2,F3,F4,S,M action
+    class A4,C2,C4,D1,D6,E0,E8 decision
+    class E9 success
+    class A5,BF,C6,D7,EF stop

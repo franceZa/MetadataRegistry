@@ -75,3 +75,50 @@ def test_cli_prints_markdown():
         encoding="utf-8",
     )
     assert r.returncode == 0 and r.stdout.startswith("## ขั้นต่อไป")
+
+
+# ---------- T-57 · FR-M.9 · AC-58 — v3 guidance: odcs.yaml, no fixed count, runbook sync ----------
+
+RUNBOOK = ROOT / "runbooks" / "release-delivery.md"
+GUIDE = ROOT / "runbooks" / "release-delivery-guide.md"
+PLACEHOLDER = "mdf-<sha12>"
+
+
+def _m_lines(rid: str = RID) -> list[str]:
+    lines = [ln for ln in ns._manual(rid, REPO, None) if ln.startswith("- [ ] **M-")]
+    assert [ln.split("**")[1] for ln in lines] == [f"M-{i}" for i in range(1, 8)]
+    return lines
+
+
+def test_t57_manual_m3_says_upload_odcs_yaml_and_has_no_fixed_file_count():
+    text = ns.render("manual", RID, REPO)
+    m3 = next(ln for ln in text.splitlines() if "**M-3**" in ln)
+    assert "**และ `*.odcs.yaml`**" in m3 and "*.resolved.json" in m3
+    assert "ทุกไฟล์" in m3 and "`<source>/`" in m3
+    assert "file_count" in m3  # count comes from the manifest, never hardcoded
+    assert "[TAMPERED]" in m3  # what happens if the .odcs.yaml is forgotten
+    assert not re.search(r"\d+\s*×|\d+\s*ไฟล์", text), re.search(r"\d+\s*×|\d+\s*ไฟล์", text)
+
+
+def test_t57_runbook_m1_to_m7_match_next_steps_word_for_word():
+    """HRM correction #1 (H-115): runbook M-1…M-7 == next_steps.py (release_id placeholder)."""
+    runbook = RUNBOOK.read_text(encoding="utf-8").splitlines()
+    for line in _m_lines(PLACEHOLDER):
+        assert line in runbook, line.split("**")[1]
+
+
+def test_t57_guide_m1_to_m7_table_matches_next_steps_word_for_word():
+    guide = GUIDE.read_text(encoding="utf-8").splitlines()
+    for line in _m_lines(PLACEHOLDER):
+        tag, body = re.match(r"- \[ \] (\*\*M-\d\*\*) (.*)$", line).groups()
+        rows = [g for g in guide if g.startswith(f"| {tag} | ")]
+        assert len(rows) == 1, tag
+        assert rows[0].split(" | ")[1] == body, tag
+
+
+def test_t57_runbooks_have_no_hardcoded_file_counts():
+    for path in (RUNBOOK, GUIDE, ROOT / "runbooks" / "release-workflow" / "flow-chart.mmd"):
+        text = path.read_text(encoding="utf-8")
+        assert "8 ไฟล์" not in text and "6 ×" not in text, path
+    rb = RUNBOOK.read_text(encoding="utf-8")
+    assert "`file_count` ใน `manifest.json` + 2" in rb

@@ -1,4 +1,4 @@
--- T-44 · FR-L.13 / AC-44 · delivery_mode: manual — step M-4 of runbooks/release-delivery.md
+-- T-44 · FR-L.13 / AC-44 · delivery_mode: manual — step M-5 of runbooks/release-delivery.md
 -- Verifies a release folder in the Volume and appends ONE REGISTERED row, with the same checks
 -- and the same skip/fail rules as job mdf_release_register_dev (src/mdf/register.py).
 --
@@ -9,6 +9,17 @@
 --      If the folder does not exist at all, statement 2 stops with Databricks' own PATH_NOT_FOUND.
 -- Catalog is dev_catalog. For another env, replace dev_catalog in the 3 places below.
 -- Idempotent: running it again for an already-registered release inserts nothing.
+--
+-- T-51 (FR-L.13, FR-L.14 · AC-50): layout v2 — files live under per-source subfolders
+-- (releases/<release_id>/<source>/<file>), so this reads the Volume recursively
+-- (recursiveFileLookup => 'true') and matches each file by its path RELATIVE TO THE RELEASE
+-- ROOT (e.g. 'cc/x.json'), not just the basename, so it lines up with manifest.files[].path.
+-- Legacy v1 (flat) releases are still handled: a v1 file sits directly at the release root, so
+-- its relative path IS its basename already — the same formula covers both layouts.
+-- Extraneous-file / manifest.json / validation-report.json checks compare the RELATIVE path, so
+-- a stray 'manifest.json' or 'validation-report.json' nested inside a source subfolder (e.g.
+-- 'cc/manifest.json') is NOT exempted — it only counts as root when the relative path has no '/'.
+-- No filtering by file extension on purpose (a future round may add non-.json files).
 
 -- (1) FORMAT CHECK — before any file is read.
 SELECT CASE WHEN :release_id RLIKE '^mdf-[0-9a-f]{12}$' THEN 'OK — รูปแบบ release_id ถูกต้อง'
@@ -18,8 +29,9 @@ SELECT CASE WHEN :release_id RLIKE '^mdf-[0-9a-f]{12}$' THEN 'OK — รูป�
 WITH
 rid AS (SELECT :release_id AS release_id),
 vol AS (
-  SELECT regexp_extract(f.path, '[^/]+$', 0) AS name, sha2(f.content, 256) AS sha256, f.content
-  FROM read_files(concat('/Volumes/dev_catalog/ops/files/releases/', :release_id, '/'), format => 'binaryFile') AS f
+  SELECT regexp_extract(f.path, concat(:release_id, '/(.*)$'), 1) AS name, sha2(f.content, 256) AS sha256, f.content
+  FROM read_files(concat('/Volumes/dev_catalog/ops/files/releases/', :release_id, '/'),
+                  format => 'binaryFile', recursiveFileLookup => 'true') AS f
 ),
 man_raw AS (SELECT content, sha256 AS manifest_sha256 FROM vol WHERE name = 'manifest.json'),
 man AS (
@@ -66,8 +78,9 @@ INSERT INTO dev_catalog.ops.release_registry
 WITH
 rid AS (SELECT :release_id AS release_id WHERE :release_id RLIKE '^mdf-[0-9a-f]{12}$'),
 vol AS (
-  SELECT regexp_extract(f.path, '[^/]+$', 0) AS name, sha2(f.content, 256) AS sha256, f.content
-  FROM read_files(concat('/Volumes/dev_catalog/ops/files/releases/', :release_id, '/'), format => 'binaryFile') AS f
+  SELECT regexp_extract(f.path, concat(:release_id, '/(.*)$'), 1) AS name, sha2(f.content, 256) AS sha256, f.content
+  FROM read_files(concat('/Volumes/dev_catalog/ops/files/releases/', :release_id, '/'),
+                  format => 'binaryFile', recursiveFileLookup => 'true') AS f
 ),
 man AS (
   SELECT sha256 AS manifest_sha256,

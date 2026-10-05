@@ -12,7 +12,7 @@
 5. [การเพิ่มกฎ DQ](#การเพิ่มกฎ-dq)
 6. [การทดสอบ](#การทดสอบ)
 7. [Workflow ของทีม (swe-delivery-loop)](#workflow-ของทีม)
-8. [แนวทาง Phase 2](#แนวทาง-phase-2)
+8. [Phase ถัดไป](#phase-ถัดไป)
 
 ## ภาพรวม
 
@@ -25,7 +25,7 @@ config/dq_library.yaml (กฎพื้นฐาน)          ─┤→         
 config/rules/*.rules.json (กฎเชิงโครงสร้าง)  ─┘                    mdf package → release package + manifest
 ```
 
-หลักการสำคัญ (ยึดจาก SSOT `agent_output/ba_refinement/draft_reviewd_by_agent.md` รอบ 8):
+หลักการสำคัญ (ยึดจาก SSOT `DocsForAgent/draft_reviewd_by_agent_v2.md`):
 
 - **Metadata in Git only** — ไม่มี database, ไม่มี intermediate spec
 - **Deterministic** — compile กี่ครั้งก็ได้ผล sha256 เดิม (AC-11)
@@ -171,17 +171,14 @@ uv run ruff check src tests      # lint
 - หลักฐาน QA ต่อ Epic: `qa/E<n>/SIGNOFF.md`
 - Governance: `.github/CODEOWNERS.example`, `docs/branch_protection.md`
 
-## แนวทาง Phase 2
+## Phase ถัดไป
 
-Phase 1 = static (นิยาม + validate + compile) — **Phase 2 = runtime** (ตาม SSOT):
+Phase 1 (static: นิยาม + validate + compile + package) ปิดแล้ว · ลำดับถัดไปตาม SSOT v2:
 
-- PySpark executor รัน DQ กับข้อมูลจริง (bronze → silver)
-- Medallion: `_gold/` specs + gold compiler
-- Tokenise (HMAC-SHA256 + vault), erasure
-- Backfill (SCD2, replaceWhere, cascade)
-- Deploy Databricks (DAB) + UC ABAC tags
-- รายละเอียด: ดู SSOT §Phase 2 (FR-I, FR-J, DPR, E5, E6)
+- **Phase 2 — Release delivery:** publish GitHub Release `mdf-<sha12>` → CD ดาวน์โหลด → `verify-package` → `/Volumes/{catalog}/ops/files/releases/<release_id>/` (immutable) → append `{catalog}.ops.release_registry` (SSOT §5)
+- **Phase 3 — Medallion runtime:** PySpark bronze → silver → gold, DQ รันจริง, tokenise + vault, backfill (SCD2, replaceWhere, cascade), job `mdf_cc_dev`, UC ABAC tag (SSOT §6)
+- **Phase 4 — AI:** semantic layer, PII detection, classification, auto-suggest UC ABAC tag (SSOT §7)
 
 ---
 
-*อ้างอิงสเปก: `agent_output/ba_refinement/draft_reviewd_by_agent.md` (รอบ 8) — เอกสารชี้ขาดสูงสุด*
+*อ้างอิงสเปก: `DocsForAgent/draft_reviewd_by_agent_v2.md` — เอกสารชี้ขาดสูงสุด*

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ลำดับงานตั้งแต่ PR, build package, publish GitHub Release จนถึงการบันทึก ACTIVATED ใน Databricks">
+  <title>Release flow chart · Metadata Registry</title>
+  <style>
+:root{color-scheme:light;--ink:#182b3a;--muted:#58707f;--line:#d8e4e8;--blue:#276087}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#e8f1f5 0,#f6f9fb 320px);color:var(--ink);font-family:Tahoma,"Segoe UI",sans-serif;line-height:1.6}
+a{color:var(--blue)}a:focus-visible{outline:3px solid #e9a83c;outline-offset:3px}
+.wrap{width:min(1440px,calc(100% - 36px));margin:auto}
+header{padding:28px 0 20px;border-bottom:1px solid var(--line)}
+.topline{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:center}
+.brand{font-weight:700;letter-spacing:.04em;color:#194766}
+nav{display:flex;flex-wrap:wrap;gap:8px}
+nav a{display:inline-block;padding:8px 13px;text-decoration:none;border-radius:999px;border:1px solid #b9d0dc;background:#fff;font-size:14px}
+nav a[aria-current=page]{color:#fff;background:#275e81;border-color:#275e81}
+main{padding:32px 0 64px}.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;color:#537285}
+h1{margin:7px 0 10px;font-size:clamp(30px,3.5vw,50px);line-height:1.16}
+.lead{max-width:900px;margin:0;font-size:18px;color:#3f5d6b}
+.notice{display:flex;gap:12px;align-items:flex-start;margin:24px 0 22px;padding:15px 18px;border-left:5px solid #449271;background:#dff2e6;border-radius:0 10px 10px 0}
+.notice strong{white-space:nowrap}.meta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:0 0 16px;color:var(--muted);font-size:14px}
+.meta a{text-decoration:underline;text-underline-offset:3px}
+.diagram-shell{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 40px rgba(25,58,78,.07)}
+.diagram-top{padding:15px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.diagram-top h2{margin:0;font-size:17px}.diagram-top span{color:var(--muted);font-size:13px}
+.diagram-viewport{overflow:auto;padding:20px;min-height:320px}
+.mermaid{display:flex;justify-content:center;margin:0;white-space:pre-wrap;font-size:15px}
+.mermaid svg{max-width:none!important;height:auto}.status{padding:0 20px 16px;color:var(--muted);font-size:13px}.status.error{color:#9c3030}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;margin:16px 0 28px;color:#4d6574;font-size:14px}
+.legend span::before{content:"";display:inline-block;width:13px;height:13px;margin-right:7px;vertical-align:-2px;border:1px solid #b9cad2;border-radius:3px;background:#e8f3ff}
+.legend .decision::before{background:#fff2d8}.legend .success::before{background:#dcf4e8}.legend .stop::before{background:#fce6e6}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.notes article{padding:18px 19px;border-top:3px solid #93b7cc;background:#fff}
+.notes h3{margin:0 0 5px;font-size:16px}.notes p{margin:0;color:#4d6574;font-size:14px}
+footer{margin-top:30px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+code{background:#e8eef1;border-radius:4px;padding:1px 4px}
+@media(max-width:760px){.notes{grid-template-columns:1fr}.notice{display:block}.notice strong{display:block;margin-bottom:3px}.diagram-viewport{padding:12px}}
+</style>
+</head>
+<body>
+  <header><div class="wrap topline">
+    <div class="brand">METADATA REGISTRY · RELEASE</div>
+    <nav aria-label="แผนภาพ release">
+      <a href="decision-tree.html" >Decision tree</a>
+      <a href="flow-chart.html" aria-current="page">Flow chart</a>
+      <a href="../../runbooks/release-delivery.md">Runbook</a>
+    </nav>
+  </div></header>
+  <main class="wrap">
+    <div class="eyebrow">RELEASE WORKFLOW / SEQUENCE</div>
+    <h1>Release flow chart</h1>
+    <p class="lead">ลำดับงานตั้งแต่ PR, build package, publish GitHub Release จนถึงการบันทึก ACTIVATED ใน Databricks</p>
+    <div class="notice"><strong>สถานะปัจจุบัน · u2m</strong><span>Push เข้า <code>master</code> จะสร้าง GitHub Release อัตโนมัติ จากนั้นผู้ใช้ checkout release tag, login Databricks และรัน <code>scripts/deliver_release.sh</code> เพื่อส่งและ activate</span></div>
+    <div class="meta"><a href="flow-chart.mmd" download>ดาวน์โหลด Mermaid source (.mmd)</a><span>·</span><a href="decision-tree.html">ดู decision tree</a><span>·</span><a href="../../config/env/dev.yaml">config/env/dev.yaml</a></div>
+    <section class="diagram-shell" aria-labelledby="diagram-title">
+      <div class="diagram-top"><h2 id="diagram-title">แผนภาพ</h2><span>เลื่อนภายในภาพเพื่อดูส่วนที่อยู่นอกจอ</span></div>
+      <div class="diagram-viewport"><pre class="mermaid" id="diagram">flowchart TD
+    subgraph A[1 · Pull request เข้า master]
+        A1[เปิด PR] --&gt; A2[ci.yml: lint → validate → diff&lt;br/&gt;→ compile → preview package → verify → pytest]
+        A1 --&gt; A3[security.yml: Bandit + Gitleaks]
+        A2 --&gt; A4{PR พร้อม merge?}
+        A3 --&gt; A4
+    end
+
+    subgraph B[2 · Push เข้า master และสร้าง package จริง]
+        B1[release.yml: checkout commit SHA] --&gt; B2[uv sync --locked → mdf validate → pytest]
+        B2 --&gt; B3[mdf compile --env dev]
+        B3 --&gt; B4[mdf package --env dev --release]
+        B4 --&gt; B5[verify-package + preview=false&lt;br/&gt;release_id = mdf-sha12]
+        B5 --&gt; B6[upload Actions artifact&lt;br/&gt;retention 30 วัน]
+        B4 -.-&gt;|release gate ไม่ผ่าน| BF([หยุด: ไม่มี package จริง])
+    end
+
+    subgraph C[3 · เผยแพร่ GitHub Release]
+        C1[download artifact และ verify ซ้ำ] --&gt; C2{release id นี้มีอยู่?}
+        C2 --&gt;|ไม่มี| C3[gh release create&lt;br/&gt;tag = mdf-sha12, target = commit SHA]
+        C2 --&gt;|มี| C4{manifest เหมือนเดิม&lt;br/&gt;ยกเว้น ci_run_url?}
+        C4 --&gt;|เหมือน| C5[skip publish]
+        C4 --&gt;|ต่าง| C6([fail: ห้ามใช้ id เดิมกับเนื้อหาต่างกัน])
+        C3 --&gt; C7[next_steps.py เขียนคำแนะนำ&lt;br/&gt;ลง job summary]
+        C5 --&gt; C7
+    end
+
+    subgraph D[4 · เลือกวิธีส่งตาม delivery_mode]
+        D1{config/env/dev.yaml} --&gt;|auto| D2[deploy-dev.yml: ตรวจ OIDC federation&lt;br/&gt;และ repo variables]
+        D1 --&gt;|u2m · ค่าปัจจุบัน| D3[ผู้ใช้ checkout tag, login Databricks&lt;br/&gt;แล้วรัน deliver_release.sh]
+        D1 --&gt;|manual| D4[M-1 ถึง M-3: ดาวน์โหลด zip เดียวแล้วแตก&lt;br/&gt;อัปโหลดทุกไฟล์ใน source รวม *.odcs.yaml&lt;br/&gt;manifest.json สุดท้าย]
+        D4 --&gt; D9[M-4 ถึง M-5: register_release.sql&lt;br/&gt;ตรวจ REGISTERED และ manifest hash]
+        D9 --&gt; D10[M-6 ถึง M-7: activate_release.sql&lt;br/&gt;ตรวจ active_release_id]
+        D2 --&gt; D6{preflight ผ่าน?}
+        D6 --&gt;|ไม่ผ่าน| D7([หยุด: ตั้ง federation หรือใช้ u2m])
+        D6 --&gt;|ผ่าน| D8[Environment dev: review หากตั้งไว้&lt;br/&gt;checkout release tag และ sync dependencies]
+        D8 --&gt; D5[deliver_release.sh]
+        D3 --&gt; D5
+    end
+
+    subgraph E[5 · deliver_release.sh · auto และ u2m]
+        E0{preflight: มี CLI และ&lt;br/&gt;login Databricks ได้?} --&gt;|ได้| E1[CD-1 ดาวน์โหลด GitHub Release&lt;br/&gt;หรือใช้ --from-dir]
+        E0 --&gt;|ไม่ได้| EF([หยุดก่อนแตะ workspace&lt;br/&gt;แสดงวิธีแก้หรือใช้ manual])
+        E1 --&gt; E2[CD-2 verify package ในเครื่อง]
+        E2 --&gt; E3[CD-3 คัดลอกเข้า Volume&lt;br/&gt;manifest.json เป็นไฟล์สุดท้าย]
+        E3 --&gt; E4[CD-4 คัดลอกกลับและ verify อีกครั้ง]
+        E4 --&gt; E5[CD-5 databricks bundle deploy]
+        E5 --&gt; E6[CD-6 รัน mdf_release_register_dev&lt;br/&gt;mode=register → REGISTERED]
+        E6 --&gt; E7[CD-7 query registry&lt;br/&gt;ตรวจ hash, file_count, 1 REGISTERED]
+        E7 --&gt; E8{--no-activate?}
+        E8 --&gt;|ใช่| E9([จบที่ REGISTERED])
+        E8 --&gt;|ไม่| E10[CD-8 รัน mode=activate → ACTIVATED&lt;br/&gt;deploy active_release_id แล้ว query ยืนยัน]
+    end
+
+    subgraph F[6 · สถานะและหลักฐาน]
+        F1[Volume: releases/mdf-sha12/&lt;br/&gt;มี manifest.json = sealed]
+        F2[(ops.release_registry&lt;br/&gt;append-only)]
+        F3[ACTIVATED ล่าสุดคือ release ที่ใช้งาน]
+        F4[rollback: activate release เก่า&lt;br/&gt;เพื่อ append ACTIVATED แถวใหม่]
+    end
+
+    A4 --&gt;|ผ่าน| B1
+    A4 --&gt;|ไม่ผ่าน| A5([แก้ PR และรันใหม่])
+    B6 --&gt; C1
+    C7 --&gt; D1
+    M[workflow_dispatch: ระบุ release_id&lt;br/&gt;เพื่อรัน deploy-dev.yml เอง] --&gt; D2
+    D5 --&gt; E0
+    D10 --&gt; F1
+    D10 --&gt; F2
+    E3 --&gt; F1
+    E6 --&gt; F2
+    E10 --&gt; F2
+    E10 --&gt; F3
+    F2 --&gt; F3
+    F3 --&gt; F4
+    F4 --&gt; F2
+
+    S[security.yml รันแยกบนทุก push] -.-&gt; B1
+
+    classDef action fill:#e8f3ff,stroke:#5584a6,color:#10253d
+    classDef decision fill:#fff2d8,stroke:#b48a42,color:#3c2a0d
+    classDef success fill:#dcf4e8,stroke:#5b9b74,color:#153b29
+    classDef stop fill:#fce6e6,stroke:#b87575,color:#4b1f1f
+    class A1,A2,A3,B1,B2,B3,B4,B5,B6,C1,C3,C5,C7,D2,D3,D4,D5,D8,D9,D10,E1,E2,E3,E4,E5,E6,E7,E10,F1,F2,F3,F4,S,M action
+    class A4,C2,C4,D1,D6,E0,E8 decision
+    class E9 success
+    class A5,BF,C6,D7,EF stop
+</pre></div>
+      <div class="status" id="render-status" role="status" aria-live="polite">กำลังแสดงแผนภาพ…</div>
+    </section>
+    <div class="legend" aria-label="คำอธิบายสี"><span>ขั้นตอน</span><span class="decision">จุดตัดสินใจ</span><span class="success">สำเร็จ</span><span class="stop">หยุดหรือแก้ไข</span></div>
+    <section class="notes" aria-label="วิธีอ่านแผนภาพ"><article><h3>1. ตรวจและสร้าง</h3><p>PR สร้าง preview package; push เข้า master จึงสร้าง package จริงและตรวจ release gate</p></article>
+<article><h3>2. ส่ง package</h3><p>auto และ u2m ใช้ deliver_release.sh ชุดเดียวกัน; manual ใช้ UI กับ SQL ที่เตรียมไว้</p></article>
+<article><h3>3. ยืนยันผล</h3><p>manifest.json ปิดผนึกโฟลเดอร์ Volume; แถว ACTIVATED ล่าสุดใน registry บอก release ที่ใช้งาน</p></article></section>
+    <footer>อ้างอิงจาก <a href="../../.github/workflows/ci.yml">ci.yml</a>, <a href="../../.github/workflows/security.yml">security.yml</a>, <a href="../../.github/workflows/release.yml">release.yml</a>, <a href="../../.github/workflows/deploy-dev.yml">deploy-dev.yml</a>, <a href="../../scripts/deliver_release.sh">deliver_release.sh</a> และ <a href="../../scripts/next_steps.py">next_steps.py</a></footer>
+  </main>
+  <script type="module">
+    const status = document.getElementById("render-status");
+    try {
+      const { default: mermaid } = await import("https://cdn.jsdelivr.net/npm/mermaid@11.16.1/dist/mermaid.esm.min.mjs");
+      mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "base", themeVariables: { fontFamily: "Tahoma, Segoe UI, sans-serif", background: "#ffffff", primaryColor: "#e8f3ff", primaryTextColor: "#182b3a", primaryBorderColor: "#5584a6", lineColor: "#6c8492", secondaryColor: "#fff2d8", tertiaryColor: "#dcf4e8" }, flowchart: { useMaxWidth: false, htmlLabels: true, curve: "basis" } });
+      await mermaid.run({ nodes: [document.getElementById("diagram")] });
+      status.textContent = "แสดงแผนภาพแล้ว";
+    } catch (error) {
+      status.textContent = "โหลดแผนภาพไม่สำเร็จ: เปิดไฟล์ .mmd เพื่อดู Mermaid source หรือเชื่อมต่ออินเทอร์เน็ตแล้วโหลดหน้าใหม่";
+      status.classList.add("error");
+      console.error(error);
+    }
+  </script>
+</body>
+</html>

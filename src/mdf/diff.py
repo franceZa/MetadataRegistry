@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from mdf.calendar import compiled_calendar, custom_property
 from mdf.loading import discover_datasets, load_yaml, load_yaml_file
 
 
@@ -203,6 +204,40 @@ def diff_contracts(
                         "source ต้องส่งค่าเสมอ)",
                     )
                 )
+
+            # FR-M.11 (P1): pii/pci changes are flagged "ต้อง review" -- never auto-breaking,
+            # because tightening (false->true) is a privacy improvement and loosening
+            # (true->false) weakens protection; a human must look at both either way.
+            for flag in ("pii", "pci"):
+                cur_flag = custom_property(cur_cols[col_name], flag)
+                base_flag = custom_property(base_cols[col_name], flag)
+                if cur_flag != base_flag:
+                    changes.append(
+                        ChangeRecord(
+                            kind="non_breaking",
+                            category="privacy_flag_changed",
+                            dataset=cid,
+                            detail=f"คอลัมน์ '{col_name}' เปลี่ยน {flag}: {base_flag} → {cur_flag} "
+                            "— ต้อง review",
+                            fix="ตรวจสอบว่าการเปลี่ยนธงนี้ตั้งใจ และ pipeline (tokenise) "
+                            "สอดคล้องกันแล้ว",
+                        )
+                    )
+
+        # FR-M.11 (P1): calendar changes (status/schedule/latency/recovery_window) -- also
+        # "ต้อง review", not breaking (AS-30/FR-M.4 already handle missing-vs-wrong at validate).
+        cur_calendar = compiled_calendar(cur)
+        base_calendar = compiled_calendar(base)
+        if cur_calendar != base_calendar:
+            changes.append(
+                ChangeRecord(
+                    kind="non_breaking",
+                    category="calendar_changed",
+                    dataset=cid,
+                    detail=f"calendar เปลี่ยนจาก {base_calendar} เป็น {cur_calendar} — ต้อง review",
+                    fix="ตรวจสอบผลกระทบต่อ reconciliation/arrival logic ที่ใช้ calendar นี้",
+                )
+            )
 
     for cid in baseline.keys() - current.keys():
         changes.append(

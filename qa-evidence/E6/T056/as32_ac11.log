@@ -1,0 +1,34 @@
+== AS-32: bundled contract vs working tree vs HEAD vs lineage ==
+platform: win32
+-- customer
+   bundle   38813858c933deeb3db47dc87cb0c526a18cc9b3c95d06f3da603089a04bcb0b  CRLF=False
+   worktree 38813858c933deeb3db47dc87cb0c526a18cc9b3c95d06f3da603089a04bcb0b  CRLF=False
+   HEAD     2c6a0af2612d5bc8734e3aaaf0efe9eba51ceb1cf27a3b6a6a7b26cc62f1163e  (== worktree: False)
+   lineage.bronze.contract_sha256 38813858c933deeb3db47dc87cb0c526a18cc9b3c95d06f3da603089a04bcb0b  bundle_path=cc/customer.odcs.yaml  contract_file=DataContract/cc/contract/customer.odcs.yaml
+   lineage.silver.contract_sha256 38813858c933deeb3db47dc87cb0c526a18cc9b3c95d06f3da603089a04bcb0b  bundle_path=cc/customer.odcs.yaml  contract_file=DataContract/cc/contract/customer.odcs.yaml
+   bundle==worktree, sha==lineage(x2), bundle_path ok, no CRLF -> [True, True, True, True]
+-- credit_card
+   bundle   1718f4e1edb8428f9131c8ada07b7285f946412e5492b97f254c22edcf1a03f7  CRLF=False
+   worktree 1718f4e1edb8428f9131c8ada07b7285f946412e5492b97f254c22edcf1a03f7  CRLF=False
+   HEAD     6be1dc020514e0fb6739578e2ab3ddd4852bb07ff35a906f3d321aa072d3a591  (== worktree: False)
+   lineage.bronze.contract_sha256 1718f4e1edb8428f9131c8ada07b7285f946412e5492b97f254c22edcf1a03f7  bundle_path=cc/credit_card.odcs.yaml  contract_file=DataContract/cc/contract/credit_card.odcs.yaml
+   lineage.silver.contract_sha256 1718f4e1edb8428f9131c8ada07b7285f946412e5492b97f254c22edcf1a03f7  bundle_path=cc/credit_card.odcs.yaml  contract_file=DataContract/cc/contract/credit_card.odcs.yaml
+   bundle==worktree, sha==lineage(x2), bundle_path ok, no CRLF -> [True, True, True, True]
+-- credit_card_txn
+   bundle   145c94d42d8e0e7faea58e940bedfc43210859328506dde81b26c77c419eef3b  CRLF=False
+   worktree 145c94d42d8e0e7faea58e940bedfc43210859328506dde81b26c77c419eef3b  CRLF=False
+   HEAD     97bdbb222333523e09e72b71f5d1c0b4bf6fa0993396811fbc51090404d746d0  (== worktree: False)
+   lineage.bronze.contract_sha256 145c94d42d8e0e7faea58e940bedfc43210859328506dde81b26c77c419eef3b  bundle_path=cc/credit_card_txn.odcs.yaml  contract_file=DataContract/cc/contract/credit_card_txn.odcs.yaml
+   lineage.silver.contract_sha256 145c94d42d8e0e7faea58e940bedfc43210859328506dde81b26c77c419eef3b  bundle_path=cc/credit_card_txn.odcs.yaml  contract_file=DataContract/cc/contract/credit_card_txn.odcs.yaml
+   bundle==worktree, sha==lineage(x2), bundle_path ok, no CRLF -> [True, True, True, True]
+AS-32 RESULT: PASS
+
+== AC-11: package twice -> byte-identical ==
+[WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer
+[WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer
+files compared: 11
+differing files: []
+file-set difference: []
+commit/run-bound fields (same here because same commit): {'release_id': 'mdf-5a9126bc35c9', 'source_commit': '5a9126bc35c9fac28bf7b2a222eb9ac501303924', 'compiler_revision': '0.1.0+src.106088cbfdd7', 'ci_run_url': None}
+AC-11 RESULT: PASS
+EXIT=0

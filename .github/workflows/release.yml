@@ -98,36 +98,92 @@ jobs:
           uv run mdf verify-package build/dev/release --expect-release-id "$RELEASE_ID"
           test "$(jq -r '.preview' build/dev/release/manifest.json)" = "false"
 
+      # T-52 · FR-L.1a: GitHub Release assets cannot hold subfolders (compile/package now
+      # write `<source>/...`) so the whole package ships as a single zip. No wrapping folder:
+      # `manifest.json` / `validation-report.json` / `<source>/...` sit at the zip root.
+      - name: Build release zip asset
+        run: |
+          (cd build/dev/release && zip -q -r "../../../build/${RELEASE_ID}.zip" .)
+
+      # FR-L.14 (รอบ 6): computed once, reused by both the release notes and the job summary
+      # so the two digests can never drift apart.
+      - name: Compute manifest digest
+        id: digest
+        run: |
+          echo "manifest_sha256=$(sha256sum build/dev/release/manifest.json | cut -d' ' -f1)" \
+            >> "$GITHUB_OUTPUT"
+
+      # T-57 · FR-M.4 / FR-M.9: datasets whose calendar is still PENDING_OWNER, read from
+      # `calendar.status` already compiled into the package's `*.resolved.json` (the same
+      # `compiled_calendar()` result `mdf package` warns about) — the contracts are NOT
+      # re-parsed here. Empty when every calendar is COMPLETE. Reused by the release notes
+      # and the job summary below so the two lists can never drift apart.
+      - name: Collect calendar PENDING_OWNER datasets
+        id: pending
+        run: |
+          uv run python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          ids = set()
+          for path in Path("build/dev/release").rglob("*.resolved.json"):
+              cfg = json.loads(path.read_text(encoding="utf-8"))
+              if (cfg.get("calendar") or {}).get("status") == "PENDING_OWNER":
+                  ids.add(cfg.get("contract_id") or f"{cfg.get('source')}.{cfg.get('dataset')}")
+          print("pending_owner=" + ", ".join(sorted(ids)))
+          PY
+
       - name: Publish or skip if identical release exists
         env:
           GH_TOKEN: ${{ github.token }}
+          MANIFEST_SHA256: ${{ steps.digest.outputs.manifest_sha256 }}
+          PENDING_OWNER: ${{ steps.pending.outputs.pending_owner }}
         run: |
           if gh release view "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            mkdir -p build/existing
-            gh release download "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" --dir build/existing
+            mkdir -p build/existing-dl build/existing
+            # FR-L.1b: idempotency compares manifest.json extracted FROM the zip, not the
+            # zip's own hash (zip encoding/order/mtime are not deterministic).
+            gh release download "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" \
+              --dir build/existing-dl --pattern "${RELEASE_ID}.zip"
+            uv run python scripts/safe_unzip.py \
+              "build/existing-dl/${RELEASE_ID}.zip" build/existing
             uv run mdf verify-package build/existing --expect-release-id "$RELEASE_ID"
             # ci_run_url differs between runs of the same commit; everything else must match.
             if ! diff <(jq -S 'del(.ci_run_url)' build/existing/manifest.json) \
                       <(jq -S 'del(.ci_run_url)' build/dev/release/manifest.json); then
               echo "::error::release $RELEASE_ID exists with different content"
+              echo "manifest_sha256: \`${MANIFEST_SHA256}\`" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
             echo "release $RELEASE_ID already published with identical content - skip"
             exit 0
           fi
+          NOTES="$(printf 'mdf release package for %s\n\nmanifest_sha256: %s\n' "$GITHUB_SHA" "$MANIFEST_SHA256")"
+          # T-57 · FR-M.4: only when some calendar is still PENDING_OWNER (empty = no line)
+          if [ -n "$PENDING_OWNER" ]; then
+            NOTES="$(printf '%s\n\ncalendar PENDING_OWNER: %s\n' "$NOTES" "$PENDING_OWNER")"
+          fi
           gh release create "$RELEASE_ID" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "$RELEASE_ID" \
-            --notes "mdf release package for ${GITHUB_SHA}" \
-            build/dev/release/*
+            --notes "$NOTES" \
+            "build/${RELEASE_ID}.zip"
 
       # T-45 · FR-L.14 (ก): tell the user what to do next for the configured delivery_mode.
+      # T-52 (รอบ 6/OQ-P5-9): also echo manifest_sha256 so it matches the release notes above.
       - name: Next steps (job summary)
         env:
           DELIVERY_MODE: ${{ needs.build-and-verify.outputs.delivery_mode }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MANIFEST_SHA256: ${{ steps.digest.outputs.manifest_sha256 }}
+          PENDING_OWNER: ${{ steps.pending.outputs.pending_owner }}
         run: |
+          echo "manifest_sha256: \`${MANIFEST_SHA256}\`" >> "$GITHUB_STEP_SUMMARY"
+          # T-57 · FR-M.4: only when some calendar is still PENDING_OWNER (empty = no line)
+          if [ -n "$PENDING_OWNER" ]; then
+            printf '\ncalendar PENDING_OWNER: %s\n\n' "$PENDING_OWNER" >> "$GITHUB_STEP_SUMMARY"
+          fi
           uv run python scripts/next_steps.py "$DELIVERY_MODE" "$RELEASE_ID" \
             --run-url "$RUN_URL" --repo "$GITHUB_REPOSITORY" | tee -a "$GITHUB_STEP_SUMMARY"
 

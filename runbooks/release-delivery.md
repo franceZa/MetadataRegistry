@@ -1,5 +1,7 @@
 # Runbook — ส่ง release ไป Databricks · 3 mode · rollback (Phase 2 · E6)
 
+> 📘 ยังไม่เคยดูแลระบบนี้? อ่าน [`release-delivery-guide.md`](release-delivery-guide.md) ก่อน — อธิบายสถาปัตยกรรม, ขั้น CD-1…8, และวิธี maintain
+
 > คำสั่งและ SQL ทั้งหมดในไฟล์นี้รันจริงแล้วบน Free Edition (T-41, T-42, T-44 · 2026-09-27) · หลักฐาน: `qa-evidence/E6/T041/`, `T042/`, `T044/`
 > host/email ของ workspace ไม่อยู่ใน repo (repo เป็น public) · ตัวอย่างใช้ release จริง `mdf-ef2f425903b6`
 
@@ -84,27 +86,25 @@ bash scripts/deliver_release.sh mdf-<sha12>
 
 ตรวจเท่ากับ job ทุกข้อ (hash ทุกไฟล์ · ไฟล์ขาด/เกิน · release_id · preview · hash เดิมที่ register ไว้) โดย SQL ใน `sql/manual/`
 
-- [ ] **M-1** เปิดหน้า Release `https://github.com/franceZa/MetadataRegistry/releases/tag/mdf-<sha12>` → ดาวน์โหลดครบ 8 ไฟล์ (6 × `*.resolved.json`, `manifest.json`, `validation-report.json`)
-- [ ] **M-2** Databricks → **Catalog** → `dev_catalog` → `ops` → Volume `files` → โฟลเดอร์ `releases` → **Create directory** ชื่อ `mdf-<sha12>`
-  - มีโฟลเดอร์นี้แล้ว **และมี `manifest.json`** = ส่งไปแล้ว → ข้ามไป M-4
-  - มีโฟลเดอร์แต่ **ไม่มี** `manifest.json` = ค้างครึ่งทาง → อัปโหลดทับได้ (M-3)
-- [ ] **M-3** เข้าโฟลเดอร์ → **Upload to this volume** → อัปโหลดทุกไฟล์ **ยกเว้น `manifest.json`** → เสร็จแล้วค่อยอัปโหลด `manifest.json` **เป็นไฟล์สุดท้าย**
-- [ ] **M-4** **SQL Editor** → วางทั้งไฟล์ `sql/manual/register_release.sql` → ตั้ง parameter `release_id = mdf-<sha12>` → **Run all**
-- [ ] **M-5** ผล statement สุดท้าย: REGISTERED 1 แถว `actor = manual-ui` · `manifest_sha256` ต้องเท่ากับ sha256 ของ `manifest.json` บนหน้า Release (GitHub แสดงที่รายการ asset)
+- [ ] **M-1** Catalog Explorer → `dev_catalog` → `ops` → Volume `files` → `releases/` → ถ้ามีโฟลเดอร์ `mdf-<sha12>` ที่มี `manifest.json` แล้ว **ห้ามอัปโหลด** ข้ามไป M-5
+- [ ] **M-2** เปิด [หน้า GitHub Release](https://github.com/franceZa/MetadataRegistry/releases/tag/mdf-<sha12>) → ดาวน์โหลด asset เดียว `mdf-<sha12>.zip` → แตก zip ในเครื่องตัวเอง → จด `manifest_sha256` จาก release notes ของหน้านี้ **หรือ** Job Summary ของ run `release.yml` (เลือกที่ใดก็ได้ — ไม่ใช่ digest ของไฟล์ zip ที่หน้า Release แสดง เพราะเลขนั้นเป็นของ zip ไม่ใช่ของ `manifest.json`)
+- [ ] **M-3** สร้างโฟลเดอร์ `/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>` แล้วสร้างโฟลเดอร์ย่อย `<source>/` ทีละ source (ดูจากโฟลเดอร์ที่แตก zip ได้ใน M-2 ว่ามีกี่ source) → อัปโหลด**ทุกไฟล์**ในโฟลเดอร์ `<source>/` ที่แตกจาก zip เข้าโฟลเดอร์ `<source>/` เดียวกัน — ทั้ง `*.resolved.json` **และ `*.odcs.yaml`** (ลืม `*.odcs.yaml` = M-5 หยุดด้วย `[TAMPERED]`) · จำนวนไฟล์ทั้งหมดใน `<source>/` = `file_count` ใน `manifest.json` (**ห้ามอัปโหลดไว้ที่ราก/แบบ flat**) แล้วค่อยอัปโหลด `validation-report.json` ที่ราก `/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>`
+- [ ] **M-4** อัปโหลด `manifest.json` เป็นไฟล์สุดท้าย ที่ราก `/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>` (ไม่ใช่ในโฟลเดอร์ `<source>/`)
+- [ ] **M-5** **SQL Editor** → วางไฟล์ `sql/manual/register_release.sql` → ตั้ง parameter `release_id = mdf-<sha12>` → **Run all** → ต้องได้ `REGISTERED` และ `manifest_sha256` ตรงกับที่จดใน M-2 (จาก Job Summary ของ `release.yml` ไม่ใช่หน้า Release) · error (รวมถึงกรณีอัปโหลดผิดโฟลเดอร์/flat) = หยุด ห้ามแก้ไฟล์ใน Volume เอง
 - [ ] **M-6** วาง `sql/manual/activate_release.sql` → `release_id = mdf-<sha12>` → **Run all**
-- [ ] **M-7** ผลสุดท้าย `active_release_id = mdf-<sha12>`
+- [ ] **M-7** query ตรวจ: แถว `ACTIVATED` ล่าสุด = `mdf-<sha12>` · เก็บผล query เป็นหลักฐาน (ป้าย `manual-ui`) · ผลสุดท้ายต้องขึ้น `active_release_id = mdf-<sha12>`
 
 **error ที่ SQL บอก (ไม่มีแถวใหม่ทุกกรณี · ทดสอบจริงใน T-44):**
 
 | ข้อความ | ทำอะไร |
 |---|---|
 | `[BAD_RELEASE_ID]` | parameter ต้องเป็น `mdf-` + 12 ตัว hex |
-| `CF_PATH_DOES_NOT_EXIST_FOR_READ_FILES` | ยังไม่ได้สร้างโฟลเดอร์ / สะกดชื่อผิด → M-2 |
-| `[RELEASE_NOT_FOUND]` | ยังไม่ได้อัปโหลด `manifest.json` → M-3 ไฟล์สุดท้าย |
-| `[TAMPERED] … sha256 ไม่ตรง` / `หายไป` / `ไฟล์ที่ไม่มีใน manifest` | ไฟล์เสีย/ขาด/เกิน → ลบไฟล์นั้นในโฟลเดอร์ (ถ้ายังไม่มีแถว REGISTERED) แล้วอัปโหลดจากหน้า Release ใหม่ |
+| `CF_PATH_DOES_NOT_EXIST_FOR_READ_FILES` | ยังไม่ได้สร้างโฟลเดอร์ / สะกดชื่อผิด → M-3 |
+| `[RELEASE_NOT_FOUND]` | ยังไม่ได้อัปโหลด `manifest.json` → M-4 ไฟล์สุดท้าย |
+| `[TAMPERED] … sha256 ไม่ตรง` / `หายไป` / `ไฟล์ที่ไม่มีใน manifest` | ไฟล์เสีย/ขาด/เกิน (รวมถึงอัปโหลดผิดโฟลเดอร์ `<source>/`) → ลบไฟล์นั้นในโฟลเดอร์ (ถ้ายังไม่มีแถว REGISTERED) แล้วอัปโหลดจากหน้า Release ใหม่ |
 | `[RELEASE_ID_MISMATCH]` | อัปโหลดผิดโฟลเดอร์ (ชื่อโฟลเดอร์ ≠ release ใน manifest) |
 | `[HASH_CONFLICT]` | id นี้ถูก register ด้วยเนื้อหาอื่นแล้ว · **ห้ามแก้** · ใช้ release ใหม่ |
-| `[NOT_REGISTERED]` (activate) | ทำ M-4 ก่อน |
+| `[NOT_REGISTERED]` (activate) | ทำ M-5 ก่อน |
 
 ## 5. ตั้งค่า mode `auto` ครั้งแรก (ต้องมี account admin · ทำไม่ได้บน Free Edition)
 
@@ -129,7 +129,7 @@ WHERE event = 'ACTIVATED' ORDER BY event_ts DESC LIMIT 1;
 SELECT event, manifest_sha256, file_count, actor, event_ts
 FROM dev_catalog.ops.release_registry WHERE release_id = 'mdf-<sha12>' ORDER BY event_ts;
 ```
-Volume ต้องมี 8 ไฟล์ รวม `manifest.json`: `databricks fs ls dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>` หรือเปิดใน Catalog Explorer
+Volume ต้องมีไฟล์ทั้งหมด = `file_count` ใน `manifest.json` + 2 (`manifest.json` + `validation-report.json` ที่ราก) · ไฟล์ตาม `file_count` อยู่ในโฟลเดอร์ย่อย `<source>/` ของมัน ทั้ง `*.resolved.json` และ `*.odcs.yaml` (ไม่นับจำนวนไฟล์ตายตัว เพราะจำนวน source/dataset เปลี่ยนได้ตามรอบ): `databricks fs ls dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-<sha12> --recursive` หรือเปิดใน Catalog Explorer
 
 ## 7. Rollback config (ทุก mode)
 

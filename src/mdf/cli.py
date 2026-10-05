@@ -22,7 +22,8 @@ def _cmd_compile(args) -> int:
             env=args.env, base_dir=args.datacontract_dir, config_dir=args.config_dir
         )
         print(
-            f"✅ compile สำเร็จ: เขียน resolved JSON {len(written)} ไฟล์ลง build/{args.env}/resolved/"
+            f"✅ compile สำเร็จ: เขียน resolved JSON {len(written)} ไฟล์ลง "
+            f"build/{args.env}/resolved/<source>/"
         )
         for p in written:
             print(f"   - {p}")
@@ -48,6 +49,15 @@ def _cmd_package(args) -> int:
         manifest = json.loads((pkg_dir / "manifest.json").read_text(encoding="utf-8"))
         print(f"✅ package สร้างที่: {pkg_dir}")
         print(f"   release_id={manifest['release_id']} preview={str(manifest['preview']).lower()}")
+        # T-56 · FR-M.7: show the manifest layout and how many files[] (resolved + contracts)
+        kinds: dict[str, int] = {}
+        for entry in manifest["files"]:
+            kinds[entry.get("kind", "?")] = kinds.get(entry.get("kind", "?"), 0) + 1
+        print(
+            f"   manifest_version={manifest['manifest_version']} "
+            f"file_count={manifest['file_count']} "
+            + " ".join(f"{k}={v}" for k, v in sorted(kinds.items()))
+        )
         if not args.release:
             print("   (โหมด preview — ใช้ --release เพื่อบังคับ release gate)")
         return 0
@@ -64,6 +74,8 @@ def _cmd_verify_package(args) -> int:
             f"files={result['verified_files']}, release_id={result['release_id']}, "
             f"manifest_sha256={result['manifest_sha256']}"
         )
+        for warning in result.get("warnings", []):
+            print(f"   {warning}")
         return 0
     except RuntimeError as e:
         print(str(e))
@@ -93,7 +105,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_validate.set_defaults(func=_cmd_validate)
 
     p_compile = sub.add_parser(
-        "compile", help="สร้าง resolved JSON configs ลง build/<env>/resolved/"
+        "compile", help="สร้าง resolved JSON configs ลง build/<env>/resolved/<source>/"
     )
     _add_common_args(p_compile)
     p_compile.add_argument("--env", default="dev", help="ชื่อ environment (default: dev)")
@@ -104,7 +116,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_diff.add_argument("--base", required=True, help="git revision ของ baseline (เช่น 88b982d)")
     p_diff.set_defaults(func=_cmd_diff)
 
-    p_package = sub.add_parser("package", help="รวม resolved configs เป็น release package")
+    p_package = sub.add_parser(
+        "package",
+        help="รวม resolved configs + ODCS contract ต้นฉบับ เป็น release package (manifest v3)",
+    )
     _add_common_args(p_package)
     p_package.add_argument("--env", default="dev", help="ชื่อ environment (default: dev)")
     p_package.add_argument("--release", action="store_true", help="บังคับ release gate (AC-16)")
