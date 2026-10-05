@@ -116,7 +116,7 @@ def test_ac42_known_release_id_registers(sealed):
     assert tuple(row) == COLUMNS
     assert row["release_id"] == sealed["rid"]
     assert row["source_commit"] == sealed["manifest"]["source_commit"]
-    assert row["file_count"] == 6
+    assert row["file_count"] == 9  # T-56 · FR-M.7: v3 = 6 resolved + 3 ODCS contracts
     assert len(row["manifest_sha256"]) == 64
     assert row["volume_path"].endswith(f"/dev_catalog/ops/files/releases/{sealed['rid']}")
 
@@ -154,7 +154,7 @@ def test_ac40_registered_with_other_hash_fails(sealed):
 def test_tampered_volume_fails_verify(sealed, tmp_path):
     vol = tmp_path / "Volumes"
     shutil.copytree(sealed["vol"], vol)
-    f = release_dir(vol, CATALOG, sealed["rid"]) / "silver.cc.customer.resolved.json"
+    f = release_dir(vol, CATALOG, sealed["rid"]) / "cc" / "silver.cc.customer.resolved.json"
     data = bytearray(f.read_bytes())
     data[len(data) // 2] ^= 0x01
     f.write_bytes(bytes(data))

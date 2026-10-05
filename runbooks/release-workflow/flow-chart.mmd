@@ -28,7 +28,7 @@ flowchart TD
     subgraph D[4 · เลือกวิธีส่งตาม delivery_mode]
         D1{config/env/dev.yaml} -->|auto| D2[deploy-dev.yml: ตรวจ OIDC federation<br/>และ repo variables]
         D1 -->|u2m · ค่าปัจจุบัน| D3[ผู้ใช้ checkout tag, login Databricks<br/>แล้วรัน deliver_release.sh]
-        D1 -->|manual| D4[M-1 ถึง M-3: ดาวน์โหลด 8 ไฟล์<br/>อัปโหลด Volume, manifest.json สุดท้าย]
+        D1 -->|manual| D4[M-1 ถึง M-3: ดาวน์โหลด zip เดียวแล้วแตก<br/>อัปโหลดทุกไฟล์ใน source รวม *.odcs.yaml<br/>manifest.json สุดท้าย]
         D4 --> D9[M-4 ถึง M-5: register_release.sql<br/>ตรวจ REGISTERED และ manifest hash]
         D9 --> D10[M-6 ถึง M-7: activate_release.sql<br/>ตรวจ active_release_id]
         D2 --> D6{preflight ผ่าน?}

@@ -63,7 +63,12 @@ def test_ac35_release_manifest_has_fr_f2_fields(clean_repo):
     sha = _git(clean_repo, "rev-parse", "HEAD")
     for key in REQUIRED_MANIFEST_KEYS:
         assert key in m, key
-    assert m["manifest_version"] == 1
+    # T-48 · FR-F.7 layout `<source>/` (POSIX) kept · T-56 · FR-M.7: manifest_version 3,
+    # every entry has kind/source/dataset (+layer for resolved_config), sorted by path
+    assert m["manifest_version"] == 3
+    assert m["files"] and all(f["path"].count("/") == 1 for f in m["files"])
+    assert all(f["path"].split("/")[0] == f["source"] for f in m["files"])
+    assert [f["path"] for f in m["files"]] == sorted(f["path"] for f in m["files"])
     assert m["release_id"] == f"mdf-{sha[:12]}"
     assert m["source_commit"] == sha and len(sha) == 40
     assert m["environment"] == "dev"
@@ -72,7 +77,15 @@ def test_ac35_release_manifest_has_fr_f2_fields(clean_repo):
     assert len(m["uv_lock_sha256"]) == 64
     assert len(m["validation_report_sha256"]) == 64
     assert m["compiler_revision"].count("+src.") == 1
-    assert all(set(f) == {"path", "sha256"} for f in m["files"])
+    assert m["file_count"] == len(m["files"]) == 9
+    for f in m["files"]:
+        if f["kind"] == "resolved_config":
+            assert set(f) == {"path", "sha256", "kind", "source", "dataset", "layer"}
+            assert f["path"].split("/")[1].split(".")[1] == f["source"]
+        else:
+            assert f["kind"] == "odcs_contract"
+            assert set(f) == {"path", "sha256", "kind", "source", "dataset"}
+            assert f["path"] == f"{f['source']}/{f['dataset']}.odcs.yaml"
     # manifest never lists / hashes itself
     assert "manifest.json" not in {f["path"] for f in m["files"]}
 
@@ -210,3 +223,42 @@ def test_verify_needs_no_source_checkout(clean_repo, tmp_path, monkeypatch):
     shutil.copytree(pkg, elsewhere / "pkg")
     monkeypatch.chdir(elsewhere)
     assert verify_package("pkg")["status"] == "OK"
+
+
+# ---------- AC-54 (release-gate warning portion · T-54) ----------
+
+
+def test_ac54_release_gate_passes_with_calendar_pending_owner_warning(clean_repo, capsys):
+    """cc contracts have no calendar fields yet -> gate still passes (warning, not error)."""
+    pkg = build_package(env="dev", release=True)
+    assert pkg.exists()
+    out = capsys.readouterr().out
+    assert "[WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer" in out
+
+
+def test_ac54_cli_package_release_prints_pending_owner_warning(clean_repo, capsys):
+    assert main(["package", "--env", "dev", "--release"]) == 0
+    out = capsys.readouterr().out
+    assert "[WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer" in out
+
+
+def test_ac54_malformed_calendar_still_refuses_release_not_warning(clean_repo):
+    """AC-54 (And): a present-but-malformed field is an error -> build must refuse, not warn.
+
+    compile_project() validates first (FR-D.1) and raises before the release gate even
+    writes anything — so the exception here is RuntimeError, not ReleaseGateError.
+    """
+    contract = next((clean_repo / "DataContract" / "cc" / "contract").glob("credit_card.odcs.yaml"))
+    text = contract.read_text(encoding="utf-8")
+    text = text.replace(
+        "slaProperties:\n  - property: frequency\n    value: daily\n",
+        "slaProperties:\n  - property: frequency\n    value: daily\n"
+        '  - property: expected_at\n    value: "25:00"\n',
+        1,
+    )
+    assert '  - property: expected_at\n    value: "25:00"\n' in text
+    contract.write_text(text, encoding="utf-8")
+    _git(clean_repo, "commit", "-q", "-am", "bad expected_at")
+    with pytest.raises(RuntimeError) as e:
+        build_package(env="dev", release=True)
+    assert "CALENDAR_INVALID" in str(e.value)

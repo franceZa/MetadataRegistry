@@ -34,7 +34,7 @@ def test_e2e_step2_compile(e2e_timing, capsys):
     assert rc == 0
     out = capsys.readouterr().out
     assert "6" in out
-    resolved = sorted(Path("build/dev/resolved").glob("*.resolved.json"))
+    resolved = sorted(Path("build/dev/resolved").glob("*/*.resolved.json"))
     assert len(resolved) == 6
 
 
@@ -51,14 +51,20 @@ def test_e2e_step4_package(e2e_timing, capsys):
     manifest = Path("build/dev/release/manifest.json")
     assert manifest.exists()
     m = json.loads(manifest.read_text(encoding="utf-8"))
-    assert m["file_count"] == 6
+    # T-56 · FR-M.7: manifest v3 = 6 resolved configs + 3 bundled ODCS contracts
+    assert m["manifest_version"] == 3
+    assert m["file_count"] == 9
+    assert Path("build/dev/release/cc/customer.odcs.yaml").exists()
 
 
 def test_e2e_step5_verify(e2e_timing, capsys):
     """verify-package: intact package verifies OK."""
     rc = main(["verify-package", "build/dev/release"])
     assert rc == 0
-    assert "OK" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "OK" in out
+    assert "files=9" in out
+    assert "[WARN]" not in out  # AC-56: v3 has no legacy warning
 
 
 def test_e2e_step6_trace(e2e_timing, capsys):

@@ -29,11 +29,40 @@ def test_compile_produces_resolved_files(tmp_path, monkeypatch):
     assert len(written) == 6
     for p in written:
         assert p.exists()
-        assert "build/dev/resolved" in str(p).replace("\\", "/")
+        assert "build/dev/resolved/cc" in str(p).replace("\\", "/")
+        # regression: single-source layout still gets a <source>/ subfolder (no flat fallback)
+        assert p.parent.name == "cc"
         data = json.loads(p.read_text(encoding="utf-8"))
         assert "lineage" in data
         assert "checks" in data
         assert "schema" in data
+
+
+def test_ac46_multi_source_creates_per_source_subfolders(tmp_path, monkeypatch):
+    """AC-46: >1 source -> compile writes build/<env>/resolved/<source>/<file> per source.
+
+    Fixture built from the real 'cc' source copied into a second 'xyz' source inside
+    tmp_path (HRM correction #3, H-103) — DataContract/ itself is never modified.
+    """
+    import shutil
+
+    root = Path(__file__).parent.parent
+    shutil.copytree(root / "DataContract" / "cc", tmp_path / "DataContract" / "cc")
+    shutil.copytree(root / "DataContract" / "cc", tmp_path / "DataContract" / "xyz")
+    shutil.copytree(root / "config", tmp_path / "config")
+    monkeypatch.chdir(tmp_path)
+
+    written = compile_project(env="dev")
+
+    # 2 sources x 3 datasets x 2 layers = 12 files
+    assert len(written) == 12
+    seen_sources = set()
+    for p in written:
+        rel = p.relative_to(Path("build") / "dev" / "resolved")
+        assert len(rel.parts) == 2, rel  # exactly <source>/<file>
+        assert rel.parts[0] in ("cc", "xyz")
+        seen_sources.add(rel.parts[0])
+    assert seen_sources == {"cc", "xyz"}
 
 
 def test_ac11_deterministic_compile():

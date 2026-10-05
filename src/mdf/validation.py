@@ -5,6 +5,7 @@ from typing import Any
 
 import jsonschema
 
+from mdf.calendar import custom_property, has_custom_property, read_calendar
 from mdf.dq import DQLibrary, DQValidationError, resolve_column_dq_rules
 from mdf.loading import (
     DiscoveryError,
@@ -91,7 +92,10 @@ class ValidationReport:
     def format_thai_summary(self) -> str:
         if self.is_valid:
             warn_msg = f" (พบข้อควรระวัง {len(self.warnings)} รายการ)" if self.warnings else ""
-            return f"✅ การตรวจสอบความถูกต้องผ่านเรียบร้อย (PASS){warn_msg}"
+            lines = [f"✅ การตรวจสอบความถูกต้องผ่านเรียบร้อย (PASS){warn_msg}"]
+            for w in self.warnings:
+                lines.append(w.format_thai())
+            return "\n".join(lines)
 
         grouped: dict[str, list[ValidationIssue]] = {}
         for issue in self.issues:
@@ -120,6 +124,25 @@ def get_contract_column_names(contract_data: dict[str, Any]) -> set[str]:
                 if isinstance(props, list):
                     for p in props:
                         if isinstance(p, dict) and "name" in p:
+                            columns.add(p["name"])
+    return columns
+
+
+def get_pci_columns(contract_data: dict[str, Any]) -> set[str]:
+    """Column names whose customProperties.pci is exactly True (C-PCI-TOKENISE, FR-M.6)."""
+    columns: set[str] = set()
+    schemas = contract_data.get("schema", [])
+    if isinstance(schemas, list):
+        for s in schemas:
+            if isinstance(s, dict):
+                props = s.get("properties", [])
+                if isinstance(props, list):
+                    for p in props:
+                        if (
+                            isinstance(p, dict)
+                            and "name" in p
+                            and custom_property(p, "pci") is True
+                        ):
                             columns.add(p["name"])
     return columns
 
@@ -209,6 +232,55 @@ def validate_contract_file(
                                     ),
                                 )
 
+    # 4. Calendar fields (FR-M.1, FR-M.2, FR-M.4 · T-54) — single source of truth: mdf.calendar
+    _, missing, calendar_errors = read_calendar(data)
+    if missing:
+        report.add_warning(
+            code="CALENDAR_PENDING_OWNER",
+            message="ยังไม่ได้กำหนดฟิลด์ calendar: " + ", ".join(missing),
+            file_path=path_str,
+            field=", ".join(missing),
+            fix="ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, "
+            "expected_day_offset, recovery_window, business_schedule) ใน contract",
+        )
+    for field_name, message, fix in calendar_errors:
+        report.add_error(
+            code="CALENDAR_INVALID",
+            message=message,
+            file_path=path_str,
+            field=field_name,
+            fix=fix,
+        )
+
+    # 5. pii/pci must be real booleans on every column (FR-M.6, HRM correction #4, H-111) —
+    # an ODCS schema may let customProperties.value be AnyType (e.g. string "true"), so this
+    # check has to live in Python, not the generic rules engine.
+    if isinstance(schemas, list):
+        for s_idx, s in enumerate(schemas):
+            if not isinstance(s, dict):
+                continue
+            props = s.get("properties", [])
+            if not isinstance(props, list):
+                continue
+            for p in props:
+                if not isinstance(p, dict):
+                    continue
+                col_name = p.get("name", "unknown")
+                for flag in ("pii", "pci"):
+                    value = custom_property(p, flag)
+                    if not has_custom_property(p, flag) or not isinstance(value, bool):
+                        got = type(value).__name__ if value is not None else "ไม่มี"
+                        report.add_error(
+                            code="PRIVACY_FLAG_INVALID",
+                            message=f"คอลัมน์ '{col_name}' ต้องมี customProperties.{flag} เป็นค่า "
+                            f"boolean จริง (ตอนนี้ไม่มีค่า หรือเป็น {got})",
+                            file_path=path_str,
+                            field=f"schema[{s_idx}].properties[{col_name}].customProperties.{flag}",
+                            fix=f"ใส่ {{ property: {flag}, value: true }} หรือ "
+                            f"{{ property: {flag}, value: false }} ใต้ customProperties ของคอลัมน์ "
+                            f"'{col_name}' (ต้องเป็น boolean ไม่ใช่ string)",
+                        )
+
     return data
 
 
@@ -288,6 +360,23 @@ def validate_pipeline_file(
                             fix="ตรวจสอบชื่อคอลัมน์ใน action ให้ตรงกับ DataContract",
                         )
 
+        # 3. C-PCI-TOKENISE (FR-M.6, P1): every column flagged pci:true in the contract must
+        # be tokenise:true in the pipeline. Cross-contract-vs-pipeline checks like this can't
+        # be expressed as a single-document rule JSON (HRM correction #3, H-111) -- same shape
+        # as the foreign_key check above.
+        for col_name in get_pci_columns(contract_data):
+            col_cfg = cols.get(col_name) if isinstance(cols, dict) else None
+            tokenise = col_cfg.get("tokenise") if isinstance(col_cfg, dict) else None
+            if tokenise is not True:
+                report.add_error(
+                    code="C-PCI-TOKENISE",
+                    message=f"คอลัมน์ '{col_name}' เป็นข้อมูล PCI (pci: true) แต่ pipeline ไม่ได้ "
+                    "สั่ง tokenise",
+                    file_path=path_str,
+                    field=f"columns.{col_name}.tokenise",
+                    fix=f"เพิ่ม tokenise: true ใต้ columns.{col_name} ในไฟล์ pipeline นี้",
+                )
+
     return data
 
 
@@ -356,6 +445,8 @@ def validate_project(
 
     validate_env_configs(cfg_base, report)
 
+    validate_reader_fields(contracts_by_id, cfg_base, report)
+
     return report
 
 
@@ -382,6 +473,47 @@ def validate_env_configs(cfg_base: Path, report: ValidationReport) -> None:
                     "ใส่ delivery_mode: u2m (login เองแล้วสคริปต์ทำต่อ) · auto (GitHub Actions · "
                     "ต้องมี federation ไม่ใช่ Free Edition) · manual (ทำเองในเบราว์เซอร์)"
                 ),
+            )
+
+
+def validate_reader_fields(
+    contracts_by_id: dict[str, tuple[Path, dict[str, Any]]],
+    cfg_base: Path,
+    report: ValidationReport,
+) -> None:
+    """FR-M.5: every contract must resolve a `reader` for every env it is compiled against.
+
+    `mdf compile --env <env>` needs: a `servers[]` entry whose `environment == env` (for
+    `format`) and a `file_pattern` customProperty. Missing either is a hard validate error
+    (not a warning) because compile cannot produce a usable `reader` object without them.
+    """
+    envs = sorted(p.stem for p in (cfg_base / "env").glob("*.yaml"))
+    for ds_id, (c_path, c_data) in contracts_by_id.items():
+        path_str = str(c_path)
+        servers = c_data.get("servers", [])
+        server_envs = {
+            s.get("environment") for s in servers if isinstance(s, dict)
+        } if isinstance(servers, list) else set()
+
+        for env in envs:
+            if env not in server_envs:
+                report.add_error(
+                    code="READER_SERVER_MISSING",
+                    message=f"Dataset '{ds_id}' ไม่มี servers[] ที่ environment: {env} "
+                    "ทำให้ compile หา reader.format ไม่ได้",
+                    file_path=path_str,
+                    field="servers",
+                    fix=f"เพิ่ม servers[] entry ที่ environment: {env} พร้อม format",
+                )
+
+        if not has_custom_property(c_data, "file_pattern"):
+            report.add_error(
+                code="READER_FILE_PATTERN_MISSING",
+                message=f"Dataset '{ds_id}' ไม่มี customProperties.file_pattern "
+                "ทำให้ compile หา reader.file_pattern ไม่ได้",
+                file_path=path_str,
+                field="customProperties.file_pattern",
+                fix="เพิ่ม { property: file_pattern, value: \"<pattern>\" } ใน customProperties",
             )
 
 

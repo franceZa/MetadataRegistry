@@ -1,0 +1,8 @@
+E501 Line too long (101 > 100)
+   --> tests\test_deliver_release.py:467:101
+    |
+467 | # ---------- T-52 · AC-51 · FR-L.3a — CD-1 zip asset / zip-slip guard / v1 legacy fallback ----------
+    |                                                                                                     ^
+
+Found 1 error.
+EXIT=1

@@ -1,0 +1,8 @@
+--- fixture v1: exit=0
+✅ package ผ่านการตรวจสอบ (OK): env=dev, files=6, release_id=mdf-5a9126bc35c9, manifest_sha256=d7ca12f3b2bdc9aa70c1989fb9c62f805bc6f6e11162b48eaf3a2fe1baed491d
+   [WARN] legacy flat layout (manifest_version 1)
+--- fixture v2: exit=0
+✅ package ผ่านการตรวจสอบ (OK): env=dev, files=6, release_id=mdf-5a9126bc35c9, manifest_sha256=e418b3a30b4e03847ab3238c1e6fb281683ec0075d714d454f28eb341aa9f0d9
+--- fixture v4: exit=1
+[TAMPERED] unknown manifest_version: 4
+EXIT=0

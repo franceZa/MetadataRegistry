@@ -20,7 +20,7 @@
 | คำ | ความหมาย | ตัวอย่าง |
 |---|---|---|
 | **release_id** | ชื่อของ release หนึ่งชุด = `mdf-` + 12 ตัวแรกของ commit SHA บน `master` · 1 commit = 1 release | `mdf-d3ea0d559e04` |
-| **package** | โฟลเดอร์ 8 ไฟล์ของ release หนึ่งชุด: `*.resolved.json` 6 ไฟล์ + `manifest.json` + `validation-report.json` | `build/dev/release/` |
+| **package** | โฟลเดอร์ของ release หนึ่งชุด: ไฟล์ resolved (`*.resolved.json`) แยกเป็นโฟลเดอร์ย่อยตาม source (`<source>/*.resolved.json`) + `manifest.json` + `validation-report.json` ที่ราก | `build/dev/release/` |
 | **manifest.json** | "ใบกำกับสินค้า" ของ package: บอก `release_id`, commit, และ **sha256 ของทุกไฟล์** ถ้าไฟล์ไหนถูกแก้แม้ 1 byte hash จะไม่ตรง | — |
 | **manifest_sha256** | hash ของไฟล์ `manifest.json` เอง ใช้เป็น "ลายนิ้วมือ" ของทั้ง release | `e871519b7400…` |
 | **GitHub Release** | ที่เก็บ package ต้นฉบับ บน GitHub (หน้า Releases ของ repo) | — |
@@ -41,7 +41,7 @@ flowchart LR
   subgraph GH["GitHub (repo franceZa/MetadataRegistry · public)"]
     SRC["DataContract/ + config/<br/>(ต้นฉบับ YAML)"]
     WF["Actions: release.yml<br/>deploy-dev.yml"]
-    REL["GitHub Release<br/>mdf-&lt;sha12&gt;<br/>(8 ไฟล์)"]
+    REL["GitHub Release<br/>mdf-&lt;sha12&gt;<br/>(zip เดียว รวม manifest.json)"]
   end
 
   subgraph YOU["เครื่องของคนส่ง (mode u2m)"]
@@ -69,7 +69,7 @@ flowchart LR
 
 | ชิ้นส่วน | ไฟล์ใน repo | หน้าที่ |
 |---|---|---|
-| ตัวสร้าง package | `src/mdf/package.py` (`mdf package`, `mdf verify-package`) | สร้าง 8 ไฟล์ + manifest · ตรวจว่า hash ครบ/ตรง/ไม่มีไฟล์เกิน |
+| ตัวสร้าง package | `src/mdf/package.py` (`mdf package`, `mdf verify-package`) | สร้างไฟล์ resolved ต่อ source + manifest · ตรวจว่า hash ครบ/ตรง/ไม่มีไฟล์เกิน |
 | Workflow ออก release | `.github/workflows/release.yml` | ทุก push master → ทดสอบ → สร้าง package → เผยแพร่ GitHub Release → แสดง "ขั้นต่อไป" ตาม mode |
 | Workflow ส่งอัตโนมัติ | `.github/workflows/deploy-dev.yml` | ใช้เฉพาะ mode `auto` · เรียก `deliver_release.sh` บน GitHub runner |
 | สคริปต์ส่งของ | `scripts/deliver_release.sh` | ทำ CD-1…CD-8 · **ตัวเดียว** ใช้ทั้ง mode `auto` และ `u2m` |
@@ -137,7 +137,7 @@ auto  ──(ยังไม่มี federation / preflight ไม่ผ่า�
 | **Preflight** | เช็คว่ามีคำสั่ง `databricks` และ `gh` และ login ได้จริง (`databricks current-user me`) | ให้พังตั้งแต่ต้น พร้อมบอกวิธีแก้ ดีกว่าพังกลางทาง | หยุดทันที พิมพ์ `❌ [PREFLIGHT] …` + บรรทัด `ขั้นต่อไป: …` · ยังไม่แตะอะไรเลย |
 | **CD-1** ดาวน์โหลด | `gh release download <id>` ลงโฟลเดอร์ชั่วคราว `build/deliver/<id>/pkg/` | เอาของต้นฉบับจาก GitHub Release ไม่ใช่จากเครื่องใครสักคน | `❌ [CD-1]` · ยังไม่แตะ workspace |
 | **CD-2** ตรวจที่เครื่อง | `mdf verify-package <dir> --expect-release-id <id>` | กันไฟล์เสีย/ถูกแก้/ผิด release ก่อนส่ง | `❌ [CD-2]` · ยังไม่แตะ workspace |
-| **CD-3** คัดลอกเข้า Volume | ดูว่าโฟลเดอร์ปลายทาง sealed หรือยัง (ดูข้อ 8) → คัดลอก 7 ไฟล์ก่อน → **คัดลอก `manifest.json` เป็นไฟล์สุดท้าย** | ไฟล์ `manifest.json` คือตัว "ปิดผนึก" ถ้าคัดลอกค้างกลางทาง โฟลเดอร์จะยังไม่ sealed และรันใหม่ต่อได้ | sealed แต่ hash ต่าง → `❌ [CD-3]` ปฏิเสธการเขียนทับ |
+| **CD-3** คัดลอกเข้า Volume | ดูว่าโฟลเดอร์ปลายทาง sealed หรือยัง (ดูข้อ 8) → คัดลอกทุกไฟล์ตาม `manifest.files[].path` (`*.resolved.json` + `*.odcs.yaml` แยกโฟลเดอร์ย่อยตาม source) และ `validation-report.json` ก่อน → **คัดลอก `manifest.json` เป็นไฟล์สุดท้าย** | ไฟล์ `manifest.json` คือตัว "ปิดผนึก" ถ้าคัดลอกค้างกลางทาง โฟลเดอร์จะยังไม่ sealed และรันใหม่ต่อได้ | sealed แต่ hash ต่าง → `❌ [CD-3]` ปฏิเสธการเขียนทับ |
 | **CD-4** คัดลอกกลับมาตรวจ | ดึงโฟลเดอร์จาก Volume กลับมา แล้ว `verify-package` อีกรอบ + เทียบ hash กับ CD-2 | พิสูจน์ว่าของที่อยู่ใน Volume จริง ๆ ครบและตรง ไม่ใช่แค่ "คำสั่งคัดลอกไม่ error" | `❌ [CD-4]` |
 | **CD-5** deploy job | `databricks bundle deploy -t dev` · สร้าง/อัปเดต job + อัปโหลด wheel ของ `mdf` | job ต้องใช้โค้ดเวอร์ชันเดียวกับ release ที่ส่ง | สคริปต์หยุด |
 | **CD-6** ลงทะเบียน | `databricks bundle run mdf_release_register_dev --params release_id=…,mode=register` · job อ่านไฟล์ใน Volume ตรวจ hash **ในฝั่ง workspace** แล้ว INSERT แถว `REGISTERED` | ตรวจอีกมุมหนึ่งจากในระบบปลายทาง และบันทึกไว้ในตารางที่แก้ไม่ได้ | `❌ [CD-6]` · ไม่มีแถวใหม่ |
@@ -210,13 +210,13 @@ bash scripts/deliver_release.sh <release_id>
 
 | ขั้น manual | ทำอะไร | เทียบกับ CD | ข้อสังเกต |
 |---|---|---|---|
-| **M-1** | ดาวน์โหลด 8 ไฟล์จากหน้า GitHub Release | CD-1 | — |
-| **M-2** | Databricks → Catalog → `dev_catalog` → `ops` → Volume `files` → `releases` → Create directory ชื่อ `<release_id>` | CD-3 (ส่วนสร้างโฟลเดอร์) | ถ้ามีโฟลเดอร์และมี `manifest.json` แล้ว = ส่งไปแล้ว ข้ามไป M-4 |
-| **M-3** | อัปโหลด 7 ไฟล์ก่อน แล้ว **อัปโหลด `manifest.json` เป็นไฟล์สุดท้าย** | CD-3 | กฎเดียวกับสคริปต์ ตรวจได้จากเวลา `last_modified` ของไฟล์ |
-| **M-4** | SQL Editor → วาง `sql/manual/register_release.sql` → ตั้ง parameter `release_id` → Run all | CD-2 + CD-4 + CD-6 | SQL ตรวจ hash **ของไฟล์ใน Volume** ทุกไฟล์ แทนการตรวจที่เครื่อง แล้วค่อย INSERT |
-| **M-5** | ดูผล: REGISTERED 1 แถว · `actor = manual-ui` · `manifest_sha256` ตรงกับ digest ของ `manifest.json` บนหน้า Release | CD-7 | — |
-| **M-6** | วาง `sql/manual/activate_release.sql` → `release_id` เดิม → Run all | CD-8 | — |
-| **M-7** | ผลต้องขึ้น `active_release_id = <release_id>` | CD-8 (ส่วนยืนยัน) | — |
+| **M-1** | Catalog Explorer → `dev_catalog` → `ops` → Volume `files` → `releases/` → ถ้ามีโฟลเดอร์ `mdf-<sha12>` ที่มี `manifest.json` แล้ว **ห้ามอัปโหลด** ข้ามไป M-5 | CD-3 (sealed check) | — |
+| **M-2** | เปิด [หน้า GitHub Release](https://github.com/franceZa/MetadataRegistry/releases/tag/mdf-<sha12>) → ดาวน์โหลด asset เดียว `mdf-<sha12>.zip` → แตก zip ในเครื่องตัวเอง → จด `manifest_sha256` จาก release notes ของหน้านี้ **หรือ** Job Summary ของ run `release.yml` (เลือกที่ใดก็ได้ — ไม่ใช่ digest ของไฟล์ zip ที่หน้า Release แสดง เพราะเลขนั้นเป็นของ zip ไม่ใช่ของ `manifest.json`) | CD-1 | — |
+| **M-3** | สร้างโฟลเดอร์ `/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>` แล้วสร้างโฟลเดอร์ย่อย `<source>/` ทีละ source (ดูจากโฟลเดอร์ที่แตก zip ได้ใน M-2 ว่ามีกี่ source) → อัปโหลด**ทุกไฟล์**ในโฟลเดอร์ `<source>/` ที่แตกจาก zip เข้าโฟลเดอร์ `<source>/` เดียวกัน — ทั้ง `*.resolved.json` **และ `*.odcs.yaml`** (ลืม `*.odcs.yaml` = M-5 หยุดด้วย `[TAMPERED]`) · จำนวนไฟล์ทั้งหมดใน `<source>/` = `file_count` ใน `manifest.json` (**ห้ามอัปโหลดไว้ที่ราก/แบบ flat**) แล้วค่อยอัปโหลด `validation-report.json` ที่ราก `/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>` | CD-3 | กฎเดียวกับสคริปต์ ตรวจได้จากเวลา `last_modified` ของไฟล์ |
+| **M-4** | อัปโหลด `manifest.json` เป็นไฟล์สุดท้าย ที่ราก `/Volumes/dev_catalog/ops/files/releases/mdf-<sha12>` (ไม่ใช่ในโฟลเดอร์ `<source>/`) | CD-3 (seal) | — |
+| **M-5** | **SQL Editor** → วางไฟล์ `sql/manual/register_release.sql` → ตั้ง parameter `release_id = mdf-<sha12>` → **Run all** → ต้องได้ `REGISTERED` และ `manifest_sha256` ตรงกับที่จดใน M-2 (จาก Job Summary ของ `release.yml` ไม่ใช่หน้า Release) · error (รวมถึงกรณีอัปโหลดผิดโฟลเดอร์/flat) = หยุด ห้ามแก้ไฟล์ใน Volume เอง | CD-2 + CD-4 + CD-6 | SQL ตรวจ hash **ของไฟล์ใน Volume** ทุกไฟล์ (อ่าน recursive ตาม path สัมพัทธ์เต็ม) แทนการตรวจที่เครื่อง แล้วค่อย INSERT |
+| **M-6** | วาง `sql/manual/activate_release.sql` → `release_id = mdf-<sha12>` → **Run all** | CD-8 | — |
+| **M-7** | query ตรวจ: แถว `ACTIVATED` ล่าสุด = `mdf-<sha12>` · เก็บผล query เป็นหลักฐาน (ป้าย `manual-ui`) · ผลสุดท้ายต้องขึ้น `active_release_id = mdf-<sha12>` | CD-8 (ส่วนยืนยัน) | — |
 
 mode manual **ไม่มี CD-5** (ไม่ต้อง deploy job) เพราะใช้ SQL แทน job
 

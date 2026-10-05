@@ -86,7 +86,7 @@ code{background:#e8eef1;border-radius:4px;padding:1px 4px}
     subgraph D[4 · เลือกวิธีส่งตาม delivery_mode]
         D1{config/env/dev.yaml} --&gt;|auto| D2[deploy-dev.yml: ตรวจ OIDC federation&lt;br/&gt;และ repo variables]
         D1 --&gt;|u2m · ค่าปัจจุบัน| D3[ผู้ใช้ checkout tag, login Databricks&lt;br/&gt;แล้วรัน deliver_release.sh]
-        D1 --&gt;|manual| D4[M-1 ถึง M-3: ดาวน์โหลด 8 ไฟล์&lt;br/&gt;อัปโหลด Volume, manifest.json สุดท้าย]
+        D1 --&gt;|manual| D4[M-1 ถึง M-3: ดาวน์โหลด zip เดียวแล้วแตก&lt;br/&gt;อัปโหลดทุกไฟล์ใน source รวม *.odcs.yaml&lt;br/&gt;manifest.json สุดท้าย]
         D4 --&gt; D9[M-4 ถึง M-5: register_release.sql&lt;br/&gt;ตรวจ REGISTERED และ manifest hash]
         D9 --&gt; D10[M-6 ถึง M-7: activate_release.sql&lt;br/&gt;ตรวจ active_release_id]
         D2 --&gt; D6{preflight ผ่าน?}

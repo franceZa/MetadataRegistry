@@ -61,7 +61,12 @@ def fs(args):
             return 1
         names = sorted(p.name for p in target.iterdir())
         if "--output" in rest and rest[rest.index("--output") + 1] == "json":
-            print(json.dumps([{"name": n, "is_directory": False} for n in names], indent=2))
+            print(
+                json.dumps(
+                    [{"name": n, "is_directory": (target / n).is_dir()} for n in names],
+                    indent=2,
+                )
+            )
         else:
             print("\n".join(names))
         return 0
@@ -71,12 +76,20 @@ def fs(args):
         paths = [a for a in rest if not a.startswith("-")]
         src, dst = _map(paths[0]), _map(paths[1])
         if recursive:
-            dst.mkdir(parents=True, exist_ok=True)
-            for f in src.iterdir():
-                if (dst / f.name).exists() and not overwrite:
-                    print(f"{f} -> {dst / f.name} (skipped; already exists)")
-                    continue
-                shutil.copy2(f, dst / f.name)
+            # real `fs cp -r` copies the whole tree, subfolders included (T-50)
+            def _copy_tree(s: Path, d: Path):
+                d.mkdir(parents=True, exist_ok=True)
+                for child in s.iterdir():
+                    target = d / child.name
+                    if child.is_dir():
+                        _copy_tree(child, target)
+                    else:
+                        if target.exists() and not overwrite:
+                            print(f"{child} -> {target} (skipped; already exists)")
+                            continue
+                        shutil.copy2(child, target)
+
+            _copy_tree(src, dst)
             return 0
         if dst.exists() and not overwrite:
             print(f"{paths[0]} -> {paths[1]} (skipped; already exists)")

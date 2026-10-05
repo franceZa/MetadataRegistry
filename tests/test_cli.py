@@ -63,7 +63,7 @@ def test_verify_package_tampered_exit_one(tmp_path, capsys):
     pkg = build_package(env="dev")
     tampered = tmp_path / "tampered"
     shutil.copytree(pkg, tampered)
-    target = tampered / "silver.cc.credit_card_txn.resolved.json"
+    target = tampered / "cc" / "silver.cc.credit_card_txn.resolved.json"
     data = bytearray(target.read_bytes())
     data[len(data) // 2] ^= 0x01
     target.write_bytes(bytes(data))
@@ -72,6 +72,34 @@ def test_verify_package_tampered_exit_one(tmp_path, capsys):
     assert rc == 1
     out = capsys.readouterr().out
     assert "TAMPERED" in out
+
+
+def test_package_prints_manifest_v3_summary(capsys):
+    """T-56 · FR-M.7: `mdf package` reports manifest_version 3 + file_count 9 by kind."""
+    rc = main(["package", "--env", "dev"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "manifest_version=3 file_count=9 odcs_contract=3 resolved_config=6" in out
+
+
+def test_verify_package_tampered_contract_exit_one(tmp_path, capsys):
+    """T-56 · AC-57 (1) via CLI: 1 byte changed in a bundled contract -> exit 1 TAMPERED."""
+    import shutil
+
+    from mdf.package import build_package
+
+    pkg = build_package(env="dev")
+    tampered = tmp_path / "tampered_contract"
+    shutil.copytree(pkg, tampered)
+    target = tampered / "cc" / "customer.odcs.yaml"
+    data = bytearray(target.read_bytes())
+    data[len(data) // 2] ^= 0x01
+    target.write_bytes(bytes(data))
+    capsys.readouterr()
+    rc = main(["verify-package", str(tampered)])
+    assert rc == 1
+    out = capsys.readouterr().out
+    assert "[TAMPERED]" in out and "cc/customer.odcs.yaml" in out
 
 
 def test_package_release_gate_exit_one(tmp_path, capsys):

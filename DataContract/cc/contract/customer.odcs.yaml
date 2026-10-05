@@ -42,6 +42,9 @@ slaProperties:
   - property: latency # grace period before a file counts as missing
     value: 4
     unit: h
+  - property: recovery_window # AS-31: 2 d retry window before escalation (CR-01)
+    value: 2
+    unit: d
 
 customProperties:
   - property: source_system
