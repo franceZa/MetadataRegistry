@@ -1,0 +1,54 @@
+── CD-1 gh release download mdf-b255065b505d -R franceZa/MetadataRegistry -p mdf-b255065b505d.zip (zip)
+── CD-2 verify-package (local)
+✅ package ผ่านการตรวจสอบ (OK): env=dev, files=9, release_id=mdf-b255065b505d, manifest_sha256=4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+── CD-3 sealed check dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-b255065b505d
+── CD-4 copy back + verify
+✅ package ผ่านการตรวจสอบ (OK): env=dev, files=9, release_id=mdf-b255065b505d, manifest_sha256=4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+── CD-5 bundle deploy -t dev
+Building mdf_wheel...
+Uploading dist/mdf-0.1.0-py3-none-any.whl...
+Uploading bundle files to /Workspace/Users/<user>/.bundle/mdf/dev/files...
+Files: 108 uploaded, 0 deleted
+Resources: 0 created, 0 changed, 0 deleted, 1 unchanged
+── CD-6 register job
+Run URL: https://<host>/jobs/945186884866349/runs/988507787574430?o=3911646557004951
+
+2026-10-05 22:35:39 "[dev franceza2558] mdf_release_register_dev" RUNNING
+2026-10-05 22:37:02 "[dev franceza2558] mdf_release_register_dev" TERMINATED SUCCESS
+✅ REGISTERED appended: release_id=mdf-b255065b505d manifest_sha256=4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+── CD-7 smoke query registry
+── CD-8 activate
+Run URL: https://<host>/jobs/945186884866349/runs/513016927274223?o=3911646557004951
+
+2026-10-05 22:37:32 "[dev franceza2558] mdf_release_register_dev" RUNNING
+2026-10-05 22:38:23 "[dev franceza2558] mdf_release_register_dev" TERMINATED SUCCESS
+✅ ACTIVATED appended: release_id=mdf-b255065b505d manifest_sha256=4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+Building mdf_wheel...
+Uploading dist/mdf-0.1.0-py3-none-any.whl...
+Uploading bundle files to /Workspace/Users/<user>/.bundle/mdf/dev/files...
+Files: 0 uploaded, 0 deleted
+Resources: 0 created, 0 changed, 0 deleted, 1 unchanged
+── ✅ delivered mdf-b255065b505d · evidence: build/deliver/mdf-b255065b505d/evidence.md
+Using CPython 3.13.15
+Creating virtual environment at: C:/Users/User/AppData/Local/Temp/t053-venv
+Resolved 15 packages in 0.99ms
+   Building mdf @ file:///C:/Users/User/AppData/Local/Temp/t053-release
+      Built mdf @ file:///C:/Users/User/AppData/Local/Temp/t053-release
+Prepared 1 package in 3.58s
+Installed 14 packages in 705ms
+ + attrs==26.1.0
+ + colorama==0.4.6
+ + iniconfig==2.3.0
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + mdf==0.1.0 (from file:///C:/Users/User/AppData/Local/Temp/t053-release)
+ + packaging==26.3
+ + pluggy==1.6.0
+ + pygments==2.21.0
+ + pytest==9.1.1
+ + pyyaml==6.0.3
+ + referencing==0.37.0
+ + rpds-py==2026.6.3
+ + ruff==0.16.8
+
+exit_code=0

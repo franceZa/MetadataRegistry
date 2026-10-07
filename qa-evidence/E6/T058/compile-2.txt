@@ -1,0 +1,12 @@
+$ uv run mdf compile --env dev
+✅ compile สำเร็จ: เขียน resolved JSON 6 ไฟล์ลง build/dev/resolved/<source>/
+   - build\dev\resolved\cc\bronze.cc.credit_card.resolved.json
+   - build\dev\resolved\cc\silver.cc.credit_card.resolved.json
+   - build\dev\resolved\cc\bronze.cc.credit_card_txn.resolved.json
+   - build\dev\resolved\cc\silver.cc.credit_card_txn.resolved.json
+   - build\dev\resolved\cc\bronze.cc.customer.resolved.json
+   - build\dev\resolved\cc\silver.cc.customer.resolved.json
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

@@ -1,0 +1,33 @@
+{
+  "statement": "SELECT release_id, actor, CAST(event_ts AS STRING) AS event_ts FROM dev_catalog.ops.release_registry WHERE event='ACTIVATED' ORDER BY event_ts DESC LIMIT 1",
+  "status": {
+    "state": "SUCCEEDED"
+  },
+  "columns": [
+    {
+      "name": "release_id",
+      "position": 0,
+      "type_name": "STRING",
+      "type_text": "STRING"
+    },
+    {
+      "name": "actor",
+      "position": 1,
+      "type_name": "STRING",
+      "type_text": "STRING"
+    },
+    {
+      "name": "event_ts",
+      "position": 2,
+      "type_name": "STRING",
+      "type_text": "STRING"
+    }
+  ],
+  "rows": [
+    [
+      "mdf-ef2f425903b6",
+      "u2m",
+      "2026-10-05 15:41:30.794287"
+    ]
+  ]
+}

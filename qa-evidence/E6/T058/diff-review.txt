@@ -1,0 +1,6 @@
+$ uv run pytest tests/test_diff.py::test_fr_m11_calendar_change_is_review_not_breaking -q
+.                                                                        [100%]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

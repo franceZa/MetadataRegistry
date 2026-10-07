@@ -1,0 +1,9 @@
+$ uv run python qa-evidence/E6/T058/inspect.py preservation
+warning: Failed to set cwd to temp dir
+Traceback (most recent call last):
+  File "E:\OneDrive - Thammasat University\เดสก์ท็อป\datalake\MetadataRegistry\MetadatasRegistry\qa-evidence\E6\T058\inspect.py", line 54, in <module>
+    for relative, original in before["contracts"].items():
+                              ~~~~~~^^^^^^^^^^^^^
+KeyError: 'contracts'
+
+EXIT=1

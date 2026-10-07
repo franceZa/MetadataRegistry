@@ -1,17 +1,13 @@
-"""T-54 — calendar parser + validator (FR-M.1, FR-M.2, FR-M.4 · AC-53, AC-54).
+"""T-58: six SLA entries, one reader/validator, seven resolved keys."""
 
-AC-53's 12 malformed cases are each a parametrized sub-test; every one must make
-`mdf validate` exit 1 with a Thai field/fix message, and `compile_project` must
-abort without writing anything. All mutate a copy of the real `cc` DataContract
-in tmp_path (never the committed DataContract/**, per H-109 constraint #5).
-"""
-
+import json
 import shutil
 from pathlib import Path
 
 import pytest
 import yaml
 
+from mdf.calendar import CALENDAR_FIELDS, compiled_calendar
 from mdf.cli import main
 from mdf.compile import compile_project
 from mdf.validation import validate_project
@@ -28,236 +24,273 @@ def project(tmp_path, monkeypatch):
     return tmp_path
 
 
-def _load_contract(project: Path) -> dict:
-    return yaml.safe_load((project / CONTRACT_REL).read_text(encoding="utf-8"))
+def _sla(**values):
+    return {
+        "slaProperties": [
+            {
+                "property": key,
+                "value": value,
+                **(
+                    {"unit": "h"}
+                    if key == "latency"
+                    else {"unit": "d"}
+                    if key == "recovery_window"
+                    else {}
+                ),
+            }
+            for key, value in values.items()
+        ]
+    }
 
 
-def _save_contract(project: Path, data: dict) -> None:
-    (project / CONTRACT_REL).write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
-
-
-def _set_custom(contract: dict, prop: str, value) -> None:
-    props = [cp for cp in contract.get("customProperties", []) if cp.get("property") != prop]
-    props.append({"property": prop, "value": value})
-    contract["customProperties"] = props
-
-
-def _set_sla(contract: dict, prop: str, value, unit: str | None = None) -> None:
-    props = [sp for sp in contract.get("slaProperties", []) if sp.get("property") != prop]
-    entry = {"property": prop, "value": value}
-    if unit is not None:
-        entry["unit"] = unit
-    props.append(entry)
-    contract["slaProperties"] = props
-
-
-_VALID_SCHEDULE = {
-    "type": "daily",
-    "effective_from": "2026-01-01",
-    "effective_to": "2026-12-31",
-    "holidays": ["2026-01-01"],
-    "explicit_dates": [],
-}
-
-
-def _mut_timezone_not_string(c):
-    _set_custom(c, "timezone", 123)
-
-
-def _mut_timezone_empty(c):
-    _set_custom(c, "timezone", "   ")
-
-
-def _mut_expected_at_bad(c):
-    _set_sla(c, "expected_at", "25:00")
-
-
-def _mut_expected_day_offset_negative(c):
-    _set_custom(c, "expected_day_offset", -1)
-
-
-def _mut_holiday_duplicate(c):
-    sched = dict(_VALID_SCHEDULE)
-    sched["holidays"] = ["2026-01-01", "2026-01-01"]
-    _set_custom(c, "business_schedule", sched)
-
-
-def _mut_date_not_iso(c):
-    sched = dict(_VALID_SCHEDULE)
-    sched["holidays"] = ["2026/01/01"]
-    _set_custom(c, "business_schedule", sched)
-
-
-def _mut_effective_to_before_from(c):
-    sched = dict(_VALID_SCHEDULE)
-    sched["effective_from"] = "2026-02-01"
-    sched["effective_to"] = "2026-01-01"
-    _set_custom(c, "business_schedule", sched)
-
-
-def _mut_day_of_month_32(c):
-    sched = dict(_VALID_SCHEDULE)
-    sched["type"] = "day_of_month"
-    sched["day_of_month"] = 32
-    sched["day_of_month_policy"] = "last_business_day"
-    _set_custom(c, "business_schedule", sched)
-
-
-def _mut_day_of_month_missing_policy(c):
-    sched = dict(_VALID_SCHEDULE)
-    sched["type"] = "day_of_month"
-    sched["day_of_month"] = 15
-    _set_custom(c, "business_schedule", sched)
-
-
-def _mut_explicit_dates_empty(c):
-    sched = dict(_VALID_SCHEDULE)
-    sched["type"] = "explicit_dates"
-    sched["explicit_dates"] = []
-    _set_custom(c, "business_schedule", sched)
-
-
-def _mut_type_outside_enum(c):
-    sched = dict(_VALID_SCHEDULE)
-    sched["type"] = "weekly"
-    _set_custom(c, "business_schedule", sched)
-
-
-def _mut_recovery_window_lt_latency(c):
-    # credit_card.odcs.yaml already has latency: 4 unit: h (slaProperties)
-    _set_sla(c, "recovery_window", 2, unit="h")
-
-
-def _mut_unit_invalid(c):
-    _set_sla(c, "recovery_window", 2, unit="m")
-
-
-AC53_CASES = [
-    ("timezone_not_string", _mut_timezone_not_string, "timezone"),
-    ("timezone_empty", _mut_timezone_empty, "timezone"),
-    ("expected_at_bad", _mut_expected_at_bad, "expected_at"),
-    ("expected_day_offset_negative", _mut_expected_day_offset_negative, "expected_day_offset"),
-    ("holiday_duplicate", _mut_holiday_duplicate, "holidays"),
-    ("date_not_iso", _mut_date_not_iso, "holidays"),
-    ("effective_to_before_from", _mut_effective_to_before_from, "effective_to"),
-    ("day_of_month_32", _mut_day_of_month_32, "day_of_month"),
-    ("day_of_month_missing_policy", _mut_day_of_month_missing_policy, "day_of_month_policy"),
-    ("explicit_dates_empty", _mut_explicit_dates_empty, "explicit_dates"),
-    ("type_outside_enum", _mut_type_outside_enum, "type"),
-    ("recovery_window_lt_latency", _mut_recovery_window_lt_latency, "recovery_window"),
-    ("unit_invalid", _mut_unit_invalid, "recovery_window"),
-]
+def test_authoring_has_exact_six_keys_and_unknown_owner_nulls():
+    paths = [ROOT / "DataContract/_template/contract/my_dataset.odcs.yaml"]
+    paths += sorted((ROOT / "DataContract/cc/contract").glob("*.odcs.yaml"))
+    for path in paths:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        entries = data["slaProperties"]
+        assert [p["property"] for p in entries] == list(CALENDAR_FIELDS)
+        calendar, missing, errors = compiled_calendar(data)
+        assert errors == []
+        assert calendar["missing_after_seconds"] == 14400
+        # owner values pass through as-is (null -> null); only the template must stay blank
+        sla = {p["property"]: p.get("value") for p in entries}
+        for key in ("schedule_type", "day_of_month", "expected_at", "business_date_lag"):
+            assert calendar[key] == sla[key]
+        if "_template" in path.parts:
+            assert calendar["status"] == "PENDING_OWNER"
+            owner_keys = ("schedule_type", "expected_at", "business_date_lag")
+            assert all(sla[k] is None for k in owner_keys)
+            assert calendar["recovery_window_seconds"] is None
+        else:
+            assert calendar["recovery_window_seconds"] == 172800
 
 
 @pytest.mark.parametrize(
-    "case_id,mutate,field_substr", AC53_CASES, ids=[c[0] for c in AC53_CASES]
+    "key,value,unit",
+    [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("business_date_lag", 1, None),
+        ("business_date_lag", -1.5, None),
+        ("business_date_lag", True, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ],
 )
-def test_ac53_malformed_calendar_fails_validate_and_compile(
-    project, case_id, mutate, field_substr, capsys
-):
-    contract = _load_contract(project)
-    mutate(contract)
-    _save_contract(project, contract)
-
-    report = validate_project()
-    assert report.is_valid is False
-    codes = [i.code for i in report.errors]
-    assert "CALENDAR_INVALID" in codes
-    err = next(
-        i for i in report.errors if i.code == "CALENDAR_INVALID" and field_substr in (i.field or "")
+def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+    _, _, errors = compiled_calendar(
+        {
+            "slaProperties": [
+                {"property": key, "value": value, "unit": unit},
+            ]
+        }
     )
-    assert err.fix  # NFR-7: every error carries a Thai fix
+    assert len(errors) == 1
+    field, message, fix = errors[0]
+    assert field == "slaProperties." + key
+    assert "ต้อง" in message
+    assert "กำหนด" in fix
 
+
+def test_null_sla_fields_are_pending_with_exact_seven_key_output():
+    contract = {
+        "slaProperties": [
+            {"property": "schedule_type", "value": None},
+            {"property": "latency", "value": 4, "unit": "h"},
+            {"property": "recovery_window", "value": 2, "unit": "d"},
+        ]
+    }
+    calendar, missing, errors = compiled_calendar(contract)
+    assert calendar == {
+        "status": "PENDING_OWNER",
+        "schedule_type": None,
+        "day_of_month": None,
+        "expected_at": None,
+        "business_date_lag": None,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+    }
+    assert missing == ["schedule_type", "expected_at", "business_date_lag"]
+    assert errors == []
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "timezone",
+        "expected_day_offset",
+        "business_date_lag",
+        "business_schedule",
+        "expected_at",
+        "recovery_window",
+        "schedule_type",
+        "day_of_month",
+    ],
+)
+def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+    _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+    assert errors == [
+        ("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties", "ย้ายไป slaProperties")
+    ]
+
+
+@pytest.mark.parametrize(
+    "key,value,unit",
+    [
+        ("schedule_type", "daily", None),
+        ("schedule_type", "workday", None),
+        ("schedule_type", "workday_excluding_holidays", None),
+        ("schedule_type", "monthly", None),
+        ("day_of_month", 1, None),
+        ("day_of_month", 31, None),
+        ("business_date_lag", 0, None),
+        ("business_date_lag", -1, None),
+        ("business_date_lag", -10, None),
+        ("expected_at", "00:00", None),
+        ("expected_at", "23:59", None),
+        ("latency", 0, "h"),
+        ("latency", 1.5, "d"),
+        ("recovery_window", 0.5, "h"),
+    ],
+)
+def test_per_kind_good_values(key, value, unit):
+    _, _, errors = compiled_calendar(
+        {"slaProperties": [{"property": key, "value": value, "unit": unit}]}
+    )
+    assert errors == []
+
+
+def test_absent_and_explicit_null_are_equal_even_with_unused_units():
+    assert compiled_calendar({}) == compiled_calendar(_sla(**dict.fromkeys(CALENDAR_FIELDS)))
+
+
+def test_unknown_sla_is_ignored_and_no_duplicate_collision_rules():
+    unknown = {"property": "frequency", "value": {"arbitrary": "metadata"}}
+    assert compiled_calendar({"slaProperties": [unknown, unknown]}) == compiled_calendar({})
+    calendar, _, errors = compiled_calendar(
+        {
+            "slaProperties": [
+                {"property": "expected_at", "value": "06:30"},
+                {"property": "expected_at", "value": "07:45"},
+            ]
+        }
+    )
+    assert calendar["expected_at"] == "07:45"
+    assert errors == []
+
+
+def test_no_cross_field_or_holiday_requirements():
+    data = _sla(
+        schedule_type="workday_excluding_holidays",
+        expected_at="06:30",
+        business_date_lag=0,
+        latency=30,
+        recovery_window=0,
+    )
+    calendar, missing, errors = compiled_calendar(data)
+    assert calendar["status"] == "COMPLETE"
+    assert missing == errors == []
+
+
+def test_monthly_null_day_is_pending_not_invalid():
+    data = _sla(
+        schedule_type="monthly", expected_at="06:30", business_date_lag=0, recovery_window=3
+    )
+    calendar, missing, errors = compiled_calendar(data)
+    assert calendar["status"] == "PENDING_OWNER"
+    assert missing == ["day_of_month"]
+    assert errors == []
+
+
+@pytest.mark.parametrize("mode", ["daily", "workday", "workday_excluding_holidays", "monthly"])
+def test_complete_contract_nondefault_seconds_and_layer_equality(project, mode):
+    path = project / CONTRACT_REL
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    data.update(
+        _sla(
+            schedule_type=mode,
+            day_of_month=31 if mode == "monthly" else None,
+            expected_at="06:30",
+            business_date_lag=-1,
+            latency=30,
+            recovery_window=3,
+        )
+    )
+    path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+    report = validate_project()
+    assert report.is_valid
+    assert not any(
+        w.code == "CALENDAR_PENDING_OWNER" and "credit_card.odcs.yaml" in w.file_path
+        for w in report.warnings
+    )
+    calendar, missing, errors = compiled_calendar(data)
+    assert calendar["status"] == "COMPLETE"
+    assert calendar["missing_after_seconds"] == 108000
+    assert calendar["recovery_window_seconds"] == 259200
+    assert missing == errors == []
+    written = compile_project(env="dev")
+    by_name = {p.name: json.loads(p.read_text(encoding="utf-8")) for p in written}
+    assert by_name["bronze.cc.credit_card.resolved.json"]["calendar"] == calendar
+    assert by_name["silver.cc.credit_card.resolved.json"]["calendar"] == calendar
+
+
+@pytest.mark.parametrize(
+    "key,value,unit",
+    [
+        ("schedule_type", "explicit_dates", None),
+        ("expected_at", "25:00", None),
+        ("day_of_month", True, None),
+        ("business_date_lag", 1, None),
+        ("latency", -1, "h"),
+        ("recovery_window", 2, "minutes"),
+    ],
+)
+def test_invalid_cli_reports_field_fix_and_compile_writes_nothing(
+    project, capsys, key, value, unit
+):
+    path = project / CONTRACT_REL
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    for entry in data["slaProperties"]:
+        if entry["property"] == key:
+            entry.update(value=value, unit=unit)
+    path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
     assert main(["validate"]) == 1
     out = capsys.readouterr().out
     assert "CALENDAR_INVALID" in out
-    assert field_substr in out
-
-    with pytest.raises(RuntimeError):
-        compile_project()
+    assert "credit_card.odcs.yaml" in out
+    assert "slaProperties." + key in out
+    assert "กำหนด" in out
+    with pytest.raises(RuntimeError, match="CALENDAR_INVALID"):
+        compile_project(env="dev")
     assert not (project / "build").exists()
 
 
-def test_ac54_real_cc_contracts_pass_with_three_pending_owner_warnings(project, capsys):
-    """AC-54: the real cc contracts (no calendar fields yet) validate OK with warnings."""
-    report = validate_project()
-    assert report.is_valid is True
-    warn_codes = [w.code for w in report.warnings]
-    assert warn_codes.count("CALENDAR_PENDING_OWNER") == 3
-
-    assert main(["validate"]) == 0
-    out = capsys.readouterr().out
-    assert out.count("CALENDAR_PENDING_OWNER") == 3
-    assert "expected_at" in out and "timezone" in out
+def test_new_field_needs_only_table_line_and_contract_entry(monkeypatch):
+    # The whole extension: one table line plus one contract entry. No mapper/checker edits.
+    monkeypatch.setitem(CALENDAR_FIELDS, "future_offset", "int")
+    contract = {"slaProperties": [{"property": "future_offset", "value": 2}]}
+    calendar, _, errors = compiled_calendar(contract)
+    assert calendar["future_offset"] == 2
+    assert errors == []
+    contract["slaProperties"][0]["value"] = -1
+    assert compiled_calendar(contract)[2][0][0] == "slaProperties.future_offset"
 
 
-def test_r29_bogus_iana_timezone_name_passes_validate(project):
-    """R-29 / OQ-TRI-12a: no IANA check — a made-up zone name like 'Asia/Bangkokk' passes."""
-    contract = _load_contract(project)
-    _set_custom(contract, "timezone", "Asia/Bangkokk")
-    _save_contract(project, contract)
-
-    report = validate_project()
-    assert report.is_valid is True
-    codes = [i.code for i in report.issues]
-    assert "CALENDAR_INVALID" not in codes
-
-
-def test_complete_and_correct_calendar_has_no_warning_for_that_dataset(project):
-    """A contract with every calendar field present and valid gets no PENDING_OWNER warning."""
-    contract = _load_contract(project)
-    _set_custom(contract, "timezone", "Asia/Bangkok")
-    _set_custom(contract, "expected_day_offset", 0)
-    _set_custom(contract, "business_schedule", dict(_VALID_SCHEDULE))
-    _set_sla(contract, "expected_at", "06:30")
-    _set_sla(contract, "recovery_window", 8, unit="h")
-    _save_contract(project, contract)
-
-    report = validate_project()
-    assert report.is_valid is True
-    cc_warnings = [
-        w
-        for w in report.warnings
-        if w.code == "CALENDAR_PENDING_OWNER" and "credit_card.odcs.yaml" in w.file_path
-    ]
-    assert cc_warnings == []
-
-
-def test_ac52_compiled_calendar_complete_status_and_sorted_lists(project):
-    """AC-52 (T-55): a contract with every calendar field present compiles `calendar.status`
-    = COMPLETE, `missing_after_seconds`/`recovery_window_seconds` derived from slaProperties
-    (not hardcoded), and bronze/silver get byte-identical `calendar` for that dataset.
-    """
-    import json
-
-    from mdf.calendar import compiled_calendar
-
-    contract = _load_contract(project)
-    _set_custom(contract, "timezone", "Asia/Bangkok")
-    _set_custom(contract, "expected_day_offset", 0)
-    schedule = dict(_VALID_SCHEDULE)
-    schedule["holidays"] = sorted(["2026-01-01", "2026-04-13"])  # must already be sorted
-    _set_custom(contract, "business_schedule", schedule)
-    _set_sla(contract, "expected_at", "06:30")
-    _set_sla(contract, "recovery_window", 2, unit="d")
-    _save_contract(project, contract)
-
-    calendar = compiled_calendar(contract)
-    assert calendar["status"] == "COMPLETE"
-    assert calendar["missing_after_seconds"] == 14400  # latency 4h * 3600, not hardcoded
-    assert calendar["recovery_window_seconds"] == 172800  # recovery_window 2d * 86400
-    assert calendar["holidays"] == sorted(calendar["holidays"])
-    assert calendar["schedule_type"] == "daily"
-
-    written = compile_project(env="dev")
-    by_name = {p.name: p for p in written}
-    bronze = json.loads(
-        by_name["bronze.cc.credit_card.resolved.json"].read_text(encoding="utf-8")
+def test_old_expected_day_offset_in_sla_is_ignored_and_lag_is_pending():
+    calendar, missing, errors = compiled_calendar(
+        {"slaProperties": [{"property": "expected_day_offset", "value": 1}]}
     )
-    silver = json.loads(
-        by_name["silver.cc.credit_card.resolved.json"].read_text(encoding="utf-8")
-    )
-    assert json.dumps(bronze["calendar"], sort_keys=True) == json.dumps(
-        silver["calendar"], sort_keys=True
-    )
-    assert bronze["calendar"]["status"] == "COMPLETE"
+    assert "expected_day_offset" not in calendar
+    assert calendar["business_date_lag"] is None
+    assert "business_date_lag" in missing
+    assert errors == []

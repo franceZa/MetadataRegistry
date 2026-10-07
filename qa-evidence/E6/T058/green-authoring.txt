@@ -1,0 +1,6 @@
+$ uv run pytest tests/test_calendar.py::test_authoring_has_exact_six_keys_and_unknown_owner_nulls -q
+.                                                                        [100%]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

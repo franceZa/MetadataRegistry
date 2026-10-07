@@ -1,0 +1,4 @@
+$ uv run ruff check src tests
+All checks passed!
+
+EXIT=0

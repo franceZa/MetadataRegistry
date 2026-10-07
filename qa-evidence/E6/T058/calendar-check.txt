@@ -1,0 +1,84 @@
+$ uv run pytest tests/test_calendar.py -q
+.........................................FFFF.......                     [100%]
+================================== FAILURES ===================================
+_____ test_complete_contract_nondefault_seconds_and_layer_equality[daily] _____
+
+project = WindowsPath('C:/Users/User/AppData/Local/Temp/pytest-of-User/pytest-777/test_complete_contract_nondefa0')
+mode = 'daily'
+
+    @pytest.mark.parametrize("mode", ["daily", "workday", "workday_excluding_holidays", "monthly"])
+    def test_complete_contract_nondefault_seconds_and_layer_equality(project, mode):
+        path = project / CONTRACT_REL
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        data.update(_sla(schedule_type=mode, day_of_month=31 if mode == "monthly" else None,
+                         expected_at="06:30", expected_day_offset=1, latency=30, recovery_window=3))
+        path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        report = validate_project()
+>       assert report.ok
+               ^^^^^^^^^
+E       AttributeError: 'ValidationReport' object has no attribute 'ok'
+
+E:\OneDrive - Thammasat University\เดสก์ท็อป\datalake\MetadataRegistry\MetadatasRegistry\tests\test_calendar.py:159: AttributeError
+____ test_complete_contract_nondefault_seconds_and_layer_equality[workday] ____
+
+project = WindowsPath('C:/Users/User/AppData/Local/Temp/pytest-of-User/pytest-777/test_complete_contract_nondefa1')
+mode = 'workday'
+
+    @pytest.mark.parametrize("mode", ["daily", "workday", "workday_excluding_holidays", "monthly"])
+    def test_complete_contract_nondefault_seconds_and_layer_equality(project, mode):
+        path = project / CONTRACT_REL
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        data.update(_sla(schedule_type=mode, day_of_month=31 if mode == "monthly" else None,
+                         expected_at="06:30", expected_day_offset=1, latency=30, recovery_window=3))
+        path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        report = validate_project()
+>       assert report.ok
+               ^^^^^^^^^
+E       AttributeError: 'ValidationReport' object has no attribute 'ok'
+
+E:\OneDrive - Thammasat University\เดสก์ท็อป\datalake\MetadataRegistry\MetadatasRegistry\tests\test_calendar.py:159: AttributeError
+_ test_complete_contract_nondefault_seconds_and_layer_equality[workday_excluding_holidays] _
+
+project = WindowsPath('C:/Users/User/AppData/Local/Temp/pytest-of-User/pytest-777/test_complete_contract_nondefa2')
+mode = 'workday_excluding_holidays'
+
+    @pytest.mark.parametrize("mode", ["daily", "workday", "workday_excluding_holidays", "monthly"])
+    def test_complete_contract_nondefault_seconds_and_layer_equality(project, mode):
+        path = project / CONTRACT_REL
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        data.update(_sla(schedule_type=mode, day_of_month=31 if mode == "monthly" else None,
+                         expected_at="06:30", expected_day_offset=1, latency=30, recovery_window=3))
+        path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        report = validate_project()
+>       assert report.ok
+               ^^^^^^^^^
+E       AttributeError: 'ValidationReport' object has no attribute 'ok'
+
+E:\OneDrive - Thammasat University\เดสก์ท็อป\datalake\MetadataRegistry\MetadatasRegistry\tests\test_calendar.py:159: AttributeError
+____ test_complete_contract_nondefault_seconds_and_layer_equality[monthly] ____
+
+project = WindowsPath('C:/Users/User/AppData/Local/Temp/pytest-of-User/pytest-777/test_complete_contract_nondefa3')
+mode = 'monthly'
+
+    @pytest.mark.parametrize("mode", ["daily", "workday", "workday_excluding_holidays", "monthly"])
+    def test_complete_contract_nondefault_seconds_and_layer_equality(project, mode):
+        path = project / CONTRACT_REL
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        data.update(_sla(schedule_type=mode, day_of_month=31 if mode == "monthly" else None,
+                         expected_at="06:30", expected_day_offset=1, latency=30, recovery_window=3))
+        path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        report = validate_project()
+>       assert report.ok
+               ^^^^^^^^^
+E       AttributeError: 'ValidationReport' object has no attribute 'ok'
+
+E:\OneDrive - Thammasat University\เดสก์ท็อป\datalake\MetadataRegistry\MetadatasRegistry\tests\test_calendar.py:159: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_calendar.py::test_complete_contract_nondefault_seconds_and_layer_equality[daily]
+FAILED tests/test_calendar.py::test_complete_contract_nondefault_seconds_and_layer_equality[workday]
+FAILED tests/test_calendar.py::test_complete_contract_nondefault_seconds_and_layer_equality[workday_excluding_holidays]
+FAILED tests/test_calendar.py::test_complete_contract_nondefault_seconds_and_layer_equality[monthly]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=1

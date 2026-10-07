@@ -1,0 +1,8 @@
+{
+  "build\\dev\\resolved\\cc\\bronze.cc.credit_card.resolved.json": "fcdd6ddaa7f28d66514013c8195f9eb852f98961c4ca11cde6897d9621f24fa3",
+  "build\\dev\\resolved\\cc\\bronze.cc.credit_card_txn.resolved.json": "d47fc386fa57112f2e897ba377af0051b8a67e589352396cadbf390737c0be29",
+  "build\\dev\\resolved\\cc\\bronze.cc.customer.resolved.json": "e505a662df1c2b5bd992af2cc0d777d53284ab59fe7258b8286a1793f88191cf",
+  "build\\dev\\resolved\\cc\\silver.cc.credit_card.resolved.json": "299f77419aca3f380637c9f15aece12f0443eb99ed4d2ae4dc53a7fca63fcf1b",
+  "build\\dev\\resolved\\cc\\silver.cc.credit_card_txn.resolved.json": "f46a2068d12bcba54972ffb124d0163eeac122a3b90d0eaca813fe492115b3c8",
+  "build\\dev\\resolved\\cc\\silver.cc.customer.resolved.json": "c9b03a1b0748bb52e9bd3f3a28994e0799038070b09c008f00a13598e8056f67"
+}

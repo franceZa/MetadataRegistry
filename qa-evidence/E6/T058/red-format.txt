@@ -1,0 +1,561 @@
+$ uv run pytest tests/test_calendar.py -q
+FFFFFFFFFFFFFFF.                                                         [100%]
+================================== FAILURES ===================================
+_ test_non_null_format_mismatch_reports_one_thai_error[schedule_type-explicit_dates-None] _
+
+key = 'schedule_type', value = 'explicit_dates', unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_ test_non_null_format_mismatch_reports_one_thai_error[schedule_type-value1-None] _
+
+key = 'schedule_type', value = {}, unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_ test_non_null_format_mismatch_reports_one_thai_error[expected_at-25:00-None] _
+
+key = 'expected_at', value = '25:00', unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_ test_non_null_format_mismatch_reports_one_thai_error[expected_at-06:30\n-None] _
+
+key = 'expected_at', value = '06:30\n', unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_ test_non_null_format_mismatch_reports_one_thai_error[day_of_month-True-None] _
+
+key = 'day_of_month', value = True, unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_ test_non_null_format_mismatch_reports_one_thai_error[day_of_month-32-None] __
+
+key = 'day_of_month', value = 32, unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_ test_non_null_format_mismatch_reports_one_thai_error[expected_day_offset--1-None] _
+
+key = 'expected_day_offset', value = -1, unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_ test_non_null_format_mismatch_reports_one_thai_error[expected_day_offset-1.5-None] _
+
+key = 'expected_day_offset', value = 1.5, unit = None
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_____ test_non_null_format_mismatch_reports_one_thai_error[latency--1-h] ______
+
+key = 'latency', value = -1, unit = 'h'
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+_____ test_non_null_format_mismatch_reports_one_thai_error[latency-nan-h] _____
+
+key = 'latency', value = nan, unit = 'h'
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+>       _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+
+tests\test_calendar.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+contract = {'slaProperties': [{'property': 'latency', 'value': nan, 'unit': 'h'}]}
+
+    def compiled_calendar(
+        contract: dict[str, Any],
+    ) -> tuple[dict[str, Any], list[str], list[CalendarError]]:
+        """Return (resolved calendar, null owner keys, format errors); unknown SLA keys are ignored."""
+        sla = {p["property"]: p for p in contract.get("slaProperties") or [] if isinstance(p, dict)}
+        values = {key: sla.get(key, {}).get("value") for key in CALENDAR_FIELDS}
+        required = ["schedule_type", "expected_at", "expected_day_offset", "recovery_window"]
+        if values["schedule_type"] == "monthly":
+            required.append("day_of_month")
+        missing = [key for key in required if values[key] is None]
+        calendar = {"status": "PENDING_OWNER" if missing else "COMPLETE"}
+        for key, kind in CALENDAR_FIELDS.items():
+            value = values[key]
+            if kind == "duration":
+                key_out = "missing_after_seconds" if key == "latency" else key + "_seconds"
+                unit = sla.get(key, {}).get("unit")
+>               calendar[key_out] = None if value is None else int(value * (3600 if unit == "h" else 86400))
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               ValueError: cannot convert float NaN to integer
+
+src\mdf\calendar.py:52: ValueError
+_____ test_non_null_format_mismatch_reports_one_thai_error[latency-inf-h] _____
+
+key = 'latency', value = inf, unit = 'h'
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+>       _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+
+tests\test_calendar.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+contract = {'slaProperties': [{'property': 'latency', 'value': inf, 'unit': 'h'}]}
+
+    def compiled_calendar(
+        contract: dict[str, Any],
+    ) -> tuple[dict[str, Any], list[str], list[CalendarError]]:
+        """Return (resolved calendar, null owner keys, format errors); unknown SLA keys are ignored."""
+        sla = {p["property"]: p for p in contract.get("slaProperties") or [] if isinstance(p, dict)}
+        values = {key: sla.get(key, {}).get("value") for key in CALENDAR_FIELDS}
+        required = ["schedule_type", "expected_at", "expected_day_offset", "recovery_window"]
+        if values["schedule_type"] == "monthly":
+            required.append("day_of_month")
+        missing = [key for key in required if values[key] is None]
+        calendar = {"status": "PENDING_OWNER" if missing else "COMPLETE"}
+        for key, kind in CALENDAR_FIELDS.items():
+            value = values[key]
+            if kind == "duration":
+                key_out = "missing_after_seconds" if key == "latency" else key + "_seconds"
+                unit = sla.get(key, {}).get("unit")
+>               calendar[key_out] = None if value is None else int(value * (3600 if unit == "h" else 86400))
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               OverflowError: cannot convert float infinity to integer
+
+src\mdf\calendar.py:52: OverflowError
+_ test_non_null_format_mismatch_reports_one_thai_error[recovery_window-False-d] _
+
+key = 'recovery_window', value = False, unit = 'd'
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+__ test_non_null_format_mismatch_reports_one_thai_error[recovery_window-2-d] __
+
+key = 'recovery_window', value = '2', unit = 'd'
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+>       _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+
+tests\test_calendar.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+contract = {'slaProperties': [{'property': 'recovery_window', 'value': '2', 'unit': 'd'}]}
+
+    def compiled_calendar(
+        contract: dict[str, Any],
+    ) -> tuple[dict[str, Any], list[str], list[CalendarError]]:
+        """Return (resolved calendar, null owner keys, format errors); unknown SLA keys are ignored."""
+        sla = {p["property"]: p for p in contract.get("slaProperties") or [] if isinstance(p, dict)}
+        values = {key: sla.get(key, {}).get("value") for key in CALENDAR_FIELDS}
+        required = ["schedule_type", "expected_at", "expected_day_offset", "recovery_window"]
+        if values["schedule_type"] == "monthly":
+            required.append("day_of_month")
+        missing = [key for key in required if values[key] is None]
+        calendar = {"status": "PENDING_OWNER" if missing else "COMPLETE"}
+        for key, kind in CALENDAR_FIELDS.items():
+            value = values[key]
+            if kind == "duration":
+                key_out = "missing_after_seconds" if key == "latency" else key + "_seconds"
+                unit = sla.get(key, {}).get("unit")
+>               calendar[key_out] = None if value is None else int(value * (3600 if unit == "h" else 86400))
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               ValueError: Exceeds the limit (4300 digits) for integer string conversion: value has 86400 digits; use sys.set_int_max_str_digits() to increase the limit
+
+src\mdf\calendar.py:52: ValueError
+_ test_non_null_format_mismatch_reports_one_thai_error[recovery_window-value13-d] _
+
+key = 'recovery_window', value = {}, unit = 'd'
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+>       _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+
+tests\test_calendar.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+contract = {'slaProperties': [{'property': 'recovery_window', 'value': {}, 'unit': 'd'}]}
+
+    def compiled_calendar(
+        contract: dict[str, Any],
+    ) -> tuple[dict[str, Any], list[str], list[CalendarError]]:
+        """Return (resolved calendar, null owner keys, format errors); unknown SLA keys are ignored."""
+        sla = {p["property"]: p for p in contract.get("slaProperties") or [] if isinstance(p, dict)}
+        values = {key: sla.get(key, {}).get("value") for key in CALENDAR_FIELDS}
+        required = ["schedule_type", "expected_at", "expected_day_offset", "recovery_window"]
+        if values["schedule_type"] == "monthly":
+            required.append("day_of_month")
+        missing = [key for key in required if values[key] is None]
+        calendar = {"status": "PENDING_OWNER" if missing else "COMPLETE"}
+        for key, kind in CALENDAR_FIELDS.items():
+            value = values[key]
+            if kind == "duration":
+                key_out = "missing_after_seconds" if key == "latency" else key + "_seconds"
+                unit = sla.get(key, {}).get("unit")
+>               calendar[key_out] = None if value is None else int(value * (3600 if unit == "h" else 86400))
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               TypeError: unsupported operand type(s) for *: 'dict' and 'int'
+
+src\mdf\calendar.py:52: TypeError
+__ test_non_null_format_mismatch_reports_one_thai_error[recovery_window-2-m] __
+
+key = 'recovery_window', value = 2, unit = 'm'
+
+    @pytest.mark.parametrize("key,value,unit", [
+        ("schedule_type", "explicit_dates", None),
+        ("schedule_type", {}, None),
+        ("expected_at", "25:00", None),
+        ("expected_at", "06:30\n", None),
+        ("day_of_month", True, None),
+        ("day_of_month", 32, None),
+        ("expected_day_offset", -1, None),
+        ("expected_day_offset", 1.5, None),
+        ("latency", -1, "h"),
+        ("latency", float("nan"), "h"),
+        ("latency", float("inf"), "h"),
+        ("recovery_window", False, "d"),
+        ("recovery_window", "2", "d"),
+        ("recovery_window", {}, "d"),
+        ("recovery_window", 2, "m"),
+    ])
+    def test_non_null_format_mismatch_reports_one_thai_error(key, value, unit):
+        _, _, errors = compiled_calendar({"slaProperties": [
+            {"property": key, "value": value, "unit": unit},
+        ]})
+>       assert len(errors) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_calendar.py:28: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[schedule_type-explicit_dates-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[schedule_type-value1-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[expected_at-25:00-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[expected_at-06:30\n-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[day_of_month-True-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[day_of_month-32-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[expected_day_offset--1-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[expected_day_offset-1.5-None]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[latency--1-h]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[latency-nan-h]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[latency-inf-h]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[recovery_window-False-d]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[recovery_window-2-d]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[recovery_window-value13-d]
+FAILED tests/test_calendar.py::test_non_null_format_mismatch_reports_one_thai_error[recovery_window-2-m]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=1

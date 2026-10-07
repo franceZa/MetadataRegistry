@@ -1,0 +1,1811 @@
+{
+  "backup_sha256": "4f07413bed046968e77a758c322750a03f9cf5a097afb264f9219314f34be712",
+  "backup_bytes": 279117,
+  "backup_lines": 1518,
+  "contracts": {
+    "DataContract/_template/contract/my_dataset.odcs.yaml": {
+      "sha256": "d98260fb2bb940634cb142eae68267a01c84078b1be471407ef52a57bd47c670",
+      "parsed_sha256": "7441c3a4e1f4ac907a1f9fa93d22914a951149533257f323c857f7febb2990ad",
+      "reality_lines_hex": [],
+      "sla": [
+        {
+          "property": "frequency",
+          "value": "daily"
+        },
+        {
+          "property": "latency",
+          "value": 4,
+          "unit": "h"
+        }
+      ],
+      "missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset",
+        "recovery_window",
+        "business_schedule"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": null,
+        "frequency": "daily"
+      },
+      "schema_errors": []
+    },
+    "DataContract/cc/contract/credit_card.odcs.yaml": {
+      "sha256": "1718f4e1edb8428f9131c8ada07b7285f946412e5492b97f254c22edcf1a03f7",
+      "parsed_sha256": "0060ac7a89387dc41db84ec4074b2aeee67d670de60e63ee0e3361df890153a2",
+      "reality_lines_hex": [
+        "23206023205245414c4954593a60206d61726b6572732e20416c6c205245414c495459206c696e65732062656c6f772061726520627974652d666f722d6279746520756e6368616e6765642e",
+        "202023205245414c4954593a207468652066696c6520666f7220627573696e6573735f646174653d323032362d30392d3130206973206e657665722064656c6976657265642e",
+        "202020202020202020202020225e5b302d395d7b31352c31367d24222023205245414c4954593a206661696c73206f6e20746865207370616365642076617269616e74",
+        "202020202020202023205245414c4954593a207468652073616d652050414e2069732072652d73656e74207769746820737061636573202822353535352035353030202e2e2e22292e"
+      ],
+      "sla": [
+        {
+          "property": "frequency",
+          "value": "daily"
+        },
+        {
+          "property": "latency",
+          "value": 4,
+          "unit": "h"
+        },
+        {
+          "property": "recovery_window",
+          "value": 2,
+          "unit": "d"
+        }
+      ],
+      "missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset",
+        "business_schedule"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      },
+      "schema_errors": []
+    },
+    "DataContract/cc/contract/credit_card_txn.odcs.yaml": {
+      "sha256": "145c94d42d8e0e7faea58e940bedfc43210859328506dde81b26c77c419eef3b",
+      "parsed_sha256": "06773e78dd5ff9f8bf352cbfcc46023a545571509e31759786ca788c951baaa2",
+      "reality_lines_hex": [
+        "202023205245414c4954593a20627573696e6573735f646174653d323032362d30392d31312061727269766573204c41544520286f75747369646520746865206e6f726d616c"
+      ],
+      "sla": [
+        {
+          "property": "frequency",
+          "value": "daily"
+        },
+        {
+          "property": "latency",
+          "value": 4,
+          "unit": "h"
+        },
+        {
+          "property": "recovery_window",
+          "value": 2,
+          "unit": "d"
+        }
+      ],
+      "missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset",
+        "business_schedule"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      },
+      "schema_errors": []
+    },
+    "DataContract/cc/contract/customer.odcs.yaml": {
+      "sha256": "38813858c933deeb3db47dc87cb0c526a18cc9b3c95d06f3da603089a04bcb0b",
+      "parsed_sha256": "99638c2e9bde316778e34011f2cfa5ef19d3b1d65dfc45fa44ee855435a27e51",
+      "reality_lines_hex": [
+        "23206023205245414c4954593a602062656c6f77206172652074686520706c616e746564206c6965732e",
+        "232074686520746573742e204576657279206023205245414c4954593a60206c696e652062656c6f7720697320627974652d666f722d6279746520756e6368616e6765642e",
+        "202020202020202020202020225e5b302d395d7b31337d24222023205245414c4954593a206f6e6520726f77207065722066696c652069732022313233222e205468652067617465"
+      ],
+      "sla": [
+        {
+          "property": "frequency",
+          "value": "daily"
+        },
+        {
+          "property": "latency",
+          "value": 4,
+          "unit": "h"
+        },
+        {
+          "property": "recovery_window",
+          "value": 2,
+          "unit": "d"
+        }
+      ],
+      "missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset",
+        "business_schedule"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      },
+      "schema_errors": []
+    }
+  },
+  "probes": {
+    "root_calendar": {
+      "schema_errors": [
+        "Additional properties are not allowed ('calendar' was unexpected)"
+      ],
+      "calendar_missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset",
+        "business_schedule"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      }
+    },
+    "custom_calendar": {
+      "schema_errors": [],
+      "calendar_missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset",
+        "business_schedule"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      }
+    },
+    "explicit_null_legacy": {
+      "schema_errors": [],
+      "calendar_missing": [],
+      "calendar_errors": [
+        [
+          "timezone",
+          "'timezone' ต้องเป็น string ไม่ว่าง (ได้ None) — ไม่ตรวจชื่อ IANA จริง ผู้เขียน contract ต้องใส่ให้ถูกเอง",
+          "กำหนด timezone เป็น string ที่ไม่ว่าง เช่น timezone: Asia/Bangkok"
+        ],
+        [
+          "expected_at",
+          "'expected_at' ต้องเป็นเวลารูปแบบ HH:MM ช่วง 00:00–23:59 (ได้ None)",
+          "กำหนด expected_at เป็น string รูปแบบ HH:MM เช่น \"06:30\""
+        ],
+        [
+          "expected_day_offset",
+          "'expected_day_offset' ต้องเป็นจำนวนเต็ม >= 0 (ได้ None)",
+          "กำหนด expected_day_offset เป็นจำนวนเต็ม >= 0 เช่น 0 หรือ 1"
+        ],
+        [
+          "business_schedule",
+          "'business_schedule' ต้องเป็น object",
+          "กำหนด business_schedule เป็น object ตามรูปแบบ ODCS"
+        ]
+      ],
+      "compiled_calendar": {
+        "status": "COMPLETE",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      }
+    },
+    "wrong_list": {
+      "schema_errors": [],
+      "calendar_missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": "daily",
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": "2026-01-01",
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      }
+    },
+    "wrong_exception": {
+      "schema_errors": [],
+      "calendar_missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": "daily",
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": "2026-01-01",
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [
+          "not-a-date"
+        ],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": 14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      }
+    },
+    "negative_latency": {
+      "schema_errors": [],
+      "calendar_missing": [
+        "timezone",
+        "expected_at",
+        "expected_day_offset",
+        "business_schedule"
+      ],
+      "calendar_errors": [],
+      "compiled_calendar": {
+        "status": "PENDING_OWNER",
+        "schedule_type": null,
+        "timezone": null,
+        "expected_at": null,
+        "expected_day_offset": null,
+        "effective_from": null,
+        "effective_to": null,
+        "holidays": [],
+        "explicit_dates": [],
+        "exceptions": [],
+        "day_of_month": null,
+        "day_of_month_policy": null,
+        "missing_after_seconds": -14400,
+        "recovery_window_seconds": 172800,
+        "frequency": "daily"
+      }
+    }
+  },
+  "calendar_module_lines": 415,
+  "calendar_functions": [
+    {
+      "name": "_sla_entry",
+      "line": 34,
+      "end_line": 38,
+      "lines": 5
+    },
+    {
+      "name": "_custom_value",
+      "line": 41,
+      "end_line": 45,
+      "lines": 5
+    },
+    {
+      "name": "_parse_date",
+      "line": 48,
+      "end_line": 54,
+      "lines": 7
+    },
+    {
+      "name": "_duration_seconds",
+      "line": 57,
+      "end_line": 73,
+      "lines": 17
+    },
+    {
+      "name": "_check_timezone",
+      "line": 76,
+      "end_line": 93,
+      "lines": 18
+    },
+    {
+      "name": "_check_expected_at",
+      "line": 96,
+      "end_line": 113,
+      "lines": 18
+    },
+    {
+      "name": "_check_expected_day_offset",
+      "line": 116,
+      "end_line": 132,
+      "lines": 17
+    },
+    {
+      "name": "_check_recovery_window",
+      "line": 135,
+      "end_line": 161,
+      "lines": 27
+    },
+    {
+      "name": "_check_date_list",
+      "line": 164,
+      "end_line": 187,
+      "lines": 24
+    },
+    {
+      "name": "_check_schedule_type",
+      "line": 190,
+      "end_line": 198,
+      "lines": 9
+    },
+    {
+      "name": "_check_schedule_date_range",
+      "line": 201,
+      "end_line": 228,
+      "lines": 28
+    },
+    {
+      "name": "_check_day_of_month",
+      "line": 231,
+      "end_line": 259,
+      "lines": 29
+    },
+    {
+      "name": "_check_business_schedule",
+      "line": 262,
+      "end_line": 311,
+      "lines": 50
+    },
+    {
+      "name": "read_calendar",
+      "line": 314,
+      "end_line": 345,
+      "lines": 32
+    },
+    {
+      "name": "custom_property",
+      "line": 355,
+      "end_line": 364,
+      "lines": 10
+    },
+    {
+      "name": "has_custom_property",
+      "line": 367,
+      "end_line": 372,
+      "lines": 6
+    },
+    {
+      "name": "compiled_calendar",
+      "line": 375,
+      "end_line": 415,
+      "lines": 41
+    }
+  ],
+  "calendar_keys": [
+    "status",
+    "schedule_type",
+    "timezone",
+    "expected_at",
+    "expected_day_offset",
+    "effective_from",
+    "effective_to",
+    "holidays",
+    "explicit_dates",
+    "exceptions",
+    "day_of_month",
+    "day_of_month_policy",
+    "missing_after_seconds",
+    "recovery_window_seconds",
+    "frequency"
+  ],
+  "key_traces": {
+    "status": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 379,
+        "text": "runtime: `status`, `schedule_type`, `timezone`, `expected_at`, `expected_day_offset`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 385,
+        "text": "`status` is `PENDING_OWNER` whenever `read_calendar()` reports any missing field,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 400,
+        "text": "\"status\": \"PENDING_OWNER\" if missing else \"COMPLETE\","
+      },
+      {
+        "path": "src/mdf/diff.py",
+        "line": 227,
+        "text": "# FR-M.11 (P1): calendar changes (status/schedule/latency/recovery_window) -- also"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 108,
+        "text": "status = _git([\"status\", \"--porcelain\", \"--untracked-files=all\"], repo)"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 109,
+        "text": "return {\"commit\": head.strip(), \"dirty\": status is None or status.strip() != \"\"}"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 141,
+        "text": "status = contract.get(\"status\")"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 142,
+        "text": "if status != \"active\":"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 143,
+        "text": "bad.append(f\"{ds.source}.{ds.dataset} (status={status!r})\")"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 172,
+        "text": "- any contract status is not 'active'                (checked when base_dir is given)"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 199,
+        "text": "\"commit หรือ stash ก่อน แล้วค่อยรัน --release (ดู `git status`)\""
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 206,
+        "text": "\"[RELEASE_GATE] contract ที่ status ไม่ใช่ 'active' ห้าม release: \" + \", \".join(inactive)"
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 224,
+        "text": "\"status\": \"PASS\" if report.is_valid else \"FAIL\","
+      },
+      {
+        "path": "src/mdf/package.py",
+        "line": 600,
+        "text": "\"status\": \"OK\","
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 226,
+        "text": "def test_ac52_compiled_calendar_complete_status_and_sorted_lists(project):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 227,
+        "text": "\"\"\"AC-52 (T-55): a contract with every calendar field present compiles `calendar.status`"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 246,
+        "text": "assert calendar[\"status\"] == \"COMPLETE\""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 263,
+        "text": "assert bronze[\"calendar\"][\"status\"] == \"COMPLETE\""
+      },
+      {
+        "path": "tests/test_loading.py",
+        "line": 44,
+        "text": "status: active"
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 150,
+        "text": "assert \"status: active\" in text"
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 151,
+        "text": "contract.write_text(text.replace(\"status: active\", \"status: draft\", 1), encoding=\"utf-8\")"
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 225,
+        "text": "assert verify_package(\"pkg\")[\"status\"] == \"OK\""
+      },
+      {
+        "path": "tests/test_package.py",
+        "line": 38,
+        "text": "assert result[\"status\"] == \"OK\""
+      },
+      {
+        "path": "tests/test_package.py",
+        "line": 161,
+        "text": "assert result[\"status\"] == \"OK\""
+      },
+      {
+        "path": "tests/test_package.py",
+        "line": 169,
+        "text": "assert result[\"status\"] == \"OK\""
+      },
+      {
+        "path": "tests/test_package.py",
+        "line": 371,
+        "text": "assert result[\"status\"] == \"OK\""
+      },
+      {
+        "path": "tests/test_package.py",
+        "line": 535,
+        "text": "assert result[\"status\"] == \"OK\""
+      },
+      {
+        "path": "tests/test_package.py",
+        "line": 558,
+        "text": "assert result[\"status\"] == \"OK\""
+      },
+      {
+        "path": "tests/test_release_workflow.py",
+        "line": 223,
+        "text": "\"\"\"HRM correction #2 (H-115): list = compiled `calendar.status`, contracts NOT re-parsed.\"\"\""
+      },
+      {
+        "path": "tests/test_release_workflow.py",
+        "line": 226,
+        "text": "assert '\"status\") == \"PENDING_OWNER\"' in run"
+      },
+      {
+        "path": "tests/test_release_workflow.py",
+        "line": 248,
+        "text": "def _resolved(root: Path, source: str, dataset: str, layer: str, status: str) -> None:"
+      },
+      {
+        "path": "tests/test_release_workflow.py",
+        "line": 255,
+        "text": "\"calendar\": {\"status\": status},"
+      },
+      {
+        "path": "tests/test_validation.py",
+        "line": 93,
+        "text": "status: active"
+      },
+      {
+        "path": "tests/fakes/fake_databricks.py",
+        "line": 178,
+        "text": "\"status\": {\"state\": \"SUCCEEDED\"},"
+      },
+      {
+        "path": ".github/workflows/release.yml",
+        "line": 117,
+        "text": "# `calendar.status` already compiled into the package's `*.resolved.json` (the same"
+      },
+      {
+        "path": ".github/workflows/release.yml",
+        "line": 131,
+        "text": "if (cfg.get(\"calendar\") or {}).get(\"status\") == \"PENDING_OWNER\":"
+      },
+      {
+        "path": "../../Medallion/framework/bronze_cc.py",
+        "line": 96,
+        "text": "RUN_RESULT_PLAN = record_run_result(RUN_CONTEXT, {\"status\": \"ACCEPTED\"})"
+      },
+      {
+        "path": "../../Medallion/framework/silver_cc.py",
+        "line": 115,
+        "text": "\"Review {} source columns; runtime status: {}\".format("
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 310,
+        "text": "\"status\": \"ABSTRACT\","
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 325,
+        "text": "\"transformations\": [\"preserve_raw_value_and_parse_status\"],"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 333,
+        "text": "\"status\": \"ABSTRACT\","
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 362,
+        "text": "status = result.get(\"status\")"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 363,
+        "text": "if status is not None and status not in _RUN_STATUSES:"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 364,
+        "text": "raise ValueError(\"run status is not one of the documented outcomes\")"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 367,
+        "text": "\"status\": \"ABSTRACT\","
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 369,
+        "text": "\"recognized_statuses\": list(_RUN_STATUSES),"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 371,
+        "text": "\"status_to_record\": status,"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_silver.py",
+        "line": 193,
+        "text": "\"status\": \"ABSTRACT\","
+      },
+      {
+        "path": "../../Medallion/tests/test_phase1_notebook_contracts.py",
+        "line": 111,
+        "text": "self.assertEqual(plan[\"status\"], \"ABSTRACT\")"
+      },
+      {
+        "path": "../../Medallion/tests/test_phase1_notebook_contracts.py",
+        "line": 127,
+        "text": "plan = record_run_result(self.context, {\"status\": \"MISSING\"})"
+      },
+      {
+        "path": "../../Medallion/tests/test_phase1_notebook_contracts.py",
+        "line": 130,
+        "text": "plan[\"recognized_statuses\"],"
+      }
+    ],
+    "schedule_type": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 190,
+        "text": "def _check_schedule_type(sched_type: Any, errors: list[CalendarError]) -> None:"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 282,
+        "text": "_check_schedule_type(sched_type, errors)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 379,
+        "text": "runtime: `status`, `schedule_type`, `timezone`, `expected_at`, `expected_day_offset`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 401,
+        "text": "\"schedule_type\": schedule.get(\"type\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 250,
+        "text": "assert calendar[\"schedule_type\"] == \"daily\""
+      }
+    ],
+    "timezone": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 5,
+        "text": "`customProperties.timezone`/`expected_day_offset`/`business_schedule`)."
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 12,
+        "text": "OQ-TRI-12a (closed): no IANA timezone check -- `timezone` only needs to be a"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 76,
+        "text": "def _check_timezone("
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 79,
+        "text": "value = _custom_value(contract, \"timezone\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 81,
+        "text": "missing.append(\"timezone\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 86,
+        "text": "\"timezone\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 87,
+        "text": "f\"'timezone' ต้องเป็น string ไม่ว่าง (ได้ {value!r}) — ไม่ตรวจชื่อ IANA จริง \""
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 89,
+        "text": "\"กำหนด timezone เป็น string ที่ไม่ว่าง เช่น timezone: Asia/Bangkok\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 331,
+        "text": "timezone = _check_timezone(contract, missing, errors)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 338,
+        "text": "\"timezone\": timezone,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 379,
+        "text": "runtime: `status`, `schedule_type`, `timezone`, `expected_at`, `expected_day_offset`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 402,
+        "text": "\"timezone\": calendar.get(\"timezone\"),"
+      },
+      {
+        "path": "src/mdf/validation.py",
+        "line": 243,
+        "text": "fix=\"ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, \""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 63,
+        "text": "def _mut_timezone_not_string(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 64,
+        "text": "_set_custom(c, \"timezone\", 123)"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 67,
+        "text": "def _mut_timezone_empty(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 68,
+        "text": "_set_custom(c, \"timezone\", \"   \")"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 136,
+        "text": "(\"timezone_not_string\", _mut_timezone_not_string, \"timezone\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 137,
+        "text": "(\"timezone_empty\", _mut_timezone_empty, \"timezone\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 191,
+        "text": "assert \"expected_at\" in out and \"timezone\" in out"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 194,
+        "text": "def test_r29_bogus_iana_timezone_name_passes_validate(project):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 197,
+        "text": "_set_custom(contract, \"timezone\", \"Asia/Bangkokk\")"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 209,
+        "text": "_set_custom(contract, \"timezone\", \"Asia/Bangkok\")"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 236,
+        "text": "_set_custom(contract, \"timezone\", \"Asia/Bangkok\")"
+      },
+      {
+        "path": "../../Medallion/framework/bronze_cc.py",
+        "line": 68,
+        "text": "# MAGIC Frequency and grace period come from ODCS. A timezone or expected cutoff"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 24,
+        "text": "\"\"\"Validate and return an ISO business date without timezone conversion.\"\"\""
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 276,
+        "text": "\"\"\"Describe date resolution from ODCS without guessing timezone or cutoff.\"\"\""
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 282,
+        "text": "timezone = _property_value(custom, \"timezone\")"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 294,
+        "text": "field for field, value in ((\"timezone\", timezone), (\"expected_at\", expected_at)) if value is None"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 296,
+        "text": "\"note\": \"No calendar, cutoff, or timezone is inferred from this sample contract.\","
+      },
+      {
+        "path": "../../Medallion/tests/test_phase1_notebook_contracts.py",
+        "line": 95,
+        "text": "def test_date_plan_does_not_invent_missing_timezone_or_cutoff(self):"
+      },
+      {
+        "path": "../../Medallion/tests/test_phase1_notebook_contracts.py",
+        "line": 104,
+        "text": "self.assertIn(\"timezone\", plan[\"open_contract_fields\"])"
+      }
+    ],
+    "expected_at": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 4,
+        "text": "(`slaProperties.expected_at`/`recovery_window`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 96,
+        "text": "def _check_expected_at("
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 99,
+        "text": "entry = _sla_entry(contract, \"expected_at\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 101,
+        "text": "missing.append(\"expected_at\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 107,
+        "text": "\"expected_at\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 108,
+        "text": "f\"'expected_at' ต้องเป็นเวลารูปแบบ HH:MM ช่วง 00:00–23:59 (ได้ {value!r})\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 109,
+        "text": "'กำหนด expected_at เป็น string รูปแบบ HH:MM เช่น \"06:30\"',"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 332,
+        "text": "expected_at = _check_expected_at(contract, missing, errors)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 339,
+        "text": "\"expected_at\": expected_at,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 379,
+        "text": "runtime: `status`, `schedule_type`, `timezone`, `expected_at`, `expected_day_offset`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 403,
+        "text": "\"expected_at\": calendar.get(\"expected_at\"),"
+      },
+      {
+        "path": "src/mdf/validation.py",
+        "line": 243,
+        "text": "fix=\"ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, \""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 71,
+        "text": "def _mut_expected_at_bad(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 72,
+        "text": "_set_sla(c, \"expected_at\", \"25:00\")"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 138,
+        "text": "(\"expected_at_bad\", _mut_expected_at_bad, \"expected_at\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 191,
+        "text": "assert \"expected_at\" in out and \"timezone\" in out"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 212,
+        "text": "_set_sla(contract, \"expected_at\", \"06:30\")"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 241,
+        "text": "_set_sla(contract, \"expected_at\", \"06:30\")"
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 256,
+        "text": "'  - property: expected_at\\n    value: \"25:00\"\\n',"
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 259,
+        "text": "assert '  - property: expected_at\\n    value: \"25:00\"\\n' in text"
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 261,
+        "text": "_git(clean_repo, \"commit\", \"-q\", \"-am\", \"bad expected_at\")"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 280,
+        "text": "expected_at = _property_value(contract.get(\"slaProperties\"), \"expected_at\")"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 289,
+        "text": "\"missing_at\": \"cutoff plus ODCS latency; unresolved until expected_at is supplied\","
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 294,
+        "text": "field for field, value in ((\"timezone\", timezone), (\"expected_at\", expected_at)) if value is None"
+      },
+      {
+        "path": "../../Medallion/tests/test_phase1_notebook_contracts.py",
+        "line": 105,
+        "text": "self.assertIn(\"expected_at\", plan[\"open_contract_fields\"])"
+      }
+    ],
+    "expected_day_offset": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 5,
+        "text": "`customProperties.timezone`/`expected_day_offset`/`business_schedule`)."
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 116,
+        "text": "def _check_expected_day_offset("
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 119,
+        "text": "value = _custom_value(contract, \"expected_day_offset\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 121,
+        "text": "missing.append(\"expected_day_offset\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 126,
+        "text": "\"expected_day_offset\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 127,
+        "text": "f\"'expected_day_offset' ต้องเป็นจำนวนเต็ม >= 0 (ได้ {value!r})\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 128,
+        "text": "\"กำหนด expected_day_offset เป็นจำนวนเต็ม >= 0 เช่น 0 หรือ 1\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 333,
+        "text": "expected_day_offset = _check_expected_day_offset(contract, missing, errors)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 340,
+        "text": "\"expected_day_offset\": expected_day_offset,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 379,
+        "text": "runtime: `status`, `schedule_type`, `timezone`, `expected_at`, `expected_day_offset`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 404,
+        "text": "\"expected_day_offset\": calendar.get(\"expected_day_offset\"),"
+      },
+      {
+        "path": "src/mdf/validation.py",
+        "line": 244,
+        "text": "\"expected_day_offset, recovery_window, business_schedule) ใน contract\","
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 75,
+        "text": "def _mut_expected_day_offset_negative(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 76,
+        "text": "_set_custom(c, \"expected_day_offset\", -1)"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 139,
+        "text": "(\"expected_day_offset_negative\", _mut_expected_day_offset_negative, \"expected_day_offset\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 210,
+        "text": "_set_custom(contract, \"expected_day_offset\", 0)"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 237,
+        "text": "_set_custom(contract, \"expected_day_offset\", 0)"
+      }
+    ],
+    "effective_from": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 205,
+        "text": "\"business_schedule.effective_from\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 206,
+        "text": "f\"'effective_from' ต้องเป็นวันที่ YYYY-MM-DD (ได้ {from_date!r})\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 207,
+        "text": "\"กำหนด effective_from เป็นวันที่รูปแบบ YYYY-MM-DD\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 225,
+        "text": "f\"'effective_to' ({to_date}) ต้องไม่น้อยกว่า 'effective_from' ({from_date})\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 226,
+        "text": "\"แก้ effective_to ให้ไม่น้อยกว่า effective_from\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 280,
+        "text": "from_date = value.get(\"effective_from\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 304,
+        "text": "\"effective_from\": from_date,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 380,
+        "text": "`effective_from`, `effective_to`, `holidays`, `explicit_dates`, `exceptions`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 405,
+        "text": "\"effective_from\": schedule.get(\"effective_from\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 56,
+        "text": "\"effective_from\": \"2026-01-01\","
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 93,
+        "text": "sched[\"effective_from\"] = \"2026-02-01\""
+      }
+    ],
+    "effective_to": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 216,
+        "text": "\"business_schedule.effective_to\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 217,
+        "text": "f\"'effective_to' ต้องเป็นวันที่ YYYY-MM-DD (ได้ {to_date!r})\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 218,
+        "text": "\"กำหนด effective_to เป็นวันที่รูปแบบ YYYY-MM-DD\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 224,
+        "text": "\"business_schedule.effective_to\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 225,
+        "text": "f\"'effective_to' ({to_date}) ต้องไม่น้อยกว่า 'effective_from' ({from_date})\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 226,
+        "text": "\"แก้ effective_to ให้ไม่น้อยกว่า effective_from\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 281,
+        "text": "to_date = value.get(\"effective_to\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 305,
+        "text": "\"effective_to\": to_date,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 380,
+        "text": "`effective_from`, `effective_to`, `holidays`, `explicit_dates`, `exceptions`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 406,
+        "text": "\"effective_to\": schedule.get(\"effective_to\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 57,
+        "text": "\"effective_to\": \"2026-12-31\","
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 91,
+        "text": "def _mut_effective_to_before_from(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 94,
+        "text": "sched[\"effective_to\"] = \"2026-01-01\""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 142,
+        "text": "(\"effective_to_before_from\", _mut_effective_to_before_from, \"effective_to\"),"
+      }
+    ],
+    "holidays": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 24,
+        "text": "\"workday_excluding_holidays\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 285,
+        "text": "holidays = _check_date_list(value.get(\"holidays\", []), \"business_schedule.holidays\", errors)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 306,
+        "text": "\"holidays\": holidays,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 380,
+        "text": "`effective_from`, `effective_to`, `holidays`, `explicit_dates`, `exceptions`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 407,
+        "text": "\"holidays\": schedule.get(\"holidays\") or [],"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 58,
+        "text": "\"holidays\": [\"2026-01-01\"],"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 81,
+        "text": "sched[\"holidays\"] = [\"2026-01-01\", \"2026-01-01\"]"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 87,
+        "text": "sched[\"holidays\"] = [\"2026/01/01\"]"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 140,
+        "text": "(\"holiday_duplicate\", _mut_holiday_duplicate, \"holidays\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 141,
+        "text": "(\"date_not_iso\", _mut_date_not_iso, \"holidays\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 239,
+        "text": "schedule[\"holidays\"] = sorted([\"2026-01-01\", \"2026-04-13\"])  # must already be sorted"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 249,
+        "text": "assert calendar[\"holidays\"] == sorted(calendar[\"holidays\"])"
+      }
+    ],
+    "explicit_dates": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 26,
+        "text": "\"explicit_dates\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 286,
+        "text": "explicit_dates = _check_date_list("
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 287,
+        "text": "value.get(\"explicit_dates\", []), \"business_schedule.explicit_dates\", errors"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 289,
+        "text": "if sched_type == \"explicit_dates\" and not explicit_dates:"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 292,
+        "text": "\"business_schedule.explicit_dates\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 293,
+        "text": "\"type เป็น 'explicit_dates' แต่ 'explicit_dates' ว่างหรือไม่มี\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 294,
+        "text": "\"เพิ่มรายการวันที่ลงใน explicit_dates\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 307,
+        "text": "\"explicit_dates\": explicit_dates,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 380,
+        "text": "`effective_from`, `effective_to`, `holidays`, `explicit_dates`, `exceptions`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 408,
+        "text": "\"explicit_dates\": schedule.get(\"explicit_dates\") or [],"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 59,
+        "text": "\"explicit_dates\": [],"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 113,
+        "text": "def _mut_explicit_dates_empty(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 115,
+        "text": "sched[\"type\"] = \"explicit_dates\""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 116,
+        "text": "sched[\"explicit_dates\"] = []"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 145,
+        "text": "(\"explicit_dates_empty\", _mut_explicit_dates_empty, \"explicit_dates\"),"
+      }
+    ],
+    "exceptions": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 308,
+        "text": "\"exceptions\": value.get(\"exceptions\", []) or [],"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 380,
+        "text": "`effective_from`, `effective_to`, `holidays`, `explicit_dates`, `exceptions`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 409,
+        "text": "\"exceptions\": schedule.get(\"exceptions\") or [],"
+      }
+    ],
+    "day_of_month": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 25,
+        "text": "\"day_of_month\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 231,
+        "text": "def _check_day_of_month("
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 233,
+        "text": "day_of_month: Any,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 234,
+        "text": "day_of_month_policy: Any,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 237,
+        "text": "if sched_type != \"day_of_month\":"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 240,
+        "text": "not isinstance(day_of_month, bool)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 241,
+        "text": "and isinstance(day_of_month, int)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 242,
+        "text": "and 1 <= day_of_month <= 31"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 247,
+        "text": "\"business_schedule.day_of_month\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 248,
+        "text": "f\"'day_of_month' ต้องเป็นจำนวนเต็ม 1–31 (ได้ {day_of_month!r})\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 249,
+        "text": "\"กำหนด day_of_month เป็นจำนวนเต็มช่วง 1–31\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 252,
+        "text": "if not day_of_month_policy:"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 255,
+        "text": "\"business_schedule.day_of_month_policy\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 256,
+        "text": "\"type เป็น 'day_of_month' แต่ไม่มี 'day_of_month_policy'\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 257,
+        "text": "\"เพิ่ม day_of_month_policy เช่น last_business_day\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 298,
+        "text": "day_of_month = value.get(\"day_of_month\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 299,
+        "text": "day_of_month_policy = value.get(\"day_of_month_policy\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 300,
+        "text": "_check_day_of_month(sched_type, day_of_month, day_of_month_policy, errors)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 309,
+        "text": "\"day_of_month\": day_of_month,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 310,
+        "text": "\"day_of_month_policy\": day_of_month_policy,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 381,
+        "text": "`day_of_month`, `day_of_month_policy`, `missing_after_seconds`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 410,
+        "text": "\"day_of_month\": schedule.get(\"day_of_month\"),"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 411,
+        "text": "\"day_of_month_policy\": schedule.get(\"day_of_month_policy\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 98,
+        "text": "def _mut_day_of_month_32(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 100,
+        "text": "sched[\"type\"] = \"day_of_month\""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 101,
+        "text": "sched[\"day_of_month\"] = 32"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 102,
+        "text": "sched[\"day_of_month_policy\"] = \"last_business_day\""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 106,
+        "text": "def _mut_day_of_month_missing_policy(c):"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 108,
+        "text": "sched[\"type\"] = \"day_of_month\""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 109,
+        "text": "sched[\"day_of_month\"] = 15"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 143,
+        "text": "(\"day_of_month_32\", _mut_day_of_month_32, \"day_of_month\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 144,
+        "text": "(\"day_of_month_missing_policy\", _mut_day_of_month_missing_policy, \"day_of_month_policy\"),"
+      }
+    ],
+    "day_of_month_policy": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 234,
+        "text": "day_of_month_policy: Any,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 252,
+        "text": "if not day_of_month_policy:"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 255,
+        "text": "\"business_schedule.day_of_month_policy\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 256,
+        "text": "\"type เป็น 'day_of_month' แต่ไม่มี 'day_of_month_policy'\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 257,
+        "text": "\"เพิ่ม day_of_month_policy เช่น last_business_day\","
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 299,
+        "text": "day_of_month_policy = value.get(\"day_of_month_policy\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 300,
+        "text": "_check_day_of_month(sched_type, day_of_month, day_of_month_policy, errors)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 310,
+        "text": "\"day_of_month_policy\": day_of_month_policy,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 381,
+        "text": "`day_of_month`, `day_of_month_policy`, `missing_after_seconds`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 411,
+        "text": "\"day_of_month_policy\": schedule.get(\"day_of_month_policy\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 102,
+        "text": "sched[\"day_of_month_policy\"] = \"last_business_day\""
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 144,
+        "text": "(\"day_of_month_missing_policy\", _mut_day_of_month_missing_policy, \"day_of_month_policy\"),"
+      }
+    ],
+    "missing_after_seconds": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 342,
+        "text": "\"missing_after_seconds\": latency_seconds,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 381,
+        "text": "`day_of_month`, `day_of_month_policy`, `missing_after_seconds`,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 412,
+        "text": "\"missing_after_seconds\": calendar.get(\"missing_after_seconds\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 228,
+        "text": "= COMPLETE, `missing_after_seconds`/`recovery_window_seconds` derived from slaProperties"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 247,
+        "text": "assert calendar[\"missing_after_seconds\"] == 14400  # latency 4h * 3600, not hardcoded"
+      }
+    ],
+    "recovery_window_seconds": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 334,
+        "text": "recovery_window_seconds = _check_recovery_window(contract, missing, errors, latency_seconds)"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 343,
+        "text": "\"recovery_window_seconds\": recovery_window_seconds,"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 382,
+        "text": "`recovery_window_seconds`, `frequency`."
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 413,
+        "text": "\"recovery_window_seconds\": calendar.get(\"recovery_window_seconds\"),"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 228,
+        "text": "= COMPLETE, `missing_after_seconds`/`recovery_window_seconds` derived from slaProperties"
+      },
+      {
+        "path": "tests/test_calendar.py",
+        "line": 248,
+        "text": "assert calendar[\"recovery_window_seconds\"] == 172800  # recovery_window 2d * 86400"
+      }
+    ],
+    "frequency": [
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 382,
+        "text": "`recovery_window_seconds`, `frequency`."
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 396,
+        "text": "frequency_entry = _sla_entry(contract, \"frequency\")"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 397,
+        "text": "frequency = frequency_entry.get(\"value\") if frequency_entry else None"
+      },
+      {
+        "path": "src/mdf/calendar.py",
+        "line": 414,
+        "text": "\"frequency\": frequency,"
+      },
+      {
+        "path": "tests/test_diff.py",
+        "line": 128,
+        "text": "base[\"slaProperties\"] = [{\"property\": \"frequency\", \"value\": \"daily\"}]"
+      },
+      {
+        "path": "tests/test_diff.py",
+        "line": 131,
+        "text": "{\"property\": \"frequency\", \"value\": \"daily\"},"
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 254,
+        "text": "\"slaProperties:\\n  - property: frequency\\n    value: daily\\n\","
+      },
+      {
+        "path": "tests/test_manifest_release.py",
+        "line": 255,
+        "text": "\"slaProperties:\\n  - property: frequency\\n    value: daily\\n\""
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 277,
+        "text": "schedule = _property_value(contract.get(\"slaProperties\"), \"frequency\")"
+      },
+      {
+        "path": "../../Medallion/framework/_shared_helpers_bronze.py",
+        "line": 286,
+        "text": "\"schedule_frequency\": schedule,"
+      }
+    ]
+  },
+  "schema_root_additionalProperties": false,
+  "schema_root_keys": [
+    "apiVersion",
+    "authoritativeDefinitions",
+    "contractCreatedTs",
+    "customProperties",
+    "dataProduct",
+    "description",
+    "domain",
+    "id",
+    "kind",
+    "name",
+    "price",
+    "roles",
+    "schema",
+    "servers",
+    "slaDefaultElement",
+    "slaProperties",
+    "status",
+    "support",
+    "tags",
+    "team",
+    "tenant",
+    "version"
+  ],
+  "sibling_path": "E:\\OneDrive - Thammasat University\\เดสก์ท็อป\\datalake\\Medallion",
+  "sibling_exists": true
+}

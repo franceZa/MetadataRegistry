@@ -1,0 +1,6 @@
+$ uv run mdf diff --base HEAD
+✅ ไม่พบความแตกต่างจาก baseline (no diff)
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

@@ -1,0 +1,6 @@
+$ uv run pytest tests/test_calendar.py -q
+.......................                                                  [100%]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

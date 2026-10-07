@@ -9,7 +9,7 @@
 #
 # ไฟล์นี้เก็บเฉพาะ "สิ่งที่ต้นทางรับปาก" (schema, ประเภทข้อมูล PDPA/PCI, SLA, ที่วางไฟล์)
 # ห้ามใส่: derived column, dedup, business rule, retention -> ไปใส่ในไฟล์ pipeline
-# กฎทั้งหมดที่ใช้ตรวจอยู่ที่ metadata/_rules/rules.yaml
+# DQ library: config/dq_library.yaml; structural rules: config/rules/*.rules.json
 # =============================================================================
 
 apiVersion: v3.0.2 # ห้ามเปลี่ยน
@@ -28,7 +28,7 @@ team:
   - username: source-system-owner # ทีมหรือระบบต้นทาง
     role: owner
 
-# ที่วางไฟล์ (landing) — 1 รายการต่อ 1 env ที่มีใน metadata/env/*.yaml
+# ที่วางไฟล์ (landing) — 1 รายการต่อ 1 env ที่มีใน config/env/*.yaml
 servers:
   - server: landing-dev
     environment: dev
@@ -36,14 +36,23 @@ servers:
     format: csv # csv | json | jsonl | parquet
     location: "/Volumes/{catalog}/landing_{source}/files/my_dataset/"
 
+# Calendar: slaProperties เท่านั้น; เวลาทั้งหมดเป็นเวลาไทย
+# Medallion คำนวณ expected date จาก mode และปฏิทินวันหยุดของ runtime
 slaProperties:
-  - property: frequency
-    value: daily # daily | hourly | weekly | monthly
-  - property: latency # grace period ก่อนถือว่าไฟล์หาย
-    value: 4
-    unit: h # m | h | d
-  # - property: expected_at   # optional: เวลาที่คาดว่าไฟล์จะมาถึง (HH:MM)
-  #   value: "02:00"
+  - property: schedule_type
+    value: null       # daily | workday | workday_excluding_holidays | monthly
+  - property: day_of_month
+    value: null       # ใช้เฉพาะ schedule_type = monthly: วันที่ 1–31 (null ถ้าไม่ใช่ monthly)
+  - property: expected_at
+    value: null       # "HH:MM" เวลาไทยที่ไฟล์ควรมาถึง เช่น "06:30"
+  - property: business_date_lag
+    value: null       # 0 = ไฟล์ของวันที่รัน, -1 = ไฟล์ปิดยอดของเมื่อวาน (T-1); ต้อง <= 0
+  - property: latency
+    value: 4          # ไฟล์มาช้าได้เท่าไรก่อนถือว่าหาย
+    unit: h           # h | d
+  - property: recovery_window
+    value: null       # รอไฟล์ได้นานสุดก่อนหยุด poll
+    unit: d           # h | d
 
 customProperties:
   - property: source_system

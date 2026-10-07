@@ -5,7 +5,7 @@ from typing import Any
 
 import jsonschema
 
-from mdf.calendar import custom_property, has_custom_property, read_calendar
+from mdf.calendar import compiled_calendar, custom_property, has_custom_property
 from mdf.dq import DQLibrary, DQValidationError, resolve_column_dq_rules
 from mdf.loading import (
     DiscoveryError,
@@ -233,15 +233,14 @@ def validate_contract_file(
                                 )
 
     # 4. Calendar fields (FR-M.1, FR-M.2, FR-M.4 · T-54) — single source of truth: mdf.calendar
-    _, missing, calendar_errors = read_calendar(data)
+    _, missing, calendar_errors = compiled_calendar(data)
     if missing:
         report.add_warning(
             code="CALENDAR_PENDING_OWNER",
             message="ยังไม่ได้กำหนดฟิลด์ calendar: " + ", ".join(missing),
             file_path=path_str,
             field=", ".join(missing),
-            fix="ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, "
-            "expected_day_offset, recovery_window, business_schedule) ใน contract",
+            fix="ให้ owner ของ dataset กำหนดค่า " + ", ".join(missing) + " ใน slaProperties",
         )
     for field_name, message, fix in calendar_errors:
         report.add_error(

@@ -205,7 +205,7 @@ def compile_project(
 
         # FR-M.3/FR-M.5: computed ONCE per dataset so bronze and silver get the
         # exact same object (compared byte-for-byte via json.dumps(sort_keys=True)).
-        calendar = compiled_calendar(contract)
+        calendar, _, _ = compiled_calendar(contract)
         reader = build_reader(contract, env)
 
         for layer in ("bronze", "silver"):
