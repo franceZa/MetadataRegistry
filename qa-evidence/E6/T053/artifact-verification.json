@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "release_id": "mdf-b255065b505d",
+  "manifest_version": 3,
+  "manifest_sha256": "4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f",
+  "zip_sha256": "6b5ec9d560790cc1242b4d792fa03dd9511cec388e7ce6882c1b9d06324f7cf8",
+  "files": [
+    "cc/bronze.cc.credit_card.resolved.json",
+    "cc/bronze.cc.credit_card_txn.resolved.json",
+    "cc/bronze.cc.customer.resolved.json",
+    "cc/credit_card.odcs.yaml",
+    "cc/credit_card_txn.odcs.yaml",
+    "cc/customer.odcs.yaml",
+    "cc/silver.cc.credit_card.resolved.json",
+    "cc/silver.cc.credit_card_txn.resolved.json",
+    "cc/silver.cc.customer.resolved.json",
+    "manifest.json",
+    "validation-report.json"
+  ],
+  "file_count": 9,
+  "zip_volume_bytes_match": true,
+  "final_active_release": [
+    "mdf-b255065b505d",
+    "u2m",
+    "2026-10-05 15:43:01.327298"
+  ]
+}

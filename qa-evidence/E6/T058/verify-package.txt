@@ -1,0 +1,6 @@
+$ uv run mdf verify-package build/dev/release
+✅ package ผ่านการตรวจสอบ (OK): env=dev, files=9, release_id=mdf-5fe91614735b, manifest_sha256=5818b634a9f51cf0205433caa44edbd62698f815283b2d1a711a7c179cd29eb0
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

@@ -5,6 +5,7 @@ working tree is never modified.
 """
 
 import json
+import re
 import shutil
 import subprocess  # nosec B404
 from pathlib import Path
@@ -226,20 +227,43 @@ def test_verify_needs_no_source_checkout(clean_repo, tmp_path, monkeypatch):
 
 
 # ---------- AC-54 (release-gate warning portion · T-54) ----------
+# Fixtures set their own calendar values so these tests do not depend on which real
+# datasets the owners have completed (H-128 F1).
+
+
+def _set_sla(repo: Path, dataset: str, prop: str, value: str) -> None:
+    contract = repo / "DataContract" / "cc" / "contract" / f"{dataset}.odcs.yaml"
+    text = contract.read_text(encoding="utf-8")
+    new, n = re.subn(
+        rf"(- property: {prop}\r?\n\s+value: )[^#\r\n]*", rf"\g<1>{value} ", text, count=1
+    )
+    assert n == 1, f"{prop} entry not found in {contract.name}"
+    contract.write_text(new, encoding="utf-8")
+    _git(repo, "commit", "-q", "-am", f"{dataset} {prop}={value}")
 
 
 def test_ac54_release_gate_passes_with_calendar_pending_owner_warning(clean_repo, capsys):
-    """cc contracts have no calendar fields yet -> gate still passes (warning, not error)."""
+    """A dataset with a null owner value -> gate still passes (warning, not error)."""
+    _set_sla(clean_repo, "customer", "expected_at", "null")
     pkg = build_package(env="dev", release=True)
     assert pkg.exists()
     out = capsys.readouterr().out
-    assert "[WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer" in out
+    assert "[WARN] calendar PENDING_OWNER:" in out
+    assert "cc.customer" in out
 
 
 def test_ac54_cli_package_release_prints_pending_owner_warning(clean_repo, capsys):
+    _set_sla(clean_repo, "customer", "expected_at", "null")
     assert main(["package", "--env", "dev", "--release"]) == 0
     out = capsys.readouterr().out
-    assert "[WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer" in out
+    assert "[WARN] calendar PENDING_OWNER:" in out
+    assert "cc.customer" in out
+
+
+def test_ac54_all_complete_prints_no_pending_line(clean_repo, capsys):
+    """Owners confirmed all 3 cc calendars (2026-10-06) -> no PENDING_OWNER line at all."""
+    build_package(env="dev", release=True)
+    assert "PENDING_OWNER" not in capsys.readouterr().out
 
 
 def test_ac54_malformed_calendar_still_refuses_release_not_warning(clean_repo):
@@ -248,17 +272,7 @@ def test_ac54_malformed_calendar_still_refuses_release_not_warning(clean_repo):
     compile_project() validates first (FR-D.1) and raises before the release gate even
     writes anything — so the exception here is RuntimeError, not ReleaseGateError.
     """
-    contract = next((clean_repo / "DataContract" / "cc" / "contract").glob("credit_card.odcs.yaml"))
-    text = contract.read_text(encoding="utf-8")
-    text = text.replace(
-        "slaProperties:\n  - property: frequency\n    value: daily\n",
-        "slaProperties:\n  - property: frequency\n    value: daily\n"
-        '  - property: expected_at\n    value: "25:00"\n',
-        1,
-    )
-    assert '  - property: expected_at\n    value: "25:00"\n' in text
-    contract.write_text(text, encoding="utf-8")
-    _git(clean_repo, "commit", "-q", "-am", "bad expected_at")
+    _set_sla(clean_repo, "credit_card", "expected_at", '"25:00"')
     with pytest.raises(RuntimeError) as e:
         build_package(env="dev", release=True)
     assert "CALENDAR_INVALID" in str(e.value)

@@ -1,0 +1,142 @@
+{
+  "status": "PASS",
+  "backup_sha256": "4f07413bed046968e77a758c322750a03f9cf5a097afb264f9219314f34be712",
+  "backup_bytes": 279117,
+  "backup_lines": 1518,
+  "live_bytes": 24220,
+  "live_lines": 121,
+  "reduction_percent": 91.32,
+  "id_census": {
+    "total_unique_ids": 526,
+    "active_obligation_count": 419,
+    "counts": {
+      "relocate": 400,
+      "supersede": 7,
+      "archive": 100,
+      "retain": 19
+    }
+  },
+  "active_archive_count": 0,
+  "contracts": {
+    "DataContract/_template/contract/my_dataset.odcs.yaml": {
+      "parsed_payload_matches_HEAD": true,
+      "reality_lines_unchanged": true,
+      "calendar_output_unchanged": true,
+      "odcs_schema_pass": true,
+      "staged_odcs_schema_pass": true,
+      "staged_one_calendar_source": true,
+      "staged_unknown_owner_null": true,
+      "staged_noncalendar_unchanged": true
+    },
+    "DataContract/cc/contract/credit_card.odcs.yaml": {
+      "parsed_payload_matches_HEAD": true,
+      "reality_lines_unchanged": true,
+      "calendar_output_unchanged": true,
+      "odcs_schema_pass": true,
+      "staged_odcs_schema_pass": true,
+      "staged_one_calendar_source": true,
+      "staged_unknown_owner_null": true,
+      "staged_noncalendar_unchanged": true
+    },
+    "DataContract/cc/contract/credit_card_txn.odcs.yaml": {
+      "parsed_payload_matches_HEAD": true,
+      "reality_lines_unchanged": true,
+      "calendar_output_unchanged": true,
+      "odcs_schema_pass": true,
+      "staged_odcs_schema_pass": true,
+      "staged_one_calendar_source": true,
+      "staged_unknown_owner_null": true,
+      "staged_noncalendar_unchanged": true
+    },
+    "DataContract/cc/contract/customer.odcs.yaml": {
+      "parsed_payload_matches_HEAD": true,
+      "reality_lines_unchanged": true,
+      "calendar_output_unchanged": true,
+      "odcs_schema_pass": true,
+      "staged_odcs_schema_pass": true,
+      "staged_one_calendar_source": true,
+      "staged_unknown_owner_null": true,
+      "staged_noncalendar_unchanged": true
+    }
+  },
+  "mdf_validate": {
+    "exit": 0,
+    "errors": 0,
+    "warnings": 3,
+    "code": "CALENDAR_PENDING_OWNER"
+  },
+  "markdown": {
+    "DocsForAgent/draft_reviewd_by_agent_v2.md": {
+      "fences_balanced": true,
+      "headings_unique": true,
+      "table_widths_consistent": true,
+      "tables": 3,
+      "local_links_checked": 9
+    },
+    "DocsForAgent/START_HERE.md": {
+      "fences_balanced": true,
+      "headings_unique": true,
+      "table_widths_consistent": true,
+      "tables": 0,
+      "local_links_checked": 9
+    },
+    "reports/calendar-simplification/analysis.md": {
+      "fences_balanced": true,
+      "headings_unique": true,
+      "table_widths_consistent": true,
+      "tables": 2,
+      "local_links_checked": 0
+    },
+    "reports/calendar-simplification/active-obligations.md": {
+      "fences_balanced": true,
+      "headings_unique": true,
+      "table_widths_consistent": true,
+      "tables": 3,
+      "local_links_checked": 0
+    },
+    "handoffs/120-ba-to-hrm-calendar-simplification.md": {
+      "fences_balanced": true,
+      "headings_unique": true,
+      "table_widths_consistent": true,
+      "tables": 0,
+      "local_links_checked": 0
+    }
+  },
+  "git_diff_check": "PASS",
+  "branch": "add_config_manual_deployed",
+  "core_requirement_definition_count": 251,
+  "independent_original_ID_census_pass": true,
+  "ignored_worktree_files_verified": [
+    "DocsForAgent/draft_reviewd_by_agent_v2.md",
+    "DocsForAgent/START_HERE.md",
+    "DocsForAgent/archive/calendar-simplification-id-map.json",
+    "handoffs/120-ba-to-hrm-calendar-simplification.md"
+  ],
+  "tracked_changed_files": [
+    "DataContract/_template/contract/my_dataset.odcs.yaml",
+    "DataContract/cc/contract/credit_card.odcs.yaml",
+    "DataContract/cc/contract/credit_card_txn.odcs.yaml",
+    "DataContract/cc/contract/customer.odcs.yaml"
+  ],
+  "created_ba_files": [
+    "DocsForAgent/archive/calendar-simplification-id-map.json",
+    "handoffs/120-ba-to-hrm-calendar-simplification.md",
+    "reports/calendar-simplification/active-obligations.md",
+    "reports/calendar-simplification/analysis.md",
+    "reports/calendar-simplification/audit-inputs.json",
+    "reports/calendar-simplification/audit_inputs.py",
+    "reports/calendar-simplification/build_authoring.py",
+    "reports/calendar-simplification/build_coverage.py",
+    "reports/calendar-simplification/proposed/DataContract/_template/contract/my_dataset.odcs.yaml",
+    "reports/calendar-simplification/proposed/DataContract/cc/contract/credit_card.odcs.yaml",
+    "reports/calendar-simplification/proposed/DataContract/cc/contract/credit_card_txn.odcs.yaml",
+    "reports/calendar-simplification/proposed/DataContract/cc/contract/customer.odcs.yaml",
+    "reports/calendar-simplification/proposed/sample-calendar.fragment.yaml",
+    "reports/calendar-simplification/validate.txt",
+    "reports/calendar-simplification/verification.json",
+    "reports/calendar-simplification/verify_ba.py"
+  ],
+  "git_status": " M DataContract/_template/contract/my_dataset.odcs.yaml\n M DataContract/cc/contract/credit_card.odcs.yaml\n M DataContract/cc/contract/credit_card_txn.odcs.yaml\n M DataContract/cc/contract/customer.odcs.yaml\n?? qa-evidence/E6/T053/\n?? reports/calendar-simplification/\n",
+  "no_full_suite": true,
+  "no_implementation_or_deployment": true
+}

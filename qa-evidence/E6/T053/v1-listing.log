@@ -1,0 +1,10 @@
+bronze.cc.credit_card.resolved.json
+bronze.cc.credit_card_txn.resolved.json
+bronze.cc.customer.resolved.json
+manifest.json
+silver.cc.credit_card.resolved.json
+silver.cc.credit_card_txn.resolved.json
+silver.cc.customer.resolved.json
+validation-report.json
+
+exit_code=0

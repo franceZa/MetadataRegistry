@@ -1,0 +1,22 @@
+{
+  "assets": [
+    {
+      "apiUrl": "https://api.github.com/repos/franceZa/MetadataRegistry/releases/assets/612953137",
+      "contentType": "application/zip",
+      "createdAt": "2026-10-05T15:32:38Z",
+      "digest": "sha256:6b5ec9d560790cc1242b4d792fa03dd9511cec388e7ce6882c1b9d06324f7cf8",
+      "downloadCount": 1,
+      "id": "RA_kwDOUswb_c4kiOwx",
+      "label": "",
+      "name": "mdf-b255065b505d.zip",
+      "size": 21723,
+      "state": "uploaded",
+      "updatedAt": "2026-10-05T15:32:39Z",
+      "url": "https://github.com/franceZa/MetadataRegistry/releases/download/mdf-b255065b505d/mdf-b255065b505d.zip"
+    }
+  ],
+  "body": "mdf release package for b255065b505d7babe95b5af2a4a6869f4d45cf81\n\nmanifest_sha256: 4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f\n\ncalendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer",
+  "tagName": "mdf-b255065b505d",
+  "targetCommitish": "b255065b505d7babe95b5af2a4a6869f4d45cf81",
+  "url": "https://github.com/franceZa/MetadataRegistry/releases/tag/mdf-b255065b505d"
+}

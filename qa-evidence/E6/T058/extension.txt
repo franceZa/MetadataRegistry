@@ -1,0 +1,6 @@
+$ uv run pytest tests/test_calendar.py::test_new_field_needs_only_table_line_and_contract_entry -q
+.                                                                        [100%]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

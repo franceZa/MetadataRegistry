@@ -1,0 +1,12 @@
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/validation-report.json -> C:/Users/User/AppData/Local/Temp/t053-v1/validation-report.json
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/manifest.json -> C:/Users/User/AppData/Local/Temp/t053-v1/manifest.json
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/silver.cc.customer.resolved.json -> C:/Users/User/AppData/Local/Temp/t053-v1/silver.cc.customer.resolved.json
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/silver.cc.credit_card_txn.resolved.json -> C:/Users/User/AppData/Local/Temp/t053-v1/silver.cc.credit_card_txn.resolved.json
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/silver.cc.credit_card.resolved.json -> C:/Users/User/AppData/Local/Temp/t053-v1/silver.cc.credit_card.resolved.json
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/bronze.cc.customer.resolved.json -> C:/Users/User/AppData/Local/Temp/t053-v1/bronze.cc.customer.resolved.json
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/bronze.cc.credit_card.resolved.json -> C:/Users/User/AppData/Local/Temp/t053-v1/bronze.cc.credit_card.resolved.json
+dbfs:/Volumes/dev_catalog/ops/files/releases/mdf-ef2f425903b6/bronze.cc.credit_card_txn.resolved.json -> C:/Users/User/AppData/Local/Temp/t053-v1/bronze.cc.credit_card_txn.resolved.json
+✅ package ผ่านการตรวจสอบ (OK): env=dev, files=6, release_id=mdf-ef2f425903b6, manifest_sha256=6bf079b852cb7150caf268251966217b34196abdc98b353ec54cc1ee449c8153
+   [WARN] legacy flat layout (manifest_version 1)
+
+exit_code=0

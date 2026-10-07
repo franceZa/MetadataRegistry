@@ -7,7 +7,7 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any
 
-from mdf.calendar import read_calendar
+from mdf.calendar import compiled_calendar
 from mdf.compile import compile_project, load_env_config
 from mdf.loading import discover_datasets, load_yaml_file
 from mdf.validation import ValidationReport, validate_project
@@ -147,12 +147,12 @@ def _inactive_contracts(base_dir: Path | str) -> list[str]:
 def calendar_pending_owner_datasets(base_dir: Path | str) -> list[str]:
     """FR-M.4: dataset ids with a missing (not malformed) calendar field.
 
-    Reuses mdf.calendar.read_calendar — the single calendar parser (T-54/T-55).
+    Reuses mdf.calendar.compiled_calendar — the single calendar parser (T-54/T-55).
     """
     ids: list[str] = []
     for ds in discover_datasets(base_dir):
         contract = load_yaml_file(ds.contract_path) or {}
-        _, missing, _ = read_calendar(contract)
+        _, missing, _ = compiled_calendar(contract)
         if missing:
             ids.append(contract.get("id", f"{ds.source}.{ds.dataset}"))
     return sorted(ids)

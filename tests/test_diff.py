@@ -125,10 +125,10 @@ def test_fr_m11_pci_flag_change_is_review_not_breaking():
 def test_fr_m11_calendar_change_is_review_not_breaking():
     """FR-M.11: a calendar change (e.g. recovery_window) is reported as a review item."""
     base = _mk_contract("cc.credit_card_txn", "1.0.0", BASE_TXN_COLS)
-    base["slaProperties"] = [{"property": "frequency", "value": "daily"}]
+    base["slaProperties"] = [{"property": "schedule_type", "value": "daily"}]
     cur = _mk_contract("cc.credit_card_txn", "1.0.0", BASE_TXN_COLS)
     cur["slaProperties"] = [
-        {"property": "frequency", "value": "daily"},
+        {"property": "schedule_type", "value": "daily"},
         {"property": "recovery_window", "value": 2, "unit": "d"},
     ]
 

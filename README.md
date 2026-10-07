@@ -154,6 +154,30 @@ uv run mdf validate && uv run mdf compile
 
 หมายเหตุ: กฎที่ต้องการพารามิเตอร์ (เช่น `pattern`) ต้องประกาศใน `params` และ contract ต้องมีค่านั้น — ไม่งั้นจะเจอ `TAG_WITHOUT_PARAM` (DQ-2)
 
+## Calendar authoring
+
+Calendar อยู่ใน ODCS `slaProperties` เท่านั้น: `schedule_type`, `day_of_month`,
+`expected_at`, `business_date_lag`, `latency`, `recovery_window`.
+ใช้ block พร้อมตัวอย่างใน `DataContract/_template/contract/my_dataset.odcs.yaml`.
+
+- `schedule_type`: daily | workday | workday_excluding_holidays | monthly.
+- `day_of_month`: 1–31 สำหรับ monthly; ไม่ใช่ monthly ให้ใส่ null.
+- `expected_at`: "HH:MM" เวลาไทย; `business_date_lag`: จำนวนเต็ม <= 0 นับจากวันที่รัน
+  (`business_date = วันที่รัน + lag`; 0 = ไฟล์ของวันที่รัน, -1 = ไฟล์ปิดยอดของเมื่อวาน / T-1).
+- `latency` / `recovery_window`: ตัวเลข finite >= 0 พร้อม `unit: h` หรือ `d`.
+- ไม่รู้ค่าให้ใส่ null: validate เตือน `CALENDAR_PENDING_OWNER` แต่ compile ได้.
+  COMPLETE ต้องมี schedule_type, expected_at, business_date_lag, recovery_window
+  (และ day_of_month สำหรับ monthly); latency ไม่บังคับสำหรับ COMPLETE.
+- ตรวจเฉพาะรูปแบบของค่าที่ไม่ใช่ null; ไม่ตรวจเงื่อนไขข้ามฟิลด์.
+  SLA entries ที่ไม่รู้จักถูกละเว้น; calendar key ใน customProperties ต้องย้ายไป slaProperties.
+- ไม่มี frequency, timezone หรือรายการวันที่ใน calendar; Medallion คำนวณวันจาก mode
+  และปฏิทินวันหยุดของ runtime เอง. เวลาทั้งหมดเป็นเวลาไทย.
+
+`uv run mdf validate` → `uv run mdf compile --env dev` สร้าง calendar เดียวกันทั้ง
+bronze/silver: status, schedule_type, day_of_month, expected_at, business_date_lag,
+missing_after_seconds, recovery_window_seconds (h × 3600, d × 86400; null → null).
+เพิ่มฟิลด์ชนิดที่รองรับ = เพิ่ม contract entry + หนึ่งบรรทัดใน `CALENDAR_FIELDS` เท่านั้น.
+
 ## การทดสอบ
 
 ```bash

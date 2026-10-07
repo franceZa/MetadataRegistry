@@ -1,0 +1,154 @@
+# PROPOSED / NOT ACTIVE. Requires FR-N migration before discovery/compile.
+# Unknown owner inputs are null; known SLA values copied, not guessed.
+# =============================================================================
+# Data Contract Template (ODCS v3.0.2)
+# =============================================================================
+# วิธีใช้:
+#   1. copy ไฟล์นี้ไปที่ DataContract/<source>/contract/<dataset>.odcs.yaml
+#   2. copy ไฟล์ pipeline คู่กันไปที่ DataContract/<source>/pipeline/<dataset>.pipeline.yaml
+#   3. แก้ค่าทุกตัวที่ขึ้นต้นด้วย my_ / example
+#   4. รัน:  uv run mdf validate
+#
+# ไฟล์นี้เก็บเฉพาะ "สิ่งที่ต้นทางรับปาก" (schema, ประเภทข้อมูล PDPA/PCI, SLA, ที่วางไฟล์)
+# ห้ามใส่: derived column, dedup, business rule, retention -> ไปใส่ในไฟล์ pipeline
+# DQ library: config/dq_library.yaml; structural rules: config/rules/*.rules.json
+# =============================================================================
+
+apiVersion: v3.0.2 # ห้ามเปลี่ยน
+kind: DataContract # ห้ามเปลี่ยน
+id: my_source.my_dataset # <source>.<dataset> ต้องตรงกับชื่อโฟลเดอร์/ชื่อไฟล์
+name: my_dataset # ตัวพิมพ์เล็ก snake_case
+version: 1.0.0 # semver: เปลี่ยน schema แบบ breaking -> ขึ้นเลขหน้า (2.0.0)
+status: draft # draft | active | deprecated
+domain: my_domain # เช่น customer, card, sales
+description:
+  purpose: "อธิบายภาพรวมและวัตถุประสงค์ทางธุรกิจของข้อมูลชุดนี้" # ขั้นต่ำ 20 ตัวอักษร
+
+team:
+  - username: someone@example.com # อีเมลผู้ดูแลข้อมูล (Data Steward)
+    role: steward
+  - username: source-system-owner # ทีมหรือระบบต้นทาง
+    role: owner
+
+# ที่วางไฟล์ (landing) — 1 รายการต่อ 1 env ที่มีใน config/env/*.yaml
+servers:
+  - server: landing-dev
+    environment: dev
+    type: custom
+    format: csv # csv | json | jsonl | parquet
+    location: "/Volumes/{catalog}/landing_{source}/files/my_dataset/"
+
+# CALENDAR AUTHORING — STAGED, not parsed by the current generator.
+# Owner values are unconfigured; do not infer schedule/timezone from frequency/env.
+# One ODCS-compatible customProperties entry is proposed below (comments only).
+# Keep executable SLA fields below until coordinated SWE migration (FR-N.1–N.6).
+# Never uncomment beside legacy calendar fields: one source only after cutover.
+# See reports/calendar-simplification/analysis.md and proposed/ for staged YAML.
+# customProperties calendar entry (proposed, not production defaults):
+# property: calendar
+# value:
+#   frequency: daily
+#   schedule_type: null
+#   timezone: null
+#   expected_at: null
+#   expected_day_offset: null
+#   effective_from: null
+#   latency:
+#     value: 4
+#     unit: h
+#   recovery_window: null
+
+customProperties:
+  - property: source_system
+    value: my_source
+  - property: source_type
+    value: batch_file # batch_file | derived
+  - property: file_pattern
+    value: "my_dataset_{{business_date}}.csv"
+  - property: partition_pattern
+    value: "business_date={{business_date}}"
+  - property: header
+    value: true
+  - property: encoding
+    value: utf-8
+  - property: run_grain
+    value: business_date
+  - property: erasure_target
+    value: vault # vault | silver | bronze | null (ต้องคุยกับ DPO)
+  - property: calendar
+    value:
+      frequency: daily
+      schedule_type: null
+      timezone: null
+      expected_at: null
+      expected_day_offset: null
+      effective_from: null
+      latency:
+        value: 4
+        unit: h
+      recovery_window: null
+
+schema:
+  - name: my_dataset # ต้องตรงกับ name ด้านบน
+    physicalType: table
+    properties:
+      # คีย์ที่ต้องมีทุกคอลัมน์: name, logicalType, physicalType, required,
+      #                        classification, description, customProperties(pii, pci)
+      - name: my_id
+        logicalType: string # string | integer | number | date | boolean
+        physicalType: string # string | integer | long | double | boolean | date | timestamp | decimal(p,s)
+        required: true # true = ห้ามเป็น null
+        primaryKey: true
+        primaryKeyPosition: 1
+        classification: none # none | personal | sensitive (PDPA)
+        description: "รหัสอ้างอิงหลักประจำแถวข้อมูล (Primary Key)"
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+
+      - name: national_id
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: sensitive
+        logicalTypeOptions:
+          pattern: "^[0-9]{13}$" # regex ที่ต้นทางรับปาก
+        tags: ["dq:pattern"]
+        description: "เลขประจำตัวประชาชน 13 หลัก ถูกแปลงเป็น token ตอนเขียน silver"
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: false }
+
+      - name: birth_date
+        logicalType: date
+        physicalType: date
+        required: true
+        classification: sensitive
+        description: "วันเดือนปีเกิดของลูกค้า สำหรับการวิเคราะห์และคำนวณอายุ"
+        customProperties:
+          - { property: pii, value: true }
+          - { property: pci, value: false }
+
+      - name: status
+        logicalType: string
+        physicalType: string
+        required: true
+        classification: none
+        tags: ["dq:valid_values"]
+        description: "สถานะของรายการ (ตัวอย่าง allowed values)"
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }
+          - { property: valid_values, value: ["ACTIVE", "CLOSED"] }
+
+      - name: business_date
+        logicalType: date
+        physicalType: date
+        required: true
+        partitioned: true
+        partitionKeyPosition: 1
+        classification: none
+        description: "วันที่ของข้อมูลธุรกิจ ใช้สำหรับแบ่ง partition"
+        customProperties:
+          - { property: pii, value: false }
+          - { property: pci, value: false }

@@ -1,0 +1,22 @@
+$ uv run pytest tests/test_calendar.py -q
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_null_sla_fields_are_pending_with_exact_seven_key_output _________
+
+    def test_null_sla_fields_are_pending_with_exact_seven_key_output():
+        contract = {"slaProperties": [
+            {"property": "schedule_type", "value": None},
+            {"property": "latency", "value": 4, "unit": "h"},
+            {"property": "recovery_window", "value": 2, "unit": "d"},
+        ]}
+>       calendar, missing, errors = compiled_calendar(contract)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: too many values to unpack (expected 3)
+
+tests\test_calendar.py:11: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_calendar.py::test_null_sla_fields_are_pending_with_exact_seven_key_output
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=1

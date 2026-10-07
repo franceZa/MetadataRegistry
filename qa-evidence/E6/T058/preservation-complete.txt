@@ -1,0 +1,13 @@
+$ uv run python qa-evidence/E6/T058/inspect.py preservation
+DataContract/_template/contract/my_dataset.odcs.yaml: REALITY, non-calendar prefix/content, team/email and version preserved
+DataContract/cc/contract/customer.odcs.yaml: REALITY, non-calendar prefix/content, team/email and version preserved
+DataContract/cc/contract/credit_card.odcs.yaml: REALITY, non-calendar prefix/content, team/email and version preserved
+DataContract/cc/contract/credit_card_txn.odcs.yaml: REALITY, non-calendar prefix/content, team/email and version preserved
+custom_property / has_custom_property: byte-identical to HEAD.
+dev config: only timezone line removed.
+calendar.py line count: 415 -> 107
+Targeted JUnit counts: {"tests": 160, "failures": 0, "errors": 0, "skipped": 0}
+Calendar test count: 52
+warning: Failed to set cwd to temp dir
+
+EXIT=0

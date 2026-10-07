@@ -1,0 +1,17 @@
+COMMAND: uv run mdf validate
+EXIT: 0
+✅ การตรวจสอบความถูกต้องผ่านเรียบร้อย (PASS) (พบข้อควรระวัง 3 รายการ)
+- [WARNING] รหัส: CALENDAR_PENDING_OWNER
+  ฟิลด์: timezone, expected_at, expected_day_offset, business_schedule
+  ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: timezone, expected_at, expected_day_offset, business_schedule
+  วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, expected_day_offset, recovery_window, business_schedule) ใน contract
+- [WARNING] รหัส: CALENDAR_PENDING_OWNER
+  ฟิลด์: timezone, expected_at, expected_day_offset, business_schedule
+  ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: timezone, expected_at, expected_day_offset, business_schedule
+  วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, expected_day_offset, recovery_window, business_schedule) ใน contract
+- [WARNING] รหัส: CALENDAR_PENDING_OWNER
+  ฟิลด์: timezone, expected_at, expected_day_offset, business_schedule
+  ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: timezone, expected_at, expected_day_offset, business_schedule
+  วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, expected_day_offset, recovery_window, business_schedule) ใน contract
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir

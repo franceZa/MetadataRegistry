@@ -5,7 +5,7 @@
 # `# REALITY:` markers. All REALITY lines below are byte-for-byte unchanged.
 #
 # Format: ODCS v3.0.2 (converted from DataContract/_legacy/cc/credit_card.yaml).
-# Pipeline behaviour lives in DataContract/cc/dq/credit_card.dq.yaml
+# Pipeline behaviour lives in DataContract/cc/pipeline/credit_card.pipeline.yaml
 
 apiVersion: v3.0.2
 kind: DataContract
@@ -30,18 +30,27 @@ servers:
     format: csv
     location: "/Volumes/{catalog}/landing_{source}/files/credit_card/"
 
+# Calendar: slaProperties เท่านั้น; เวลาทั้งหมดเป็นเวลาไทย
+# Medallion คำนวณ expected date จาก mode และปฏิทินวันหยุดของ runtime
 slaProperties:
-  - property: frequency
-    value: daily
-  - property: latency # grace period before a file counts as missing
-    value: 4
-    unit: h
-  - property: recovery_window # AS-31: 2 d retry window before escalation (CR-01)
-    value: 2
-    unit: d
-  # REALITY: the file for business_date=2026-09-10 is never delivered.
-  # Reconciliation must raise MISSING after the grace period (prawden 1),
-  # and must NOT silently treat the gap as "no cards issued that day".
+  - property: schedule_type
+    value: daily # daily | workday | workday_excluding_holidays | monthly
+  - property: day_of_month
+    value: null # ใช้เฉพาะ schedule_type = monthly: วันที่ 1–31 (null ถ้าไม่ใช่ monthly)
+  - property: expected_at
+    value: "06:30" # "HH:MM" เวลาไทยที่ไฟล์ควรมาถึง เช่น "06:30"
+  - property: business_date_lag
+    value: -1 # 0 = ไฟล์ของวันที่รัน, -1 = ไฟล์ปิดยอดของเมื่อวาน (T-1); ต้อง <= 0
+  - property: latency
+    value: 4 # ไฟล์มาช้าได้เท่าไรก่อนถือว่าหาย
+    unit: h # h | d
+  - property: recovery_window
+    value: 2 # รอไฟล์ได้นานสุดก่อนหยุด poll
+    unit: d # h | d
+  # REALITY: business_date=2026-09-11 arrives LATE (outside the normal
+  # window, inside grace). Per FR-E.6 this must NOT page anyone - a late
+  # file within grace is not an incident. It must still be recorded as LATE
+  # so the arrival-pattern history is honest (prawden 1, prawden 5).
 
 customProperties:
   - property: source_system
@@ -85,7 +94,7 @@ schema:
         # REALITY: the same PAN is re-sent with spaces ("5555 5500 ...").
         # Without this normalisation step the two forms tokenise to two
         # different tokens and one card silently becomes two.
-        # (normalise: strip_whitespace -> DataContract/cc/dq/credit_card.dq.yaml)
+        # (normalise: strip_whitespace -> DataContract/cc/pipeline/credit_card.pipeline.yaml)
 
       - name: customer_id
         logicalType: string

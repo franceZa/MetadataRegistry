@@ -1,0 +1,137 @@
+[
+  {
+    "statement": "SELECT event, release_id, manifest_sha256, file_count, actor, CAST(event_ts AS STRING) AS event_ts FROM dev_catalog.ops.release_registry WHERE release_id IN ('mdf-b255065b505d','mdf-ef2f425903b6') ORDER BY event_ts",
+    "status": {
+      "state": "SUCCEEDED"
+    },
+    "columns": [
+      {
+        "name": "event",
+        "position": 0,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      },
+      {
+        "name": "release_id",
+        "position": 1,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      },
+      {
+        "name": "manifest_sha256",
+        "position": 2,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      },
+      {
+        "name": "file_count",
+        "position": 3,
+        "type_name": "INT",
+        "type_text": "INT"
+      },
+      {
+        "name": "actor",
+        "position": 4,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      },
+      {
+        "name": "event_ts",
+        "position": 5,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      }
+    ],
+    "rows": [
+      [
+        "REGISTERED",
+        "mdf-ef2f425903b6",
+        "6bf079b852cb7150caf268251966217b34196abdc98b353ec54cc1ee449c8153",
+        "6",
+        "manual",
+        "2026-09-27 08:15:29.599451"
+      ],
+      [
+        "ACTIVATED",
+        "mdf-ef2f425903b6",
+        "6bf079b852cb7150caf268251966217b34196abdc98b353ec54cc1ee449c8153",
+        "6",
+        "manual",
+        "2026-09-27 08:17:01.387269"
+      ],
+      [
+        "ACTIVATED",
+        "mdf-ef2f425903b6",
+        "6bf079b852cb7150caf268251966217b34196abdc98b353ec54cc1ee449c8153",
+        "6",
+        "manual",
+        "2026-09-27 08:22:01.421393"
+      ],
+      [
+        "REGISTERED",
+        "mdf-b255065b505d",
+        "4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f",
+        "9",
+        "u2m",
+        "2026-10-05 15:36:35.097825"
+      ],
+      [
+        "ACTIVATED",
+        "mdf-b255065b505d",
+        "4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f",
+        "9",
+        "u2m",
+        "2026-10-05 15:38:05.184301"
+      ],
+      [
+        "ACTIVATED",
+        "mdf-ef2f425903b6",
+        "6bf079b852cb7150caf268251966217b34196abdc98b353ec54cc1ee449c8153",
+        "6",
+        "u2m",
+        "2026-10-05 15:41:30.794287"
+      ],
+      [
+        "ACTIVATED",
+        "mdf-b255065b505d",
+        "4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f",
+        "9",
+        "u2m",
+        "2026-10-05 15:43:01.327298"
+      ]
+    ]
+  },
+  {
+    "statement": "SELECT release_id, actor, CAST(event_ts AS STRING) AS event_ts FROM dev_catalog.ops.release_registry WHERE event='ACTIVATED' ORDER BY event_ts DESC LIMIT 1",
+    "status": {
+      "state": "SUCCEEDED"
+    },
+    "columns": [
+      {
+        "name": "release_id",
+        "position": 0,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      },
+      {
+        "name": "actor",
+        "position": 1,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      },
+      {
+        "name": "event_ts",
+        "position": 2,
+        "type_name": "STRING",
+        "type_text": "STRING"
+      }
+    ],
+    "rows": [
+      [
+        "mdf-b255065b505d",
+        "u2m",
+        "2026-10-05 15:43:01.327298"
+      ]
+    ]
+  }
+]

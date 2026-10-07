@@ -1,0 +1,747 @@
+Build & verify release package	Set up job	﻿2026-10-05T15:30:57.1367118Z Current runner version: '2.337.0'
+Build & verify release package	Set up job	2026-10-05T15:30:57.1394567Z ##[group]Runner Image Provisioner
+Build & verify release package	Set up job	2026-10-05T15:30:57.1395492Z Hosted Compute Agent
+Build & verify release package	Set up job	2026-10-05T15:30:57.1396214Z Version: 20260901.588
+Build & verify release package	Set up job	2026-10-05T15:30:57.1396899Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+Build & verify release package	Set up job	2026-10-05T15:30:57.1397769Z Build Date: 2026-09-01T19:56:44Z
+Build & verify release package	Set up job	2026-10-05T15:30:57.1398487Z Worker ID: {d7822735-eefb-431e-a69c-607bec7947f3}
+Build & verify release package	Set up job	2026-10-05T15:30:57.1399198Z Azure Region: eastus
+Build & verify release package	Set up job	2026-10-05T15:30:57.1399925Z ##[endgroup]
+Build & verify release package	Set up job	2026-10-05T15:30:57.1401559Z ##[group]Operating System
+Build & verify release package	Set up job	2026-10-05T15:30:57.1402321Z Ubuntu
+Build & verify release package	Set up job	2026-10-05T15:30:57.1402897Z 24.04.5
+Build & verify release package	Set up job	2026-10-05T15:30:57.1403461Z LTS
+Build & verify release package	Set up job	2026-10-05T15:30:57.1404317Z ##[endgroup]
+Build & verify release package	Set up job	2026-10-05T15:30:57.1404999Z ##[group]Runner Image
+Build & verify release package	Set up job	2026-10-05T15:30:57.1405709Z Image: ubuntu-24.04
+Build & verify release package	Set up job	2026-10-05T15:30:57.1406365Z Version: 20260927.320.1
+Build & verify release package	Set up job	2026-10-05T15:30:57.1407456Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+Build & verify release package	Set up job	2026-10-05T15:30:57.1409321Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+Build & verify release package	Set up job	2026-10-05T15:30:57.1410372Z ##[endgroup]
+Build & verify release package	Set up job	2026-10-05T15:30:57.1411505Z ##[group]GITHUB_TOKEN Permissions
+Build & verify release package	Set up job	2026-10-05T15:30:57.1413741Z Contents: read
+Build & verify release package	Set up job	2026-10-05T15:30:57.1414619Z Metadata: read
+Build & verify release package	Set up job	2026-10-05T15:30:57.1415299Z ##[endgroup]
+Build & verify release package	Set up job	2026-10-05T15:30:57.1417398Z Secret source: Actions
+Build & verify release package	Set up job	2026-10-05T15:30:57.1418344Z Cache mode: write
+Build & verify release package	Set up job	2026-10-05T15:30:57.1419137Z Prepare workflow directory
+Build & verify release package	Set up job	2026-10-05T15:30:57.1760566Z Prepare all required actions
+Build & verify release package	Set up job	2026-10-05T15:30:57.1809679Z Getting action download info
+Build & verify release package	Set up job	2026-10-05T15:30:57.4547807Z Download action repository 'actions/checkout@v7' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Build & verify release package	Set up job	2026-10-05T15:30:57.5533568Z Download action repository 'astral-sh/setup-uv@v10.2.0' (SHA:c18668ad3cf93ea998bef934396af7bb5c839dc7)
+Build & verify release package	Set up job	2026-10-05T15:30:57.7773636Z Download action repository 'actions/upload-artifact@v7' (SHA:043fb46d1a93c77aae656e7c1c64a875d1fc6a0a)
+Build & verify release package	Set up job	2026-10-05T15:30:57.9616001Z Complete job name: Build & verify release package
+Build & verify release package	Checkout (exact SHA)	﻿2026-10-05T15:30:58.0407727Z ##[group]Run actions/checkout@v7
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0408642Z with:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0409083Z   fetch-depth: 0
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0409573Z   repository: franceZa/MetadataRegistry
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0413587Z   token: ***
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0414468Z   ssh-strict: true
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0415021Z   ssh-user: git
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0415485Z   persist-credentials: true
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0415981Z   clean: true
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0416478Z   sparse-checkout-cone-mode: true
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0417052Z   fetch-tags: false
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0417501Z   show-progress: true
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0417957Z   lfs: false
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0418379Z   submodules: false
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0418885Z   set-safe-directory: true
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0419407Z   allow-unsafe-pr-checkout: false
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.0420282Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1536826Z Syncing repository: franceZa/MetadataRegistry
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1540148Z ##[group]Getting Git version info
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1542060Z Working directory is '/home/runner/work/MetadataRegistry/MetadataRegistry'
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1545388Z [command]/usr/bin/git version
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1663651Z git version 2.55.0
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1689972Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1701454Z Temporarily overriding HOME='/home/runner/work/_temp/32d942d0-04ca-4ede-9e27-4a75223c608d' before making global git config changes
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1704524Z Adding repository directory to the temporary git global config as a safe directory
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1710638Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MetadataRegistry/MetadataRegistry
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1787227Z Deleting the contents of '/home/runner/work/MetadataRegistry/MetadataRegistry'
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1790886Z ##[group]Determining repository object format
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1792802Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1794376Z ##[group]Initializing the repository
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1823016Z [command]/usr/bin/git init /home/runner/work/MetadataRegistry/MetadataRegistry
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1972461Z hint: Using 'master' as the name for the initial branch. This default branch name
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1974641Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1976287Z hint: to use in all of your new repositories, which will suppress this warning,
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1977494Z hint: call:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1978169Z hint:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1979027Z hint: 	git config --global init.defaultBranch <name>
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1980050Z hint:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1981024Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1982584Z hint: 'development'. The just-created branch can be renamed via this command:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1984191Z hint:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1985421Z hint: 	git branch -m <name>
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1986452Z hint:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1987499Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.1989459Z Initialized empty Git repository in /home/runner/work/MetadataRegistry/MetadataRegistry/.git/
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2013237Z [command]/usr/bin/git remote add origin https://github.com/franceZa/MetadataRegistry
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2096434Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2097721Z ##[group]Disabling automatic garbage collection
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2098714Z [command]/usr/bin/git config --local gc.auto 0
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2137646Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2139762Z ##[group]Setting up auth
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2141184Z Removing SSH command configuration
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2143111Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2185478Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2621427Z Removing HTTP extra header
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2628113Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2662965Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2881207Z Removing includeIf entries pointing to credentials config files
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2886774Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.2921901Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3161900Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3203681Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path /home/runner/work/_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3239530Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3280275Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3318421Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3355196Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3355981Z ##[group]Fetching the repository
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.3362000Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7036313Z From https://github.com/franceZa/MetadataRegistry
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7038545Z  * [new branch]      add_config_manual_deployed -> origin/add_config_manual_deployed
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7040576Z  * [new branch]      chore/actions-node24   -> origin/chore/actions-node24
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7042378Z  * [new branch]      docs/e6-t042-runbook   -> origin/docs/e6-t042-runbook
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7044356Z  * [new branch]      feat/e6-delivery-modes -> origin/feat/e6-delivery-modes
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7046157Z  * [new branch]      feat/mdf-phase2        -> origin/feat/mdf-phase2
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7047932Z  * [new branch]      feat/mdf-v2            -> origin/feat/mdf-v2
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7049602Z  * [new branch]      fix/t039-volume-mkdir  -> origin/fix/t039-volume-mkdir
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7050959Z  * [new branch]      master                 -> origin/master
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7052131Z  * [new tag]         mdf-44d14f829e93       -> mdf-44d14f829e93
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7053339Z  * [new tag]         mdf-98a182c99186       -> mdf-98a182c99186
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7054856Z  * [new tag]         mdf-d3ea0d559e04       -> mdf-d3ea0d559e04
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7056072Z  * [new tag]         mdf-ef2f425903b6       -> mdf-ef2f425903b6
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7057304Z  * [new tag]         mdf-f145479894d6       -> mdf-f145479894d6
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7059920Z [command]/usr/bin/git branch --list --remote origin/master
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7091951Z   origin/master
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7101088Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7131754Z b255065b505d7babe95b5af2a4a6869f4d45cf81
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7137058Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7138613Z ##[group]Determining the checkout info
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7140181Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7143554Z [command]/usr/bin/git sparse-checkout disable
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7207319Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7245184Z ##[group]Checking out the ref
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7249623Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7403372Z Reset branch 'master'
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7409223Z branch 'master' set up to track 'origin/master'.
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7420127Z ##[endgroup]
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7472788Z [command]/usr/bin/git log -1 --format=%H
+Build & verify release package	Checkout (exact SHA)	2026-10-05T15:30:58.7502653Z b255065b505d7babe95b5af2a4a6869f4d45cf81
+Build & verify release package	Install uv	﻿2026-10-05T15:30:58.7929002Z ##[group]Run astral-sh/setup-uv@v10.2.0
+Build & verify release package	Install uv	2026-10-05T15:30:58.7929783Z with:
+Build & verify release package	Install uv	2026-10-05T15:30:58.7930259Z   enable-cache: true
+Build & verify release package	Install uv	2026-10-05T15:30:58.7930817Z   activate-environment: false
+Build & verify release package	Install uv	2026-10-05T15:30:58.7931418Z   no-project: false
+Build & verify release package	Install uv	2026-10-05T15:30:58.7932202Z   working-directory: /home/runner/work/MetadataRegistry/MetadataRegistry
+Build & verify release package	Install uv	2026-10-05T15:30:58.7938112Z   github-token: ***
+Build & verify release package	Install uv	2026-10-05T15:30:58.7939564Z   cache-dependency-glob: **/*requirements*.txt
+Build & verify release package	Install uv	**/*requirements*.in
+Build & verify release package	Install uv	**/*constraints*.txt
+Build & verify release package	Install uv	**/*constraints*.in
+Build & verify release package	Install uv	**/pyproject.toml
+Build & verify release package	Install uv	**/uv.lock
+Build & verify release package	Install uv	**/*.py.lock
+Build & verify release package	Install uv	
+Build & verify release package	Install uv	2026-10-05T15:30:58.7941144Z   restore-cache: true
+Build & verify release package	Install uv	2026-10-05T15:30:58.7941675Z   save-cache: auto
+Build & verify release package	Install uv	2026-10-05T15:30:58.7942187Z   prune-cache: false
+Build & verify release package	Install uv	2026-10-05T15:30:58.7942728Z   cache-python: false
+Build & verify release package	Install uv	2026-10-05T15:30:58.7943295Z   ignore-nothing-to-cache: false
+Build & verify release package	Install uv	2026-10-05T15:30:58.7944228Z   ignore-empty-workdir: false
+Build & verify release package	Install uv	2026-10-05T15:30:58.7944969Z   download-from-astral-mirror: true
+Build & verify release package	Install uv	2026-10-05T15:30:58.7945649Z   add-problem-matchers: true
+Build & verify release package	Install uv	2026-10-05T15:30:58.7946283Z   quiet: false
+Build & verify release package	Install uv	2026-10-05T15:30:58.7946786Z   resolution-strategy: highest
+Build & verify release package	Install uv	2026-10-05T15:30:58.7947388Z ##[endgroup]
+Build & verify release package	Install uv	2026-10-05T15:30:58.9772931Z Trying to find version for uv in: /home/runner/work/MetadataRegistry/MetadataRegistry/uv.toml
+Build & verify release package	Install uv	2026-10-05T15:30:58.9777821Z Could not find file: /home/runner/work/MetadataRegistry/MetadataRegistry/uv.toml
+Build & verify release package	Install uv	2026-10-05T15:30:58.9781776Z Trying to find version for uv in: /home/runner/work/MetadataRegistry/MetadataRegistry/pyproject.toml
+Build & verify release package	Install uv	2026-10-05T15:30:58.9786515Z Could not determine uv version from uv.toml or pyproject.toml. Falling back to latest.
+Build & verify release package	Install uv	2026-10-05T15:30:58.9793223Z Fetching manifest data from https://raw.githubusercontent.com/astral-sh/versions/main/v1/uv.ndjson ...
+Build & verify release package	Install uv	2026-10-05T15:30:59.0348760Z Downloading uv from "https://releases.astral.sh/github/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz" ...
+Build & verify release package	Install uv	2026-10-05T15:30:59.4224251Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/15fb5868-1a9b-42e4-83c8-9aa850fea832 -f /home/runner/work/_temp/d5a2d9b4-8c22-429d-8246-6a492a38c89b
+Build & verify release package	Install uv	2026-10-05T15:30:59.7880887Z Added /home/runner/.local/bin to the path
+Build & verify release package	Install uv	2026-10-05T15:30:59.7885544Z Added /opt/hostedtoolcache/uv/0.12.23/x86_64 to the path
+Build & verify release package	Install uv	2026-10-05T15:30:59.7888897Z Set UV_PYTHON_INSTALL_DIR to /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Install uv	2026-10-05T15:30:59.7892282Z Added /home/runner/work/_temp/uv-python-dir to the path
+Build & verify release package	Install uv	2026-10-05T15:30:59.7922731Z Set UV_CACHE_DIR to /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Install uv	2026-10-05T15:30:59.7925806Z Successfully installed uv version 0.12.23
+Build & verify release package	Install uv	2026-10-05T15:30:59.8542896Z Searching files using cache dependency glob: /home/runner/work/MetadataRegistry/MetadataRegistry/**/*requirements*.txt,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*requirements*.in,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*constraints*.txt,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*constraints*.in,/home/runner/work/MetadataRegistry/MetadataRegistry/**/pyproject.toml,/home/runner/work/MetadataRegistry/MetadataRegistry/**/uv.lock,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*.py.lock
+Build & verify release package	Install uv	2026-10-05T15:30:59.8824819Z /home/runner/work/MetadataRegistry/MetadataRegistry/pyproject.toml
+Build & verify release package	Install uv	2026-10-05T15:30:59.9018590Z /home/runner/work/MetadataRegistry/MetadataRegistry/uv.lock
+Build & verify release package	Install uv	2026-10-05T15:30:59.9027490Z Found 2 files to hash.
+Build & verify release package	Install uv	2026-10-05T15:30:59.9107924Z Trying to restore cache from GitHub Actions cache with key: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521
+Build & verify release package	Install uv	2026-10-05T15:30:59.9934486Z No GitHub Actions cache found for key: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521
+Build & verify release package	Sync dependencies (locked)	﻿2026-10-05T15:31:00.1164203Z ##[group]Run uv sync --locked
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1164648Z ^[[36;1muv sync --locked^[[0m
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1440671Z shell: /usr/bin/bash -e {0}
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1441078Z env:
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1441468Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1442003Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1442408Z ##[endgroup]
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1650521Z Using CPython 3.12.3 interpreter at: /usr/bin/python3
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1651316Z Creating virtual environment at: .venv
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1668296Z Resolved 15 packages in 0.61ms
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.1697845Z    Building mdf @ file:///home/runner/work/MetadataRegistry/MetadataRegistry
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.2267302Z Downloading pygments (1.2MiB)
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.2268205Z Downloading ruff (9.8MiB)
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.2828303Z  Downloaded pygments
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.3336421Z  Downloaded ruff
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6395569Z       Built mdf @ file:///home/runner/work/MetadataRegistry/MetadataRegistry
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6407693Z Prepared 14 packages in 473ms
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6531098Z Installed 14 packages in 12ms
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6531958Z  + attrs==26.1.0
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6532637Z  + iniconfig==2.3.0
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6533040Z  + jsonschema==4.26.0
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6533487Z  + jsonschema-specifications==2025.9.1
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6534522Z  + mdf==0.1.0 (from file:///home/runner/work/MetadataRegistry/MetadataRegistry)
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6535204Z  + packaging==26.3
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6542160Z  + pluggy==1.6.0
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6542695Z  + pygments==2.21.0
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6554693Z  + pytest==9.1.1
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6555291Z  + pyyaml==6.0.3
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6555687Z  + referencing==0.37.0
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6556069Z  + rpds-py==2026.6.3
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6556897Z  + ruff==0.16.8
+Build & verify release package	Sync dependencies (locked)	2026-10-05T15:31:00.6557259Z  + typing-extensions==4.16.0
+Build & verify release package	Validate DataContracts	﻿2026-10-05T15:31:00.6679146Z ##[group]Run uv run mdf validate
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:00.6679524Z ^[[36;1muv run mdf validate^[[0m
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:00.6746595Z shell: /usr/bin/bash -e {0}
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:00.6746917Z env:
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:00.6747215Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:00.6747661Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:00.6747985Z ##[endgroup]
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0843776Z ✅ การตรวจสอบความถูกต้องผ่านเรียบร้อย (PASS) (พบข้อควรระวัง 3 รายการ)
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0845271Z - [WARNING] รหัส: CALENDAR_PENDING_OWNER
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0846105Z   ฟิลด์: timezone, expected_at, expected_day_offset, business_schedule
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0847088Z   ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: timezone, expected_at, expected_day_offset, business_schedule
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0848670Z   วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, expected_day_offset, recovery_window, business_schedule) ใน contract
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0849740Z - [WARNING] รหัส: CALENDAR_PENDING_OWNER
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0850556Z   ฟิลด์: timezone, expected_at, expected_day_offset, business_schedule
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0851481Z   ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: timezone, expected_at, expected_day_offset, business_schedule
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0852854Z   วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, expected_day_offset, recovery_window, business_schedule) ใน contract
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0854127Z - [WARNING] รหัส: CALENDAR_PENDING_OWNER
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0854787Z   ฟิลด์: timezone, expected_at, expected_day_offset, business_schedule
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0855734Z   ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: timezone, expected_at, expected_day_offset, business_schedule
+Build & verify release package	Validate DataContracts	2026-10-05T15:31:01.0857129Z   วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า calendar (expected_at, timezone, expected_day_offset, recovery_window, business_schedule) ใน contract
+Build & verify release package	Run test suite	﻿2026-10-05T15:31:01.1126339Z ##[group]Run uv run pytest
+Build & verify release package	Run test suite	2026-10-05T15:31:01.1126665Z ^[[36;1muv run pytest^[[0m
+Build & verify release package	Run test suite	2026-10-05T15:31:01.1191086Z shell: /usr/bin/bash -e {0}
+Build & verify release package	Run test suite	2026-10-05T15:31:01.1191391Z env:
+Build & verify release package	Run test suite	2026-10-05T15:31:01.1191686Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Run test suite	2026-10-05T15:31:01.1192089Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Run test suite	2026-10-05T15:31:01.1192403Z ##[endgroup]
+Build & verify release package	Run test suite	2026-10-05T15:32:16.2673237Z ........................................................................ [ 26%]
+Build & verify release package	Run test suite	2026-10-05T15:32:22.8963078Z ........................................................................ [ 53%]
+Build & verify release package	Run test suite	2026-10-05T15:32:24.1750435Z ........................................................................ [ 80%]
+Build & verify release package	Run test suite	2026-10-05T15:32:24.6317745Z ...................................................                      [100%]
+Build & verify release package	Run test suite	2026-10-05T15:32:24.6318424Z 267 passed in 83.03s (0:01:23)
+Build & verify release package	Compile resolved configs	﻿2026-10-05T15:32:24.6715592Z ##[group]Run uv run mdf compile --env dev
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.6715988Z ^[[36;1muv run mdf compile --env dev^[[0m
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.6779623Z shell: /usr/bin/bash -e {0}
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.6780028Z env:
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.6780344Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.6780748Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.6781056Z ##[endgroup]
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.9494626Z ✅ compile สำเร็จ: เขียน resolved JSON 6 ไฟล์ลง build/dev/resolved/<source>/
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.9495471Z    - build/dev/resolved/cc/bronze.cc.credit_card.resolved.json
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.9496113Z    - build/dev/resolved/cc/silver.cc.credit_card.resolved.json
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.9496789Z    - build/dev/resolved/cc/bronze.cc.credit_card_txn.resolved.json
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.9497455Z    - build/dev/resolved/cc/silver.cc.credit_card_txn.resolved.json
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.9498070Z    - build/dev/resolved/cc/bronze.cc.customer.resolved.json
+Build & verify release package	Compile resolved configs	2026-10-05T15:32:24.9498676Z    - build/dev/resolved/cc/silver.cc.customer.resolved.json
+Build & verify release package	Build release package (gated)	﻿2026-10-05T15:32:24.9793012Z ##[group]Run uv run mdf package --env dev --release
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:24.9793713Z ^[[36;1muv run mdf package --env dev --release^[[0m
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:24.9861721Z shell: /usr/bin/bash -e {0}
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:24.9861999Z env:
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:24.9862284Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:24.9862682Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:24.9862980Z ##[endgroup]
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:25.4266977Z [WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:25.4267943Z ✅ package สร้างที่: build/dev/release
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:25.4268373Z    release_id=mdf-b255065b505d preview=false
+Build & verify release package	Build release package (gated)	2026-10-05T15:32:25.4268912Z    manifest_version=3 file_count=9 odcs_contract=3 resolved_config=6
+Build & verify release package	Verify package integrity and release_id	﻿2026-10-05T15:32:25.4532063Z ##[group]Run uv run mdf verify-package build/dev/release --expect-release-id "mdf-${GITHUB_SHA::12}"
+Build & verify release package	Verify package integrity and release_id	2026-10-05T15:32:25.4532826Z ^[[36;1muv run mdf verify-package build/dev/release --expect-release-id "mdf-${GITHUB_SHA::12}"^[[0m
+Build & verify release package	Verify package integrity and release_id	2026-10-05T15:32:25.4594476Z shell: /usr/bin/bash -e {0}
+Build & verify release package	Verify package integrity and release_id	2026-10-05T15:32:25.4594744Z env:
+Build & verify release package	Verify package integrity and release_id	2026-10-05T15:32:25.4595033Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Verify package integrity and release_id	2026-10-05T15:32:25.4595431Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Verify package integrity and release_id	2026-10-05T15:32:25.4595738Z ##[endgroup]
+Build & verify release package	Verify package integrity and release_id	2026-10-05T15:32:25.5972221Z ✅ package ผ่านการตรวจสอบ (OK): env=dev, files=9, release_id=mdf-b255065b505d, manifest_sha256=4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+Build & verify release package	Read release metadata	﻿2026-10-05T15:32:25.6230848Z ##[group]Run test "$(jq -r '.preview' build/dev/release/manifest.json)" = "false"
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6231868Z ^[[36;1mtest "$(jq -r '.preview' build/dev/release/manifest.json)" = "false"^[[0m
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6232904Z ^[[36;1mecho "release_id=$(jq -r '.release_id' build/dev/release/manifest.json)" >> "$GITHUB_OUTPUT"^[[0m
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6234323Z ^[[36;1m# FR-L.12: delivery mode comes from the control file (validated by `mdf validate` above)^[[0m
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6235901Z ^[[36;1mecho "delivery_mode=$(uv run python -c "import yaml;print(yaml.safe_load(open('config/env/dev.yaml',encoding='utf-8'))['delivery_mode'])")" >> "$GITHUB_OUTPUT"^[[0m
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6305446Z shell: /usr/bin/bash -e {0}
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6305709Z env:
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6305990Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6306399Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Read release metadata	2026-10-05T15:32:25.6306702Z ##[endgroup]
+Build & verify release package	Upload package artifact	﻿2026-10-05T15:32:25.6982573Z ##[group]Run actions/upload-artifact@v7
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6982890Z with:
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6983157Z   name: mdf-release-b255065b505d7babe95b5af2a4a6869f4d45cf81
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6983499Z   path: build/dev/release
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6983723Z   retention-days: 30
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6984219Z   if-no-files-found: warn
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6984454Z   compression-level: 6
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6984663Z   overwrite: false
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6984880Z   include-hidden-files: false
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6985128Z   archive: true
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6985318Z env:
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6985578Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6985953Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.6986249Z ##[endgroup]
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.8465417Z With the provided path, there will be 11 files uploaded
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.8466394Z Artifact name is valid!
+Build & verify release package	Upload package artifact	2026-10-05T15:32:25.8466843Z Root directory input is valid!
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.0544436Z Uploading artifact: mdf-release-b255065b505d7babe95b5af2a4a6869f4d45cf81.zip
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.0592673Z Beginning upload of artifact content to blob storage
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.1459422Z Uploaded bytes 21140
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.1616945Z Finished uploading artifact content to blob storage!
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.1618321Z SHA256 digest of uploaded artifact is bcf7099d5873b4ac8b693ec2aa2412a5ece6c380c86c62cec8f62e6ae4fc925c
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.1619541Z Finalizing artifact upload
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.4134590Z Artifact mdf-release-b255065b505d7babe95b5af2a4a6869f4d45cf81 successfully finalized. Artifact ID 11355696192
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.4136520Z Artifact mdf-release-b255065b505d7babe95b5af2a4a6869f4d45cf81 has been successfully uploaded! Final size is 21140 bytes. Artifact ID is 11355696192
+Build & verify release package	Upload package artifact	2026-10-05T15:32:26.4138501Z Artifact download URL: https://github.com/franceZa/MetadataRegistry/actions/runs/37333436149/artifacts/11355696192
+Build & verify release package	Post Install uv	﻿2026-10-05T15:32:26.4323216Z Post job cleanup.
+Build & verify release package	Post Install uv	2026-10-05T15:32:26.5448209Z UV_CACHE_DIR is already set to /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Post Install uv	2026-10-05T15:32:26.5454794Z UV_PYTHON_INSTALL_DIR is already set to /home/runner/work/_temp/uv-python-dir
+Build & verify release package	Post Install uv	2026-10-05T15:32:26.5457714Z Including uv cache path: /home/runner/work/_temp/setup-uv-cache
+Build & verify release package	Post Install uv	2026-10-05T15:32:26.5677673Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/MetadataRegistry/MetadataRegistry --files-from manifest.txt --use-compress-program zstdmt
+Build & verify release package	Post Install uv	2026-10-05T15:32:26.8143848Z ##[warning]Failed to save: Unable to reserve cache with key setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521, another job may be creating this cache.
+Build & verify release package	Post Install uv	2026-10-05T15:32:26.8153254Z uv cache saved with key: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521
+Build & verify release package	Post Checkout (exact SHA)	﻿2026-10-05T15:32:26.9299777Z Post job cleanup.
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0231184Z [command]/usr/bin/git version
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0264805Z git version 2.55.0
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0308529Z Temporarily overriding HOME='/home/runner/work/_temp/ebaea893-379c-4b62-868a-40079280c7d9' before making global git config changes
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0309548Z Adding repository directory to the temporary git global config as a safe directory
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0313164Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MetadataRegistry/MetadataRegistry
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0348740Z Removing SSH command configuration
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0356410Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0396966Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0646890Z Removing HTTP extra header
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0653058Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0691452Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0948504Z Removing includeIf entries pointing to credentials config files
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.0958380Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1000082Z includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1001251Z includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1002369Z includeif.gitdir:/github/workspace/.git.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1003153Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1010260Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1040629Z /home/runner/work/_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1053231Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-92068296\-aab0\-4b69\-8d7d\-79f482f041db\.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1101191Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1143672Z /home/runner/work/_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1170993Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-92068296\-aab0\-4b69\-8d7d\-79f482f041db\.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1241895Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1276991Z /github/runner_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1281045Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-92068296\-aab0\-4b69\-8d7d\-79f482f041db\.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1318703Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1345484Z /github/runner_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1353443Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-92068296\-aab0\-4b69\-8d7d\-79f482f041db\.config
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1396442Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Build & verify release package	Post Checkout (exact SHA)	2026-10-05T15:32:27.1624223Z Removing credentials config '/home/runner/work/_temp/git-credentials-92068296-aab0-4b69-8d7d-79f482f041db.config'
+Build & verify release package	Complete job	﻿2026-10-05T15:32:27.1766206Z Evaluate and set job outputs
+Build & verify release package	Complete job	2026-10-05T15:32:27.1771762Z Set output 'release_id'
+Build & verify release package	Complete job	2026-10-05T15:32:27.1773414Z Set output 'delivery_mode'
+Build & verify release package	Complete job	2026-10-05T15:32:27.1775073Z Cleaning up orphan processes
+Publish GitHub Release	Set up job	﻿2026-10-05T15:32:32.3637253Z Current runner version: '2.337.0'
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3673662Z ##[group]Runner Image Provisioner
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3675089Z Hosted Compute Agent
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3676037Z Version: 20260901.588
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3677051Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3678487Z Build Date: 2026-09-01T19:56:44Z
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3679658Z Worker ID: {d61f27ca-2d8b-4a50-b605-4aea2d42d71f}
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3680939Z Azure Region: eastus
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3681994Z ##[endgroup]
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3684903Z ##[group]Operating System
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3685978Z Ubuntu
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3686829Z 24.04.5
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3687739Z LTS
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3688605Z ##[endgroup]
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3689477Z ##[group]Runner Image
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3690508Z Image: ubuntu-24.04
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3691528Z Version: 20260927.320.1
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3693812Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3696858Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3698576Z ##[endgroup]
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3700465Z ##[group]GITHUB_TOKEN Permissions
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3703123Z Contents: write
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3704301Z Metadata: read
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3705513Z ##[endgroup]
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3708407Z Secret source: Actions
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3710042Z Cache mode: write
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.3711100Z Prepare workflow directory
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.4435985Z Prepare all required actions
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.4508906Z Getting action download info
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.6611602Z Download action repository 'actions/checkout@v7' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.7905642Z Download action repository 'astral-sh/setup-uv@v10.2.0' (SHA:c18668ad3cf93ea998bef934396af7bb5c839dc7)
+Publish GitHub Release	Set up job	2026-10-05T15:32:32.9859302Z Download action repository 'actions/download-artifact@v8' (SHA:3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c)
+Publish GitHub Release	Set up job	2026-10-05T15:32:33.2468629Z Complete job name: Publish GitHub Release
+Publish GitHub Release	Checkout (exact SHA)	﻿2026-10-05T15:32:33.3224035Z ##[group]Run actions/checkout@v7
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3225087Z with:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3225565Z   repository: franceZa/MetadataRegistry
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3229263Z   token: ***
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3229703Z   ssh-strict: true
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3230138Z   ssh-user: git
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3230575Z   persist-credentials: true
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3231055Z   clean: true
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3231494Z   sparse-checkout-cone-mode: true
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3232013Z   fetch-depth: 1
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3232443Z   fetch-tags: false
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3232882Z   show-progress: true
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3233637Z   lfs: false
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3234377Z   submodules: false
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3235063Z   set-safe-directory: true
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3235575Z   allow-unsafe-pr-checkout: false
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3236495Z env:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3236917Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.3237411Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4406238Z Syncing repository: franceZa/MetadataRegistry
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4408720Z ##[group]Getting Git version info
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4410059Z Working directory is '/home/runner/work/MetadataRegistry/MetadataRegistry'
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4411531Z [command]/usr/bin/git version
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4504757Z git version 2.55.0
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4547644Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4565468Z Temporarily overriding HOME='/home/runner/work/_temp/df477d93-274f-4544-9edd-b02c0a4fe8c7' before making global git config changes
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4569967Z Adding repository directory to the temporary git global config as a safe directory
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4592324Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MetadataRegistry/MetadataRegistry
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4658449Z Deleting the contents of '/home/runner/work/MetadataRegistry/MetadataRegistry'
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4666327Z ##[group]Determining repository object format
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4668766Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4670967Z ##[group]Initializing the repository
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4672583Z [command]/usr/bin/git init /home/runner/work/MetadataRegistry/MetadataRegistry
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4809115Z hint: Using 'master' as the name for the initial branch. This default branch name
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4812601Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4818084Z hint: to use in all of your new repositories, which will suppress this warning,
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4819646Z hint: call:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4820691Z hint:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4821698Z hint: 	git config --global init.defaultBranch <name>
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4822939Z hint:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4824535Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4825916Z hint: 'development'. The just-created branch can be renamed via this command:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4827466Z hint:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4828296Z hint: 	git branch -m <name>
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4829261Z hint:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4830468Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4832471Z Initialized empty Git repository in /home/runner/work/MetadataRegistry/MetadataRegistry/.git/
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4837167Z [command]/usr/bin/git remote add origin https://github.com/franceZa/MetadataRegistry
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4906624Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4907982Z ##[group]Disabling automatic garbage collection
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4915804Z [command]/usr/bin/git config --local gc.auto 0
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4950164Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4951872Z ##[group]Setting up auth
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4964472Z Removing SSH command configuration
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4966159Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.4997470Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.5504087Z Removing HTTP extra header
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.5510593Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.5550694Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.5860266Z Removing includeIf entries pointing to credentials config files
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.5863103Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.5897516Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6135581Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6176092Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path /home/runner/work/_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6210440Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6253498Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6290074Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6321346Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6322780Z ##[group]Fetching the repository
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.6327520Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b255065b505d7babe95b5af2a4a6869f4d45cf81:refs/remotes/origin/master
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9221657Z From https://github.com/franceZa/MetadataRegistry
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9223667Z  * [new ref]         b255065b505d7babe95b5af2a4a6869f4d45cf81 -> origin/master
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9231191Z [command]/usr/bin/git branch --list --remote origin/master
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9260546Z   origin/master
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9269341Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9295764Z b255065b505d7babe95b5af2a4a6869f4d45cf81
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9301212Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9302601Z ##[group]Determining the checkout info
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9304795Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9306034Z [command]/usr/bin/git sparse-checkout disable
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9359427Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9393811Z ##[group]Checking out the ref
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9396540Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9544343Z Reset branch 'master'
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9550362Z branch 'master' set up to track 'origin/master'.
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9635628Z ##[endgroup]
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9639516Z [command]/usr/bin/git log -1 --format=%H
+Publish GitHub Release	Checkout (exact SHA)	2026-10-05T15:32:33.9650676Z b255065b505d7babe95b5af2a4a6869f4d45cf81
+Publish GitHub Release	Install uv	﻿2026-10-05T15:32:34.0091371Z ##[group]Run astral-sh/setup-uv@v10.2.0
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0092547Z with:
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0093473Z   enable-cache: true
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0094385Z   activate-environment: false
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0095385Z   no-project: false
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0096694Z   working-directory: /home/runner/work/MetadataRegistry/MetadataRegistry
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0106673Z   github-token: ***
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0108945Z   cache-dependency-glob: **/*requirements*.txt
+Publish GitHub Release	Install uv	**/*requirements*.in
+Publish GitHub Release	Install uv	**/*constraints*.txt
+Publish GitHub Release	Install uv	**/*constraints*.in
+Publish GitHub Release	Install uv	**/pyproject.toml
+Publish GitHub Release	Install uv	**/uv.lock
+Publish GitHub Release	Install uv	**/*.py.lock
+Publish GitHub Release	Install uv	
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0111528Z   restore-cache: true
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0112396Z   save-cache: auto
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0113526Z   prune-cache: false
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0114500Z   cache-python: false
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0115446Z   ignore-nothing-to-cache: false
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0116505Z   ignore-empty-workdir: false
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0117551Z   download-from-astral-mirror: true
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0118656Z   add-problem-matchers: true
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0119662Z   quiet: false
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0120485Z   resolution-strategy: highest
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0121443Z env:
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0122195Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.0123278Z ##[endgroup]
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.1999507Z Trying to find version for uv in: /home/runner/work/MetadataRegistry/MetadataRegistry/uv.toml
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.2002167Z Could not find file: /home/runner/work/MetadataRegistry/MetadataRegistry/uv.toml
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.2003909Z Trying to find version for uv in: /home/runner/work/MetadataRegistry/MetadataRegistry/pyproject.toml
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.2005828Z Could not determine uv version from uv.toml or pyproject.toml. Falling back to latest.
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.2016323Z Fetching manifest data from https://raw.githubusercontent.com/astral-sh/versions/main/v1/uv.ndjson ...
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.2521390Z Downloading uv from "https://releases.astral.sh/github/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz" ...
+Publish GitHub Release	Install uv	2026-10-05T15:32:34.8248222Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/a7a3477a-ebe5-4a4f-b0a7-ead3f087b2d5 -f /home/runner/work/_temp/27f4d185-80d9-4d37-882e-6101389c82d2
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2102685Z Added /home/runner/.local/bin to the path
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2113401Z Added /opt/hostedtoolcache/uv/0.12.23/x86_64 to the path
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2114341Z Set UV_PYTHON_INSTALL_DIR to /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2115365Z Added /home/runner/work/_temp/uv-python-dir to the path
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2140058Z Set UV_CACHE_DIR to /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2141151Z Successfully installed uv version 0.12.23
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2735286Z Searching files using cache dependency glob: /home/runner/work/MetadataRegistry/MetadataRegistry/**/*requirements*.txt,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*requirements*.in,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*constraints*.txt,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*constraints*.in,/home/runner/work/MetadataRegistry/MetadataRegistry/**/pyproject.toml,/home/runner/work/MetadataRegistry/MetadataRegistry/**/uv.lock,/home/runner/work/MetadataRegistry/MetadataRegistry/**/*.py.lock
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.2962499Z /home/runner/work/MetadataRegistry/MetadataRegistry/pyproject.toml
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.3268508Z /home/runner/work/MetadataRegistry/MetadataRegistry/uv.lock
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.3277499Z Found 2 files to hash.
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.3348418Z Trying to restore cache from GitHub Actions cache with key: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.4029483Z Cache hit for: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.5489358Z Received 3106818 of 3106818 (100.0%), 29.9 MBs/sec
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.5490358Z Cache Size: ~3 MB (3106818 B)
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.5557654Z [command]/usr/bin/tar -xf /home/runner/work/_temp/7e5e0a07-cb25-4e98-9ddb-0fd5e2ee4030/cache.tzst -P -C /home/runner/work/MetadataRegistry/MetadataRegistry --use-compress-program unzstd
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.6311520Z Cache restored successfully
+Publish GitHub Release	Install uv	2026-10-05T15:32:35.6318111Z cache restored from GitHub Actions cache with key: setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521
+Publish GitHub Release	Sync dependencies (locked)	﻿2026-10-05T15:32:35.7462738Z ##[group]Run uv sync --locked
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7463606Z ^[[36;1muv sync --locked^[[0m
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7784773Z shell: /usr/bin/bash -e {0}
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7785191Z env:
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7785503Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7785903Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7786349Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7786693Z ##[endgroup]
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7985754Z Using CPython 3.12.3 interpreter at: /usr/bin/python3
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.7986327Z Creating virtual environment at: .venv
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.8004698Z Resolved 15 packages in 0.70ms
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.8030549Z    Building mdf @ file:///home/runner/work/MetadataRegistry/MetadataRegistry
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.8704325Z Downloading ruff (9.8MiB)
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:35.9491101Z  Downloaded ruff
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2048876Z       Built mdf @ file:///home/runner/work/MetadataRegistry/MetadataRegistry
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2057755Z Prepared 12 packages in 404ms
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2167182Z Installed 14 packages in 10ms
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2167892Z  + attrs==26.1.0
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2168307Z  + iniconfig==2.3.0
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2168704Z  + jsonschema==4.26.0
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2169149Z  + jsonschema-specifications==2025.9.1
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2169870Z  + mdf==0.1.0 (from file:///home/runner/work/MetadataRegistry/MetadataRegistry)
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2170576Z  + packaging==26.3
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2170952Z  + pluggy==1.6.0
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2171328Z  + pygments==2.21.0
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2171695Z  + pytest==9.1.1
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2172044Z  + pyyaml==6.0.3
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2172411Z  + referencing==0.37.0
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2172818Z  + rpds-py==2026.6.3
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2173352Z  + ruff==0.16.8
+Publish GitHub Release	Sync dependencies (locked)	2026-10-05T15:32:36.2173755Z  + typing-extensions==4.16.0
+Publish GitHub Release	Download package artifact	﻿2026-10-05T15:32:36.2366982Z ##[group]Run actions/download-artifact@v8
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2367331Z with:
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2367623Z   name: mdf-release-b255065b505d7babe95b5af2a4a6869f4d45cf81
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2367989Z   path: build/dev/release
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2368238Z   merge-multiple: false
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2368723Z   repository: franceZa/MetadataRegistry
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2369006Z   run-id: 37333436149
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2369233Z   skip-decompress: false
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2369476Z   digest-mismatch: error
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2369691Z env:
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2369894Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2370222Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2370613Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.2370920Z ##[endgroup]
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.3792391Z Downloading single artifact
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.4896893Z Preparing to download the following artifacts:
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.4898533Z - mdf-release-b255065b505d7babe95b5af2a4a6869f4d45cf81 (ID: 11355696192, Size: 21140, Expected Digest: sha256:bcf7099d5873b4ac8b693ec2aa2412a5ece6c380c86c62cec8f62e6ae4fc925c)
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6468721Z Redirecting to blob download url: https://productionresultssa10.blob.core.windows.net/actions-results/d55cc54d-20a8-8a91-9c72-05372ea3ac22/workflow-job-run-67c17faf-34f6-5248-ac4d-7b7ffd474f74/artifacts/0d533b0adb6172af02dca062a5af0408a181d678c4388625ff22b3fa5dddab3e.zip
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6471620Z Starting download of artifact to: /home/runner/work/MetadataRegistry/MetadataRegistry/build/dev/release
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6764268Z (node:2360) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6765664Z (Use `node --trace-deprecation ...` to show where the warning was created)
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6935337Z SHA256 digest of downloaded artifact is bcf7099d5873b4ac8b693ec2aa2412a5ece6c380c86c62cec8f62e6ae4fc925c
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6936166Z Artifact download completed successfully.
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6936517Z Total of 1 artifact(s) downloaded
+Publish GitHub Release	Download package artifact	2026-10-05T15:32:36.6940302Z Download artifact has finished successfully
+Publish GitHub Release	Verify downloaded package	﻿2026-10-05T15:32:36.7055758Z ##[group]Run test "$RELEASE_ID" = "mdf-${GITHUB_SHA::12}"
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7056260Z ^[[36;1mtest "$RELEASE_ID" = "mdf-${GITHUB_SHA::12}"^[[0m
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7056770Z ^[[36;1muv run mdf verify-package build/dev/release --expect-release-id "$RELEASE_ID"^[[0m
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7057330Z ^[[36;1mtest "$(jq -r '.preview' build/dev/release/manifest.json)" = "false"^[[0m
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7124781Z shell: /usr/bin/bash -e {0}
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7125102Z env:
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7125337Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7125696Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7126130Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:36.7126451Z ##[endgroup]
+Publish GitHub Release	Verify downloaded package	2026-10-05T15:32:37.0258180Z ✅ package ผ่านการตรวจสอบ (OK): env=dev, files=9, release_id=mdf-b255065b505d, manifest_sha256=4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+Publish GitHub Release	Build release zip asset	﻿2026-10-05T15:32:37.0532559Z ##[group]Run (cd build/dev/release && zip -q -r "../../../build/${RELEASE_ID}.zip" .)
+Publish GitHub Release	Build release zip asset	2026-10-05T15:32:37.0533508Z ^[[36;1m(cd build/dev/release && zip -q -r "../../../build/${RELEASE_ID}.zip" .)^[[0m
+Publish GitHub Release	Build release zip asset	2026-10-05T15:32:37.0595119Z shell: /usr/bin/bash -e {0}
+Publish GitHub Release	Build release zip asset	2026-10-05T15:32:37.0595404Z env:
+Publish GitHub Release	Build release zip asset	2026-10-05T15:32:37.0595623Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Build release zip asset	2026-10-05T15:32:37.0595985Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Build release zip asset	2026-10-05T15:32:37.0596416Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Build release zip asset	2026-10-05T15:32:37.0596742Z ##[endgroup]
+Publish GitHub Release	Compute manifest digest	﻿2026-10-05T15:32:37.0888730Z ##[group]Run echo "manifest_sha256=$(sha256sum build/dev/release/manifest.json | cut -d' ' -f1)" \
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0889489Z ^[[36;1mecho "manifest_sha256=$(sha256sum build/dev/release/manifest.json | cut -d' ' -f1)" \^[[0m
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0889966Z ^[[36;1m  >> "$GITHUB_OUTPUT"^[[0m
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0951839Z shell: /usr/bin/bash -e {0}
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0952120Z env:
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0952338Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0952705Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0953570Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Compute manifest digest	2026-10-05T15:32:37.0953901Z ##[endgroup]
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	﻿2026-10-05T15:32:37.1117889Z ##[group]Run uv run python - <<'PY' >> "$GITHUB_OUTPUT"
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1118385Z ^[[36;1muv run python - <<'PY' >> "$GITHUB_OUTPUT"^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1118718Z ^[[36;1mimport json^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1118967Z ^[[36;1mfrom pathlib import Path^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1119234Z ^[[36;1m^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1119442Z ^[[36;1mids = set()^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1119772Z ^[[36;1mfor path in Path("build/dev/release").rglob("*.resolved.json"):^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1120256Z ^[[36;1m    cfg = json.loads(path.read_text(encoding="utf-8"))^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1120717Z ^[[36;1m    if (cfg.get("calendar") or {}).get("status") == "PENDING_OWNER":^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1121251Z ^[[36;1m        ids.add(cfg.get("contract_id") or f"{cfg.get('source')}.{cfg.get('dataset')}")^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1121750Z ^[[36;1mprint("pending_owner=" + ", ".join(sorted(ids)))^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1122089Z ^[[36;1mPY^[[0m
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1184740Z shell: /usr/bin/bash -e {0}
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1185015Z env:
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1185267Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1185628Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1186070Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Collect calendar PENDING_OWNER datasets	2026-10-05T15:32:37.1186393Z ##[endgroup]
+Publish GitHub Release	Publish or skip if identical release exists	﻿2026-10-05T15:32:37.1641662Z ##[group]Run if gh release view "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1642395Z ^[[36;1mif gh release view "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1642912Z ^[[36;1m  mkdir -p build/existing-dl build/existing^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1643590Z ^[[36;1m  # FR-L.1b: idempotency compares manifest.json extracted FROM the zip, not the^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1644140Z ^[[36;1m  # zip's own hash (zip encoding/order/mtime are not deterministic).^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1644639Z ^[[36;1m  gh release download "$RELEASE_ID" --repo "$GITHUB_REPOSITORY" \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1645126Z ^[[36;1m    --dir build/existing-dl --pattern "${RELEASE_ID}.zip"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1645526Z ^[[36;1m  uv run python scripts/safe_unzip.py \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1645910Z ^[[36;1m    "build/existing-dl/${RELEASE_ID}.zip" build/existing^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1646406Z ^[[36;1m  uv run mdf verify-package build/existing --expect-release-id "$RELEASE_ID"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1647047Z ^[[36;1m  # ci_run_url differs between runs of the same commit; everything else must match.^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1647587Z ^[[36;1m  if ! diff <(jq -S 'del(.ci_run_url)' build/existing/manifest.json) \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1648073Z ^[[36;1m            <(jq -S 'del(.ci_run_url)' build/dev/release/manifest.json); then^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1648558Z ^[[36;1m    echo "::error::release $RELEASE_ID exists with different content"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1649061Z ^[[36;1m    echo "manifest_sha256: \`${MANIFEST_SHA256}\`" >> "$GITHUB_STEP_SUMMARY"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1649463Z ^[[36;1m    exit 1^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1649682Z ^[[36;1m  fi^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1650037Z ^[[36;1m  echo "release $RELEASE_ID already published with identical content - skip"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1650450Z ^[[36;1m  exit 0^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1650662Z ^[[36;1mfi^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1651096Z ^[[36;1mNOTES="$(printf 'mdf release package for %s\n\nmanifest_sha256: %s\n' "$GITHUB_SHA" "$MANIFEST_SHA256")"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1651769Z ^[[36;1m# T-57 · FR-M.4: only when some calendar is still PENDING_OWNER (empty = no line)^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1652237Z ^[[36;1mif [ -n "$PENDING_OWNER" ]; then^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1652687Z ^[[36;1m  NOTES="$(printf '%s\n\ncalendar PENDING_OWNER: %s\n' "$NOTES" "$PENDING_OWNER")"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1653312Z ^[[36;1mfi^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1653549Z ^[[36;1mgh release create "$RELEASE_ID" \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1653867Z ^[[36;1m  --repo "$GITHUB_REPOSITORY" \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1654180Z ^[[36;1m  --target "$GITHUB_SHA" \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1654636Z ^[[36;1m  --title "$RELEASE_ID" \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1654915Z ^[[36;1m  --notes "$NOTES" \^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1655177Z ^[[36;1m  "build/${RELEASE_ID}.zip"^[[0m
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1716452Z shell: /usr/bin/bash -e {0}
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1716727Z env:
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1716939Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1717290Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1717711Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1720185Z   GH_TOKEN: ***
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1720574Z   MANIFEST_SHA256: 4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1721109Z   PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:37.1721466Z ##[endgroup]
+Publish GitHub Release	Publish or skip if identical release exists	2026-10-05T15:32:39.9452876Z https://github.com/franceZa/MetadataRegistry/releases/tag/mdf-b255065b505d
+Publish GitHub Release	Next steps (job summary)	﻿2026-10-05T15:32:39.9528780Z ##[group]Run echo "manifest_sha256: \`${MANIFEST_SHA256}\`" >> "$GITHUB_STEP_SUMMARY"
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9529442Z ^[[36;1mecho "manifest_sha256: \`${MANIFEST_SHA256}\`" >> "$GITHUB_STEP_SUMMARY"^[[0m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9530007Z ^[[36;1m# T-57 · FR-M.4: only when some calendar is still PENDING_OWNER (empty = no line)^[[0m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9530501Z ^[[36;1mif [ -n "$PENDING_OWNER" ]; then^[[0m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9530987Z ^[[36;1m  printf '\ncalendar PENDING_OWNER: %s\n\n' "$PENDING_OWNER" >> "$GITHUB_STEP_SUMMARY"^[[0m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9531429Z ^[[36;1mfi^[[0m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9531768Z ^[[36;1muv run python scripts/next_steps.py "$DELIVERY_MODE" "$RELEASE_ID" \^[[0m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9532328Z ^[[36;1m  --run-url "$RUN_URL" --repo "$GITHUB_REPOSITORY" | tee -a "$GITHUB_STEP_SUMMARY"^[[0m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9592835Z shell: /usr/bin/bash -e {0}
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9593376Z env:
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9593602Z   RELEASE_ID: mdf-b255065b505d
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9593944Z   UV_PYTHON_INSTALL_DIR: /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9594401Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9594736Z   DELIVERY_MODE: u2m
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9595116Z   RUN_URL: https://github.com/franceZa/MetadataRegistry/actions/runs/37333436149
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9595692Z   MANIFEST_SHA256: 4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9596214Z   PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9596570Z ##[endgroup]
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9976631Z ## ขั้นต่อไป — `mdf-b255065b505d` · mode **u2m** (คุณ login · สคริปต์ทำที่เหลือ)
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9977123Z 
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9977378Z ทำบนเครื่องคุณ ใน git-bash / terminal ที่ root ของ repo:
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9977676Z 
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9977936Z 1. ดึงโค้ดของ release นี้ (bundle ที่ deploy ต้องตรงกับ release):
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9978351Z ```bash
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9978605Z git fetch origin --tags
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9978974Z git worktree add ../mdf-mdf-b255065b505d mdf-b255065b505d
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9979425Z cd ../mdf-mdf-b255065b505d
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9979731Z ```
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9980254Z 2. login ครั้งเดียว (เปิดเบราว์เซอร์ให้กดยืนยัน) — ข้ามได้ถ้า `databricks auth profiles` ขึ้น Valid YES:
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9980763Z ```bash
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9981173Z databricks auth login --host https://<workspace-host> --profile mdf-free
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9981645Z ```
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9982244Z 3. รันสคริปต์ (ทำ CD-1…8 ให้เองทั้งหมด):
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9982569Z ```bash
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9982982Z export DATABRICKS_CONFIG_PROFILE=mdf-free MDF_WAREHOUSE_ID=<sql-warehouse-id>
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9983896Z bash scripts/deliver_release.sh mdf-b255065b505d
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9984276Z ```
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9984893Z 4. จบเมื่อเห็น `── ✅ delivered mdf-b255065b505d` · หลักฐานอยู่ที่ `build/deliver/mdf-b255065b505d/evidence.md`
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9985368Z 
+Publish GitHub Release	Next steps (job summary)	2026-10-05T15:32:39.9986064Z **ถ้าติด** (ลง CLI ไม่ได้ · login ไม่ผ่าน · เครื่องไม่มี bash): ถอยไป mode manual (`python scripts/next_steps.py manual mdf-b255065b505d`) · ดู `runbooks/release-delivery.md`
+Publish GitHub Release	Post Install uv	﻿2026-10-05T15:32:40.0147215Z Post job cleanup.
+Publish GitHub Release	Post Install uv	2026-10-05T15:32:40.1262982Z UV_CACHE_DIR is already set to /home/runner/work/_temp/setup-uv-cache
+Publish GitHub Release	Post Install uv	2026-10-05T15:32:40.1275534Z UV_PYTHON_INSTALL_DIR is already set to /home/runner/work/_temp/uv-python-dir
+Publish GitHub Release	Post Install uv	2026-10-05T15:32:40.1276941Z Cache hit occurred on key setup-uv-2-x86_64-unknown-linux-gnu-ubuntu-24.04-3.12.3-430ef890b8fc88b5ee33864e0f267b306459d1e42b1a1526ffdc57547db01521, not saving cache.
+Publish GitHub Release	Post Checkout (exact SHA)	﻿2026-10-05T15:32:40.2424893Z Post job cleanup.
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3309258Z [command]/usr/bin/git version
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3357894Z git version 2.55.0
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3406616Z Temporarily overriding HOME='/home/runner/work/_temp/83a2ec99-c3bd-459a-a996-05ab49ae22af' before making global git config changes
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3408000Z Adding repository directory to the temporary git global config as a safe directory
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3413535Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/MetadataRegistry/MetadataRegistry
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3450597Z Removing SSH command configuration
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3459034Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3509297Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3767621Z Removing HTTP extra header
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3775510Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.3825387Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4109209Z Removing includeIf entries pointing to credentials config files
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4119161Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4155397Z includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4156873Z includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4158109Z includeif.gitdir:/github/workspace/.git.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4158969Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4164730Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4199712Z /home/runner/work/_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4218650Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-1bb3b114\-99ba\-46ff\-8b5e\-f580b352b1ef\.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4274022Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4308869Z /home/runner/work/_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4328004Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/MetadataRegistry/MetadataRegistry/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-1bb3b114\-99ba\-46ff\-8b5e\-f580b352b1ef\.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4371479Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4413902Z /github/runner_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4415829Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-1bb3b114\-99ba\-46ff\-8b5e\-f580b352b1ef\.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4451284Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4478542Z /github/runner_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4487093Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-1bb3b114\-99ba\-46ff\-8b5e\-f580b352b1ef\.config
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4527368Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Publish GitHub Release	Post Checkout (exact SHA)	2026-10-05T15:32:40.4748518Z Removing credentials config '/home/runner/work/_temp/git-credentials-1bb3b114-99ba-46ff-8b5e-f580b352b1ef.config'
+Publish GitHub Release	Complete job	﻿2026-10-05T15:32:40.4893918Z Cleaning up orphan processes
+
+exit_code=0

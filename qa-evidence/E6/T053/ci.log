@@ -1,0 +1,7 @@
+Bandit SAST (fail on Medium/High)	pass	9s	https://github.com/franceZa/MetadataRegistry/actions/runs/37332260085/job/111838039544	
+Bandit SAST (fail on Medium/High)	pass	10s	https://github.com/franceZa/MetadataRegistry/actions/runs/37332685867/job/111839485096	
+Gitleaks secret scan (fail on any finding)	pass	5s	https://github.com/franceZa/MetadataRegistry/actions/runs/37332260085/job/111838039967	
+Gitleaks secret scan (fail on any finding)	pass	6s	https://github.com/franceZa/MetadataRegistry/actions/runs/37332685867/job/111839485452	
+Validate, compile preview, test	pass	1m35s	https://github.com/franceZa/MetadataRegistry/actions/runs/37332685864/job/111839485659	
+
+exit_code=0

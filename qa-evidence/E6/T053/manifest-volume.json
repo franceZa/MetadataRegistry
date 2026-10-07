@@ -1,0 +1,85 @@
+{
+  "manifest_version": 3,
+  "release_id": "mdf-b255065b505d",
+  "environment": "dev",
+  "source_commit": "b255065b505d7babe95b5af2a4a6869f4d45cf81",
+  "compiler_revision": "0.1.0+src.106088cbfdd7",
+  "uv_lock_sha256": "b361060576425b67ccc74f12c9efb9f8c380b1f3207b896beaabb9439ae69c8c",
+  "ci_run_url": "https://github.com/franceZa/MetadataRegistry/actions/runs/37333436149",
+  "file_count": 9,
+  "files": [
+    {
+      "path": "cc/bronze.cc.credit_card.resolved.json",
+      "sha256": "4eae6b9408fc5216c9c5987c0623b6cb3105a34532d3bad4fb178d20a77f29d3",
+      "kind": "resolved_config",
+      "source": "cc",
+      "dataset": "credit_card",
+      "layer": "bronze"
+    },
+    {
+      "path": "cc/bronze.cc.credit_card_txn.resolved.json",
+      "sha256": "d124e9bf717468766e03c90a8ba1c6e15608b0f3eceec09f0dfad132766c80e6",
+      "kind": "resolved_config",
+      "source": "cc",
+      "dataset": "credit_card_txn",
+      "layer": "bronze"
+    },
+    {
+      "path": "cc/bronze.cc.customer.resolved.json",
+      "sha256": "3bd41162ae5b5c588effdc1db7101d2d0820c5ca5b48e3356175ca2af71f9d12",
+      "kind": "resolved_config",
+      "source": "cc",
+      "dataset": "customer",
+      "layer": "bronze"
+    },
+    {
+      "path": "cc/credit_card.odcs.yaml",
+      "sha256": "1718f4e1edb8428f9131c8ada07b7285f946412e5492b97f254c22edcf1a03f7",
+      "kind": "odcs_contract",
+      "source": "cc",
+      "dataset": "credit_card"
+    },
+    {
+      "path": "cc/credit_card_txn.odcs.yaml",
+      "sha256": "145c94d42d8e0e7faea58e940bedfc43210859328506dde81b26c77c419eef3b",
+      "kind": "odcs_contract",
+      "source": "cc",
+      "dataset": "credit_card_txn"
+    },
+    {
+      "path": "cc/customer.odcs.yaml",
+      "sha256": "38813858c933deeb3db47dc87cb0c526a18cc9b3c95d06f3da603089a04bcb0b",
+      "kind": "odcs_contract",
+      "source": "cc",
+      "dataset": "customer"
+    },
+    {
+      "path": "cc/silver.cc.credit_card.resolved.json",
+      "sha256": "9b62b8e75da92ca3fda11c21ee56099a850336ff28ab7fd03d01ce5830752646",
+      "kind": "resolved_config",
+      "source": "cc",
+      "dataset": "credit_card",
+      "layer": "silver"
+    },
+    {
+      "path": "cc/silver.cc.credit_card_txn.resolved.json",
+      "sha256": "af4f43fbb011b033d9877e4b7a80405624468199896ec1c873c3e7a26039dc07",
+      "kind": "resolved_config",
+      "source": "cc",
+      "dataset": "credit_card_txn",
+      "layer": "silver"
+    },
+    {
+      "path": "cc/silver.cc.customer.resolved.json",
+      "sha256": "c9419fa5554d2ff2e425ffeab6a7a9252b98c8138744bf0fbf548c51407c3eaf",
+      "kind": "resolved_config",
+      "source": "cc",
+      "dataset": "customer",
+      "layer": "silver"
+    }
+  ],
+  "validation_report_sha256": "8e50069218a359cc8aafbb1d239bf1b20f3488b45e0049e00ad0cbce9d2723f6",
+  "preview": false
+}
+
+

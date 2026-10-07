@@ -1,0 +1,325 @@
+{
+  "calendar": {
+    "day_of_month": null,
+    "day_of_month_policy": null,
+    "effective_from": null,
+    "effective_to": null,
+    "exceptions": [],
+    "expected_at": null,
+    "expected_day_offset": null,
+    "explicit_dates": [],
+    "frequency": "daily",
+    "holidays": [],
+    "missing_after_seconds": 14400,
+    "recovery_window_seconds": 172800,
+    "schedule_type": null,
+    "status": "PENDING_OWNER",
+    "timezone": null
+  },
+  "checkpoint": "/Volumes/dev_catalog/ops/checkpoints/bronze_cc/customer/",
+  "checks": [
+    {
+      "action": "reject",
+      "column": "customer_id",
+      "description": "ต้องมีค่า ห้ามว่าง (NULL)",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {},
+      "rule_id": "not_null@customer_id",
+      "sql": "customer_id IS NOT NULL",
+      "stage": "pre_tokenise"
+    },
+    {
+      "action": "reject",
+      "column": "national_id",
+      "description": "ต้องมีค่า ห้ามว่าง (NULL)",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {},
+      "rule_id": "not_null@national_id",
+      "sql": "national_id IS NOT NULL",
+      "stage": "pre_tokenise"
+    },
+    {
+      "action": "reject",
+      "column": "national_id",
+      "description": "ค่าต้องตรงกับรูปแบบ regex ที่ contract กำหนด",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {
+        "pattern": "^[0-9]{13}$"
+      },
+      "rule_id": "pattern@national_id",
+      "sql": "national_id IS NULL OR national_id RLIKE ^[0-9]{13}$",
+      "stage": "pre_tokenise"
+    },
+    {
+      "action": "reject",
+      "column": "full_name",
+      "description": "ต้องมีค่า ห้ามว่าง (NULL)",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {},
+      "rule_id": "not_null@full_name",
+      "sql": "full_name IS NOT NULL",
+      "stage": "pre_tokenise"
+    },
+    {
+      "action": "reject",
+      "column": "birth_date",
+      "description": "ต้องมีค่า ห้ามว่าง (NULL)",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {},
+      "rule_id": "not_null@birth_date",
+      "sql": "birth_date IS NOT NULL",
+      "stage": "pre_tokenise"
+    },
+    {
+      "action": "reject",
+      "column": "customer_status",
+      "description": "ต้องมีค่า ห้ามว่าง (NULL)",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {},
+      "rule_id": "not_null@customer_status",
+      "sql": "customer_status IS NOT NULL",
+      "stage": "pre_tokenise"
+    },
+    {
+      "action": "reject",
+      "column": "customer_status",
+      "description": "ค่าต้องอยู่ในรายการที่อนุญาต",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {
+        "valid_values": [
+          "ACTIVE",
+          "DORMANT",
+          "CLOSED"
+        ]
+      },
+      "rule_id": "valid_values@customer_status",
+      "sql": "customer_status IS NULL OR customer_status IN ('ACTIVE', 'DORMANT', 'CLOSED')",
+      "stage": "pre_tokenise"
+    },
+    {
+      "action": "reject",
+      "column": "business_date",
+      "description": "ต้องมีค่า ห้ามว่าง (NULL)",
+      "function": null,
+      "kind": "sql",
+      "library_version": 1,
+      "params": {},
+      "rule_id": "not_null@business_date",
+      "sql": "business_date IS NOT NULL",
+      "stage": "pre_tokenise"
+    }
+  ],
+  "config_id": "bronze.cc.customer",
+  "contract_id": "cc.customer",
+  "dataset": "customer",
+  "landing": "/Volumes/dev_catalog/landing_cc/files/customer/",
+  "layer": "bronze",
+  "library_version": 1,
+  "lineage": {
+    "contract_bundle_path": "cc/customer.odcs.yaml",
+    "contract_file": "DataContract/cc/contract/customer.odcs.yaml",
+    "contract_id": "cc.customer",
+    "contract_sha256": "38813858c933deeb3db47dc87cb0c526a18cc9b3c95d06f3da603089a04bcb0b",
+    "contract_version": "1.0.0",
+    "dq_library_sha256": "1aaea8cf0c2655706b73fd94acf2eb91692f6539735308103b3fd8ea81932204",
+    "pipeline_file": "DataContract/cc/pipeline/customer.pipeline.yaml",
+    "pipeline_sha256": "d4d976efa6cd03d1f26438f09d42715cebba4b5c6c5db4a1d6afa283958d8aaf"
+  },
+  "pipeline": {
+    "business_rules": [
+      {
+        "expression": "birth_date <= current_date()",
+        "name": "birth_date_not_future",
+        "origin": "source",
+        "severity": "reject"
+      },
+      {
+        "expression": "length(national_id) = 13 AND national_id RLIKE '^[0-9]+$'",
+        "name": "national_id_well_formed",
+        "origin": "source",
+        "severity": "reject"
+      },
+      {
+        "expression": "full_name IS NOT NULL AND trim(full_name) <> ''",
+        "name": "full_name_present",
+        "origin": "source",
+        "severity": "reject"
+      },
+      {
+        "expression": "registered_date IS NULL OR registered_date > birth_date",
+        "name": "registered_after_birth",
+        "origin": "source",
+        "severity": "flag"
+      }
+    ],
+    "columns": {
+      "full_name": {
+        "normalise": [],
+        "tokenise": true
+      },
+      "national_id": {
+        "normalise": [],
+        "tokenise": true
+      }
+    },
+    "contract_ref": "cc.customer@1",
+    "dedup": {
+      "keys": [
+        "customer_id"
+      ],
+      "order_by": "business_date"
+    },
+    "derived": [],
+    "dq_policy": "quality_first",
+    "dq_version": 1,
+    "framework": "1.x",
+    "ops": {
+      "min_dq_pass_rate": 0.99,
+      "reconciliation_interval": "2h"
+    },
+    "quarantine": {
+      "enabled": true
+    },
+    "retention": {
+      "bronze": "90d",
+      "quarantine": "180d",
+      "silver": "1825d",
+      "vault": "1825d"
+    }
+  },
+  "quarantine": "dev_catalog.quarantine_cc.customer",
+  "reader": {
+    "encoding": "utf-8",
+    "file_pattern": "customer_{{business_date}}.csv",
+    "format": "csv",
+    "header": true,
+    "partition_pattern": "",
+    "run_grain": "business_date",
+    "source_type": "batch_file"
+  },
+  "run_log": "dev_catalog.ops.run_log",
+  "schema": [
+    {
+      "classification": "none",
+      "description": "Stable customer identifier",
+      "logicalType": "string",
+      "name": "customer_id",
+      "pci": false,
+      "physicalType": "string",
+      "pii": false,
+      "required": true,
+      "tags": []
+    },
+    {
+      "classification": "sensitive",
+      "description": "Thai national ID. Source claims always 13 digits.",
+      "logicalType": "string",
+      "name": "national_id",
+      "pci": false,
+      "physicalType": "string",
+      "pii": true,
+      "required": true,
+      "tags": [
+        "dq:pattern"
+      ]
+    },
+    {
+      "classification": "sensitive",
+      "description": "REALITY: one row per file is empty despite nullable=false",
+      "logicalType": "string",
+      "name": "full_name",
+      "pci": false,
+      "physicalType": "string",
+      "pii": true,
+      "required": true,
+      "tags": []
+    },
+    {
+      "classification": "sensitive",
+      "description": "REALITY: one row per file is in the future",
+      "logicalType": "date",
+      "name": "birth_date",
+      "pci": false,
+      "physicalType": "date",
+      "pii": true,
+      "required": true,
+      "tags": []
+    },
+    {
+      "classification": "personal",
+      "description": "Customer primary contact email address.",
+      "logicalType": "string",
+      "name": "email",
+      "pci": false,
+      "physicalType": "string",
+      "pii": true,
+      "required": false,
+      "tags": []
+    },
+    {
+      "classification": "personal",
+      "description": "Customer contact mobile phone number.",
+      "logicalType": "string",
+      "name": "phone",
+      "pci": false,
+      "physicalType": "string",
+      "pii": true,
+      "required": false,
+      "tags": []
+    },
+    {
+      "classification": "none",
+      "description": "Date when customer account was registered.",
+      "logicalType": "date",
+      "name": "registered_date",
+      "pci": false,
+      "physicalType": "date",
+      "pii": false,
+      "required": false,
+      "tags": []
+    },
+    {
+      "classification": "none",
+      "description": "Lifecycle status of customer account.",
+      "logicalType": "string",
+      "name": "customer_status",
+      "pci": false,
+      "physicalType": "string",
+      "pii": false,
+      "required": true,
+      "tags": [
+        "dq:valid_values"
+      ]
+    },
+    {
+      "classification": "none",
+      "description": "Partition key. FR-D.5: one run handles exactly one.",
+      "logicalType": "date",
+      "name": "business_date",
+      "pci": false,
+      "physicalType": "date",
+      "pii": false,
+      "required": true,
+      "tags": []
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source": "cc",
+  "table": "dev_catalog.bronze_cc.customer",
+  "vault": "dev_catalog.vault_cc.customer"
+}
+

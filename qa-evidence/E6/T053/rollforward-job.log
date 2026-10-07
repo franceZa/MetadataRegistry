@@ -1,0 +1,7 @@
+✅ ACTIVATED appended: release_id=mdf-b255065b505d manifest_sha256=4704afd38d1fd99e110c2a99af25275e32cf724ee0cac617da1f5f320a809e7f
+Run URL: https://<host>/jobs/945186884866349/runs/901239151622884?o=3911646557004951
+
+2026-10-05 22:42:28 "[dev franceza2558] mdf_release_register_dev" RUNNING
+2026-10-05 22:43:09 "[dev franceza2558] mdf_release_register_dev" TERMINATED SUCCESS
+
+exit_code=0

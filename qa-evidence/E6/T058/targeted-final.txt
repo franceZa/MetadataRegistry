@@ -1,0 +1,8 @@
+$ uv run pytest tests/test_calendar.py tests/test_compile.py tests/test_diff.py tests/test_validation.py tests/test_package.py tests/test_manifest_release.py tests/test_e2e.py tests/test_reality.py tests/test_release_workflow.py -q
+........................................................................ [ 45%]
+........................................................................ [ 90%]
+................                                                         [100%]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

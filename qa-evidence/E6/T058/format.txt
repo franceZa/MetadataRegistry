@@ -1,0 +1,4 @@
+$ uv run ruff format src/mdf/calendar.py tests/test_calendar.py
+2 files reformatted
+
+EXIT=0

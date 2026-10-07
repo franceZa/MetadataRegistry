@@ -1,0 +1,10 @@
+$ uv run mdf package --env dev
+[WARN] calendar PENDING_OWNER: cc.credit_card, cc.credit_card_txn, cc.customer
+✅ package สร้างที่: build\dev\release
+   release_id=mdf-5fe91614735b preview=true
+   manifest_version=3 file_count=9 odcs_contract=3 resolved_config=6
+   (โหมด preview — ใช้ --release เพื่อบังคับ release gate)
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

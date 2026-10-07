@@ -1,0 +1,18 @@
+$ uv run mdf validate
+✅ การตรวจสอบความถูกต้องผ่านเรียบร้อย (PASS) (พบข้อควรระวัง 3 รายการ)
+- [WARNING] รหัส: CALENDAR_PENDING_OWNER
+  ฟิลด์: schedule_type, expected_at, expected_day_offset
+  ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: schedule_type, expected_at, expected_day_offset
+  วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า schedule_type, expected_at, expected_day_offset ใน slaProperties
+- [WARNING] รหัส: CALENDAR_PENDING_OWNER
+  ฟิลด์: schedule_type, expected_at, expected_day_offset
+  ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: schedule_type, expected_at, expected_day_offset
+  วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า schedule_type, expected_at, expected_day_offset ใน slaProperties
+- [WARNING] รหัส: CALENDAR_PENDING_OWNER
+  ฟิลด์: schedule_type, expected_at, expected_day_offset
+  ข้อความ: ยังไม่ได้กำหนดฟิลด์ calendar: schedule_type, expected_at, expected_day_offset
+  วิธีแก้ไข: ให้ owner ของ dataset กำหนดค่า schedule_type, expected_at, expected_day_offset ใน slaProperties
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=0

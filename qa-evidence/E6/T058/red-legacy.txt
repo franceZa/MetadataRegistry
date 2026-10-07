@@ -1,0 +1,141 @@
+$ uv run pytest tests/test_calendar.py -q
+................FFFFFFF                                                  [100%]
+================================== FAILURES ===================================
+______ test_legacy_custom_key_even_null_is_an_actionable_error[timezone] ______
+
+key = 'timezone'
+
+    @pytest.mark.parametrize("key", [
+        "timezone", "expected_day_offset", "business_schedule", "expected_at",
+        "recovery_window", "schedule_type", "day_of_month",
+    ])
+    def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+        _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+>       assert errors == [("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties",
+                           "ย้ายไป slaProperties")]
+E       assert [] == [('customProp...aProperties')]
+E         
+E         Right contains one more item: ('customProperties.timezone', "'timezone' ต้องอยู่ใน slaProperties", 'ย้ายไป slaProperties')
+E         Use -v to get more diff
+
+tests\test_calendar.py:57: AssertionError
+_ test_legacy_custom_key_even_null_is_an_actionable_error[expected_day_offset] _
+
+key = 'expected_day_offset'
+
+    @pytest.mark.parametrize("key", [
+        "timezone", "expected_day_offset", "business_schedule", "expected_at",
+        "recovery_window", "schedule_type", "day_of_month",
+    ])
+    def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+        _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+>       assert errors == [("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties",
+                           "ย้ายไป slaProperties")]
+E       assert [] == [('customProp...aProperties')]
+E         
+E         Right contains one more item: ('customProperties.expected_day_offset', "'expected_day_offset' ต้องอยู่ใน slaProperties", 'ย้ายไป slaProperties')
+E         Use -v to get more diff
+
+tests\test_calendar.py:57: AssertionError
+_ test_legacy_custom_key_even_null_is_an_actionable_error[business_schedule] __
+
+key = 'business_schedule'
+
+    @pytest.mark.parametrize("key", [
+        "timezone", "expected_day_offset", "business_schedule", "expected_at",
+        "recovery_window", "schedule_type", "day_of_month",
+    ])
+    def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+        _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+>       assert errors == [("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties",
+                           "ย้ายไป slaProperties")]
+E       assert [] == [('customProp...aProperties')]
+E         
+E         Right contains one more item: ('customProperties.business_schedule', "'business_schedule' ต้องอยู่ใน slaProperties", 'ย้ายไป slaProperties')
+E         Use -v to get more diff
+
+tests\test_calendar.py:57: AssertionError
+____ test_legacy_custom_key_even_null_is_an_actionable_error[expected_at] _____
+
+key = 'expected_at'
+
+    @pytest.mark.parametrize("key", [
+        "timezone", "expected_day_offset", "business_schedule", "expected_at",
+        "recovery_window", "schedule_type", "day_of_month",
+    ])
+    def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+        _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+>       assert errors == [("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties",
+                           "ย้ายไป slaProperties")]
+E       assert [] == [('customProp...aProperties')]
+E         
+E         Right contains one more item: ('customProperties.expected_at', "'expected_at' ต้องอยู่ใน slaProperties", 'ย้ายไป slaProperties')
+E         Use -v to get more diff
+
+tests\test_calendar.py:57: AssertionError
+__ test_legacy_custom_key_even_null_is_an_actionable_error[recovery_window] ___
+
+key = 'recovery_window'
+
+    @pytest.mark.parametrize("key", [
+        "timezone", "expected_day_offset", "business_schedule", "expected_at",
+        "recovery_window", "schedule_type", "day_of_month",
+    ])
+    def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+        _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+>       assert errors == [("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties",
+                           "ย้ายไป slaProperties")]
+E       assert [] == [('customProp...aProperties')]
+E         
+E         Right contains one more item: ('customProperties.recovery_window', "'recovery_window' ต้องอยู่ใน slaProperties", 'ย้ายไป slaProperties')
+E         Use -v to get more diff
+
+tests\test_calendar.py:57: AssertionError
+___ test_legacy_custom_key_even_null_is_an_actionable_error[schedule_type] ____
+
+key = 'schedule_type'
+
+    @pytest.mark.parametrize("key", [
+        "timezone", "expected_day_offset", "business_schedule", "expected_at",
+        "recovery_window", "schedule_type", "day_of_month",
+    ])
+    def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+        _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+>       assert errors == [("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties",
+                           "ย้ายไป slaProperties")]
+E       assert [] == [('customProp...aProperties')]
+E         
+E         Right contains one more item: ('customProperties.schedule_type', "'schedule_type' ต้องอยู่ใน slaProperties", 'ย้ายไป slaProperties')
+E         Use -v to get more diff
+
+tests\test_calendar.py:57: AssertionError
+____ test_legacy_custom_key_even_null_is_an_actionable_error[day_of_month] ____
+
+key = 'day_of_month'
+
+    @pytest.mark.parametrize("key", [
+        "timezone", "expected_day_offset", "business_schedule", "expected_at",
+        "recovery_window", "schedule_type", "day_of_month",
+    ])
+    def test_legacy_custom_key_even_null_is_an_actionable_error(key):
+        _, _, errors = compiled_calendar({"customProperties": [{"property": key, "value": None}]})
+>       assert errors == [("customProperties." + key, f"'{key}' ต้องอยู่ใน slaProperties",
+                           "ย้ายไป slaProperties")]
+E       assert [] == [('customProp...aProperties')]
+E         
+E         Right contains one more item: ('customProperties.day_of_month', "'day_of_month' ต้องอยู่ใน slaProperties", 'ย้ายไป slaProperties')
+E         Use -v to get more diff
+
+tests\test_calendar.py:57: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_calendar.py::test_legacy_custom_key_even_null_is_an_actionable_error[timezone]
+FAILED tests/test_calendar.py::test_legacy_custom_key_even_null_is_an_actionable_error[expected_day_offset]
+FAILED tests/test_calendar.py::test_legacy_custom_key_even_null_is_an_actionable_error[business_schedule]
+FAILED tests/test_calendar.py::test_legacy_custom_key_even_null_is_an_actionable_error[expected_at]
+FAILED tests/test_calendar.py::test_legacy_custom_key_even_null_is_an_actionable_error[recovery_window]
+FAILED tests/test_calendar.py::test_legacy_custom_key_even_null_is_an_actionable_error[schedule_type]
+FAILED tests/test_calendar.py::test_legacy_custom_key_even_null_is_an_actionable_error[day_of_month]
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=1

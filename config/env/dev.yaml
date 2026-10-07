@@ -9,7 +9,6 @@ workspace_host: null
 # | u2m (you `databricks auth login` once, scripts/deliver_release.sh does the rest)
 # | manual (browser only: runbooks/release-delivery.md). Change via PR.
 delivery_mode: u2m
-timezone: "Asia/Bangkok"
 default_catalog: false
 cluster_policy: null
 schedules: {}

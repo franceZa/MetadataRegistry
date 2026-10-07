@@ -1,0 +1,25 @@
+$ uv run pytest tests/test_calendar.py::test_authoring_has_exact_six_keys_and_unknown_owner_nulls -q
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_authoring_has_exact_six_keys_and_unknown_owner_nulls __________
+
+    def test_authoring_has_exact_six_keys_and_unknown_owner_nulls():
+        paths = [ROOT / "DataContract/_template/contract/my_dataset.odcs.yaml"]
+        paths += sorted((ROOT / "DataContract/cc/contract").glob("*.odcs.yaml"))
+        for path in paths:
+            data = yaml.safe_load(path.read_text(encoding="utf-8"))
+            entries = data["slaProperties"]
+>           assert [p["property"] for p in entries] == list(CALENDAR_FIELDS)
+E           AssertionError: assert ['frequency', 'latency'] == ['schedule_ty...overy_window']
+E             
+E             At index 0 diff: 'frequency' != 'schedule_type'
+E             Right contains 4 more items, first extra item: 'expected_at'
+E             Use -v to get more diff
+
+tests\test_calendar.py:39: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_calendar.py::test_authoring_has_exact_six_keys_and_unknown_owner_nulls
+warning: Failed to set cwd to temp dir
+warning: Failed to set cwd to temp dir
+
+EXIT=1

@@ -1,0 +1,20 @@
+# PROPOSED (D-CS-8/9, user 2026-10-06): slaProperties บอกแค่ "mode" — ไม่มีรายการวันที่ hard code
+# Medallion (runtime) เป็นคนคำนวณ expected date เอง จาก mode + ปฏิทินวันหยุดของ Medallion
+# PoC ใช้เวลาประเทศไทยเท่านั้น -> ไม่มี timezone ใน contract/config (เวลาทั้งหมดเป็นเวลาไทย)
+# status และ *_seconds ไม่ต้องเขียน — generator คำนวณเอง
+# ค่าที่ไม่รู้ให้ใส่ null -> compile ได้ calendar.status = PENDING_OWNER (ไม่ fail)
+slaProperties:
+  - property: schedule_type
+    value: null                  # daily | workday | workday_excluding_holidays | monthly
+  - property: day_of_month
+    value: null                  # ใช้เฉพาะ schedule_type = monthly: วันที่ 1–31 (null ถ้าไม่ใช่ monthly)
+  - property: expected_at
+    value: null                  # "HH:MM" เวลาไทยที่ไฟล์ควรมาถึง เช่น "06:30"
+  - property: expected_day_offset
+    value: null                  # 0 = มาถึงวันเดียวกับ business_date, 1 = มาถึงวันถัดไป
+  - property: latency
+    value: 4                     # ไฟล์มาช้าได้เท่าไรก่อนถือว่าหาย -> missing_after_seconds
+    unit: h                      # h | d
+  - property: recovery_window
+    value: null                  # รอไฟล์ได้นานสุดก่อนหยุด poll -> recovery_window_seconds
+    unit: d                      # h | d

@@ -1,0 +1,7 @@
+$ uv run python qa-evidence/E6/T058/inspect.py sanitize
+diff-review.xml: workstation hostname omitted; measured counts unchanged
+extension.xml: workstation hostname omitted; measured counts unchanged
+targeted-final.xml: workstation hostname omitted; measured counts unchanged
+warning: Failed to set cwd to temp dir
+
+EXIT=0

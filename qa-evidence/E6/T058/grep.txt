@@ -1,0 +1,7 @@
+$ grep -rn frequency\|timezone\|holidays\|explicit_dates DataContract config/env
+DataContract/cc/contract/credit_card.odcs.yaml:37:    value: null       # daily | workday | workday_excluding_holidays | monthly
+DataContract/cc/contract/credit_card_txn.odcs.yaml:36:    value: null       # daily | workday | workday_excluding_holidays | monthly
+DataContract/cc/contract/customer.odcs.yaml:43:    value: null       # daily | workday | workday_excluding_holidays | monthly
+DataContract/_template/contract/my_dataset.odcs.yaml:43:    value: null       # daily | workday | workday_excluding_holidays | monthly
+
+EXIT=0

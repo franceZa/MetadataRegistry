@@ -226,8 +226,8 @@ def diff_contracts(
 
         # FR-M.11 (P1): calendar changes (status/schedule/latency/recovery_window) -- also
         # "ต้อง review", not breaking (AS-30/FR-M.4 already handle missing-vs-wrong at validate).
-        cur_calendar = compiled_calendar(cur)
-        base_calendar = compiled_calendar(base)
+        cur_calendar, _, _ = compiled_calendar(cur)
+        base_calendar, _, _ = compiled_calendar(base)
         if cur_calendar != base_calendar:
             changes.append(
                 ChangeRecord(

@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.066" timestamp="2026-10-06T21:25:38.231436+07:00"><testcase classname="tests.test_diff" name="test_fr_m11_calendar_change_is_review_not_breaking" time="0.001" /></testsuite></testsuites>

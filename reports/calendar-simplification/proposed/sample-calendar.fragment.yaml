@@ -1,0 +1,16 @@
+# SAMPLE fixture — NOT owner approval or production values.
+# This fragment is for AC-60/62 migration tests, not current parser execution.
+# It needs the coordinated FR-N source-reader before compile.
+customProperties:
+  - property: calendar
+    value:
+      frequency: daily
+      schedule_type: daily
+      timezone: Sample/OwnerMustReplace
+      expected_at: "06:30"
+      expected_day_offset: 1
+      effective_from: "2026-01-01"
+      latency: {value: 4, unit: h}
+      recovery_window: {value: 2, unit: d}
+# No status or derived seconds authored; effective_to/optional lists omitted.
+# Static timezone is nonempty-string only; SAMPLE name must not be used for runtime.
